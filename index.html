@@ -1,0 +1,3444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetOps Toolkit — By M Kamjo</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;900&display=swap"
+    rel="stylesheet">
+  <script>
+    // Fire fullscreen IMMEDIATELY — before any paint, before splash renders
+    // Browsers require a user-gesture for requestFullscreen, but on file:// open
+    // we use the earliest possible moment and retry on first interaction.
+    (function () {
+      function goFS() {
+        var el = document.documentElement;
+        try {
+          if (el.requestFullscreen) el.requestFullscreen();
+          else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+          else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+          else if (el.msRequestFullscreen) el.msRequestFullscreen();
+        } catch (e) { }
+      }
+      // Attempt 1: immediately (works in some browsers/contexts)
+      goFS();
+      // Attempt 2: on DOMContentLoaded (before paint)
+      document.addEventListener('DOMContentLoaded', goFS);
+      // Attempt 3: on very first user interaction (guaranteed to work — catches cases
+      // where browser blocks autoFS — triggers before splash button is visible)
+      var triggered = false;
+      function onFirstInteraction() {
+        if (triggered) return;
+        triggered = true;
+        goFS();
+        document.removeEventListener('click', onFirstInteraction, true);
+        document.removeEventListener('keydown', onFirstInteraction, true);
+        document.removeEventListener('mousedown', onFirstInteraction, true);
+        document.removeEventListener('touchstart', onFirstInteraction, true);
+      }
+      document.addEventListener('click', onFirstInteraction, true);
+      document.addEventListener('keydown', onFirstInteraction, true);
+      document.addEventListener('mousedown', onFirstInteraction, true);
+      document.addEventListener('touchstart', onFirstInteraction, true);
+    })();
+  </script>
+  <style>
+    :root {
+      --bg: #080c10;
+      --bg2: #0d1117;
+      --bg3: #0a1018;
+      --panel: #0f1923;
+      --panel2: #152030;
+      --border: #1e3448;
+      --accent: #00c8ff;
+      --accent2: #00ff9d;
+      --accent3: #ff4f6e;
+      --accent4: #ffb800;
+      --text: #c8dce8;
+      --text2: #6a8fa8;
+      --text3: #2e4a62;
+      --mono: 'Share Tech Mono', monospace;
+      --sans: 'Exo 2', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(0, 200, 255, 0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 200, 255, 0.022) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── TOPBAR ── */
+    #topbar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(8, 12, 16, 0.98);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 50px;
+      width: 100%;
+    }
+
+    .logo {
+      font-family: var(--mono);
+      font-size: 0.95rem;
+      color: var(--accent);
+      letter-spacing: 3px;
+      text-shadow: 0 0 12px rgba(0, 200, 255, 0.45);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .logo span {
+      color: var(--accent2);
+    }
+
+    .ip-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text2);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 3px 10px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent2);
+      box-shadow: 0 0 5px var(--accent2);
+      animation: blink 2s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.15
+      }
+    }
+
+    .ip-val {
+      color: var(--accent);
+    }
+
+    .wm {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--text3);
+      letter-spacing: 1.5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      border-left: 1px solid var(--border);
+      padding-left: 12px;
+    }
+
+    .wm em {
+      color: var(--accent2);
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    #power-btn {
+      margin-left: auto;
+      background: transparent;
+      border: 1px solid rgba(255, 79, 110, 0.35);
+      border-radius: 4px;
+      color: rgba(255, 79, 110, 0.6);
+      font-size: 1rem;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #power-btn:hover {
+      background: rgba(255, 79, 110, 0.12);
+      border-color: var(--accent3);
+      color: var(--accent3);
+      box-shadow: 0 0 12px rgba(255, 79, 110, 0.2);
+    }
+
+    /* ── NAV — fixed width, arrows to scroll ── */
+    #nav-wrap {
+      position: sticky;
+      top: 50px;
+      z-index: 199;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    .nav-arrow {
+      width: 28px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg2);
+      border: none;
+      color: var(--text3);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: color 0.15s;
+      user-select: none;
+    }
+
+    .nav-arrow:hover {
+      color: var(--accent);
+    }
+
+    #nav {
+      display: flex;
+      gap: 0;
+      flex: 1;
+      overflow: hidden;
+      /* NO scroll, hidden — scrolled via JS */
+      padding: 6px 0 0;
+    }
+
+    .tab {
+      padding: 6px 12px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text3);
+      cursor: pointer;
+      border-radius: 3px 3px 0 0;
+      border: 1px solid transparent;
+      border-bottom: none;
+      white-space: nowrap;
+      transition: all 0.12s;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .tab:hover {
+      color: var(--text2);
+      background: rgba(15, 25, 35, 0.7);
+    }
+
+    .tab.active {
+      color: var(--accent);
+      background: var(--panel);
+      border-color: var(--border);
+      border-bottom: 2px solid var(--panel);
+      margin-bottom: -1px;
+      text-shadow: 0 0 8px rgba(0, 200, 255, 0.35);
+    }
+
+    /* ── MAIN ── */
+    #main {
+      padding: 16px 18px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section {
+      display: none;
+      animation: fadein 0.15s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadein {
+      from {
+        opacity: 0;
+        transform: translateY(4px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .g2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+    }
+
+    .g3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 13px;
+    }
+
+    @media(max-width:820px) {
+
+      .g2,
+      .g3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── PANEL ── */
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 16px;
+      margin-bottom: 13px;
+    }
+
+    .pt {
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 11px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .pt::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 11px;
+      background: var(--accent);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .note {
+      font-size: 0.72rem;
+      color: var(--text3);
+      margin-bottom: 9px;
+      line-height: 1.55;
+    }
+
+    /* ── INPUTS ── */
+    input[type=text],
+    input[type=password],
+    textarea,
+    select {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      padding: 8px 11px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(0, 200, 255, 0.07);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    select option {
+      background: var(--bg3);
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: 1px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      font-family: var(--sans);
+      font-size: 0.73rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn:hover {
+      background: rgba(0, 200, 255, 0.08);
+    }
+
+    .btn.g {
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    .btn.g:hover {
+      background: rgba(0, 255, 157, 0.08);
+    }
+
+    .btn.r {
+      border-color: var(--accent3);
+      color: var(--accent3);
+    }
+
+    .btn.r:hover {
+      background: rgba(255, 79, 110, 0.08);
+    }
+
+    .btn.y {
+      border-color: var(--accent4);
+      color: var(--accent4);
+    }
+
+    .btn.y:hover {
+      background: rgba(255, 184, 0, 0.08);
+    }
+
+    .btn.sm {
+      padding: 5px 11px;
+      font-size: 0.67rem;
+    }
+
+    /* ── RESULT BOX ── */
+    .rbox {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 12px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      margin-top: 9px;
+      word-break: break-word;
+      white-space: pre-wrap;
+      display: none;
+    }
+
+    .ok {
+      color: var(--accent2);
+    }
+
+    .warn {
+      color: var(--accent4);
+    }
+
+    .err {
+      color: var(--accent3);
+    }
+
+    .k {
+      color: var(--accent);
+    }
+
+    .v {
+      color: var(--text);
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── CMD BOX ── */
+    .cbox {
+      background: #03080d;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 11px 70px 11px 13px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--accent2);
+      word-break: break-all;
+      white-space: pre-wrap;
+      position: relative;
+      min-height: 40px;
+    }
+
+    .cbtn {
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      font-size: 0.63rem;
+      padding: 3px 9px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: var(--sans);
+      font-weight: 600;
+      transition: all 0.12s;
+    }
+
+    .cbtn:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* ── LAYOUT HELPERS ── */
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .row>input,
+    .row>select {
+      flex: 1;
+      min-width: 110px;
+    }
+
+    .mt8 {
+      margin-top: 8px;
+    }
+
+    .mt12 {
+      margin-top: 12px;
+    }
+
+    .mb8 {
+      margin-bottom: 8px;
+    }
+
+    .mb4 {
+      margin-bottom: 4px;
+    }
+
+    .lbl {
+      font-size: 0.64rem;
+      color: var(--text3);
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
+    }
+
+    /* ── INFO GRID (dashboard) ── */
+    .igrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-top: 8px;
+    }
+
+    .iitem {
+      background: var(--bg3);
+      padding: 8px 11px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .il {
+      font-size: 0.6rem;
+      color: var(--text3);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .iv {
+      font-family: var(--mono);
+      color: var(--accent2);
+      font-size: 0.82rem;
+    }
+
+    /* ── BADGES ── */
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 3px;
+      font-size: 0.63rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .bs {
+      background: rgba(0, 255, 157, 0.1);
+      color: var(--accent2);
+      border: 1px solid rgba(0, 255, 157, 0.22);
+    }
+
+    .bd {
+      background: rgba(255, 79, 110, 0.1);
+      color: var(--accent3);
+      border: 1px solid rgba(255, 79, 110, 0.22);
+    }
+
+    .bw {
+      background: rgba(255, 184, 0, 0.1);
+      color: var(--accent4);
+      border: 1px solid rgba(255, 184, 0, 0.22);
+    }
+
+    .bi {
+      background: rgba(0, 200, 255, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(0, 200, 255, 0.22);
+    }
+
+    /* ── WIN BUTTONS ── */
+    .wgrid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .wbtn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 13px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text2);
+      font-size: 0.73rem;
+      cursor: pointer;
+      transition: all 0.13s;
+      text-decoration: none;
+      font-family: var(--sans);
+      font-weight: 600;
+    }
+
+    .wbtn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0, 200, 255, 0.04);
+    }
+
+    /* ── TAGS ── */
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 7px;
+    }
+
+    .tag {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 4px 9px;
+      font-family: var(--mono);
+      font-size: 0.71rem;
+      color: var(--text2);
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .tag:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── EXTRACT ── */
+    .ex-sec {
+      margin-bottom: 10px;
+    }
+
+    .ex-sec h4 {
+      font-size: 0.63rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 5px;
+    }
+
+    .ex-item {
+      display: inline-block;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 2px 8px;
+      font-family: var(--mono);
+      font-size: 0.73rem;
+      color: var(--text);
+      margin: 2px;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .ex-item:hover {
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    /* ── VAULT SEARCH ── */
+    .vmatch {
+      background: var(--bg3);
+      border-left: 3px solid var(--accent);
+      padding: 8px 12px;
+      margin: 4px 0;
+      border-radius: 0 4px 4px 0;
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      line-height: 1.65;
+    }
+
+    .vln {
+      color: var(--text3);
+      margin-right: 7px;
+    }
+
+    .mh {
+      color: var(--accent);
+      font-weight: bold;
+      background: rgba(0, 200, 255, 0.12);
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    /* ── PORT TABLE ── */
+    .ptbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.76rem;
+      font-family: var(--mono);
+    }
+
+    .ptbl th {
+      color: var(--accent);
+      text-align: left;
+      padding: 6px 9px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.64rem;
+      letter-spacing: 1px;
+    }
+
+    .ptbl td {
+      padding: 5px 9px;
+      border-bottom: 1px solid rgba(30, 52, 72, 0.35);
+      color: var(--text2);
+    }
+
+    .ptbl tr:hover td {
+      background: rgba(0, 200, 255, 0.03);
+      color: var(--text);
+    }
+
+    .pnum {
+      color: var(--accent4) !important;
+    }
+
+    /* ── EMAIL HDR TABLE ── */
+    .htbl {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .htbl td {
+      padding: 5px 9px;
+      border-bottom: 1px solid rgba(30, 52, 72, 0.35);
+      font-size: 0.74rem;
+      vertical-align: top;
+    }
+
+    .htbl td:first-child {
+      color: var(--accent);
+      font-family: var(--mono);
+      width: 130px;
+      white-space: nowrap;
+    }
+
+    .htbl td:last-child {
+      color: var(--text2);
+      font-family: var(--mono);
+      word-break: break-all;
+    }
+
+    /* ── SUBNET RESULTS ── */
+    .sgrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-top: 9px;
+    }
+
+    .sitem {
+      background: var(--bg3);
+      padding: 8px 11px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .sl {
+      font-size: 0.59rem;
+      color: var(--text3);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .sv {
+      font-family: var(--mono);
+      color: var(--accent2);
+      font-size: 0.82rem;
+    }
+
+    /* ── PASSWORD METER ── */
+    .pwm {
+      height: 3px;
+      border-radius: 2px;
+      margin-top: 8px;
+      background: var(--border);
+      overflow: hidden;
+    }
+
+    .pwmf {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s, background 0.3s;
+      width: 0;
+    }
+
+    /* ── TOGGLES ── */
+    .trow {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin: 4px 0;
+    }
+
+    .trow label {
+      font-size: 0.76rem;
+      color: var(--text2);
+      cursor: pointer;
+    }
+
+    input[type=checkbox] {
+      accent-color: var(--accent);
+      width: 13px;
+      height: 13px;
+      cursor: pointer;
+    }
+
+    /* ── SPINNER ── */
+    .spin {
+      display: inline-block;
+      animation: sp 0.7s linear infinite;
+    }
+
+    @keyframes sp {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      z-index: 9999;
+      background: var(--panel2);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      padding: 8px 16px;
+      border-radius: 4px;
+      transform: translateY(14px);
+      opacity: 0;
+      transition: all 0.22s;
+      pointer-events: none;
+      max-width: 300px;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ── RADAR ── */
+    #radar-wrap {
+      position: fixed;
+      bottom: 52px;
+      right: 18px;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    #radar-canvas {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      box-shadow: 0 0 18px rgba(0, 255, 120, 0.18), 0 0 40px rgba(0, 255, 120, 0.07);
+    }
+
+
+    /* ── WATERMARK ASCII ── */
+    #watermark {
+      display: none !important;
+      position: fixed;
+      bottom: 46px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 50;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    #wm-ascii {
+      font-family: var(--mono);
+      font-size: 0.38rem;
+      line-height: 1.3;
+      color: rgba(0, 200, 255, 0.13);
+      letter-spacing: 0.5px;
+      white-space: pre;
+      text-align: center;
+    }
+
+    #wm-text {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      color: rgba(0, 200, 255, 0.22);
+      letter-spacing: 3px;
+      text-align: center;
+    }
+
+
+    /* ══════════════ SPLASH SCREEN ══════════════ */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    #splash-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #splash-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+    }
+
+    #splash-logo {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      color: #00ff9d;
+      text-shadow: 0 0 40px rgba(0, 255, 157, 0.7), 0 0 80px rgba(0, 255, 157, 0.3), 0 0 2px #fff;
+      animation: logoGlow 2s ease-in-out infinite alternate;
+      line-height: 1;
+    }
+
+    #splash-logo .sub {
+      display: block;
+      font-size: clamp(0.9rem, 2.5vw, 1.4rem);
+      letter-spacing: 0.5em;
+      color: rgba(0, 200, 255, 0.7);
+      text-shadow: 0 0 20px rgba(0, 200, 255, 0.4);
+      margin-top: 8px;
+      animation: none;
+    }
+
+    @keyframes logoGlow {
+      from {
+        text-shadow: 0 0 30px rgba(0, 255, 157, 0.6), 0 0 60px rgba(0, 255, 157, 0.2);
+      }
+
+      to {
+        text-shadow: 0 0 60px rgba(0, 255, 157, 1), 0 0 120px rgba(0, 255, 157, 0.5), 0 0 4px #fff;
+      }
+    }
+
+    #splash-credits {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      color: rgba(0, 200, 255, 0.3);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    #splash-launch {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #000;
+      background: linear-gradient(135deg, #00ff9d, #00c8ff);
+      border: none;
+      border-radius: 5px;
+      padding: 14px 48px;
+      cursor: pointer;
+      font-weight: 700;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 0 30px rgba(0, 255, 157, 0.4);
+    }
+
+    #splash-launch:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 50px rgba(0, 255, 157, 0.7), 0 0 20px rgba(0, 200, 255, 0.5);
+    }
+
+    #splash-launch::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+      transform: translateX(-100%);
+      animation: shimmer 2.5s infinite;
+    }
+
+    @keyframes shimmer {
+      to {
+        transform: translateX(100%);
+      }
+    }
+
+    #splash.hidden {
+      animation: splashOut 0.6s forwards;
+    }
+
+    @keyframes splashOut {
+      to {
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+
+    /* ══════════════ TASKBAR (bottom) ══════════════ */
+    #taskbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 500;
+      height: 38px;
+      background: rgba(6, 10, 14, 0.97);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(0, 200, 255, 0.12);
+      display: flex;
+      align-items: center;
+      padding: 0;
+      transition: box-shadow 0.35s, border-top-color 0.35s, background 0.35s;
+    }
+
+    #taskbar:hover {
+      box-shadow: 0 -4px 22px rgba(0, 255, 157, 0.14), 0 -1px 8px rgba(0, 255, 157, 0.08);
+      border-top-color: rgba(0, 255, 157, 0.28);
+      background: rgba(6, 12, 10, 0.98);
+    }
+
+    #tb-start {
+      width: 52px;
+      height: 38px;
+      flex-shrink: 0;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid rgba(0, 200, 255, 0.08);
+      transition: background 0.15s;
+      position: relative;
+    }
+
+    #tb-start:hover {
+      background: rgba(0, 255, 157, 0.08);
+    }
+
+    #win-logo rect {
+      transition: fill 0.2s;
+    }
+
+    #tb-start:hover #win-logo rect {
+      fill: rgba(0, 255, 157, 1);
+    }
+
+    #tb-center {
+      flex: 1;
+    }
+
+    #tb-right {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      height: 100%;
+      border-left: 1px solid rgba(0, 200, 255, 0.08);
+    }
+
+    .tb-info {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0 10px;
+      height: 100%;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem;
+      color: rgba(0, 200, 255, 0.55);
+      border-left: 1px solid rgba(0, 200, 255, 0.06);
+      cursor: default;
+      transition: background 0.12s;
+      white-space: nowrap;
+    }
+
+    .tb-info:hover {
+      background: rgba(0, 200, 255, 0.05);
+      color: rgba(0, 200, 255, 0.85);
+    }
+
+    .tb-net-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .tb-net-dot.online {
+      background: #00ff9d;
+      box-shadow: 0 0 6px rgba(0, 255, 157, 0.7);
+    }
+
+    .tb-net-dot.offline {
+      background: #ff4f6e;
+      box-shadow: 0 0 6px rgba(255, 79, 110, 0.7);
+    }
+
+    #tb-datetime {
+      flex-direction: column;
+      gap: 1px;
+      padding: 0 14px;
+    }
+
+    #tb-time {
+      font-size: 0.78rem;
+      color: rgba(0, 200, 255, 0.8);
+      font-weight: 700;
+    }
+
+    #tb-date {
+      font-size: 0.58rem;
+      color: rgba(0, 200, 255, 0.4);
+    }
+
+    /* Start menu popup */
+    #start-menu {
+      position: fixed;
+      bottom: 42px;
+      left: 4px;
+      z-index: 600;
+      width: 240px;
+      background: rgba(8, 12, 16, 0.97);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 255, 157, 0.2);
+      border-radius: 8px 8px 0 0;
+      padding: 12px 0 8px;
+      display: none;
+      box-shadow: 0 -4px 40px rgba(0, 255, 157, 0.08);
+      animation: menuUp 0.18s ease;
+    }
+
+    @keyframes menuUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    #start-menu.open {
+      display: block;
+    }
+
+    .sm-header {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      color: rgba(0, 255, 157, 0.4);
+      letter-spacing: 2px;
+      padding: 0 14px 8px;
+      border-bottom: 1px solid rgba(0, 200, 255, 0.08);
+      margin-bottom: 6px;
+    }
+
+    .sm-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      font-family: 'Exo 2', sans-serif;
+      font-size: 0.78rem;
+      color: rgba(0, 200, 255, 0.6);
+      cursor: pointer;
+      transition: all 0.12s;
+      text-decoration: none;
+    }
+
+    .sm-item:hover {
+      background: rgba(0, 200, 255, 0.07);
+      color: rgba(0, 200, 255, 0.95);
+    }
+
+    .sm-icon {
+      font-size: 1rem;
+      width: 22px;
+      text-align: center;
+    }
+
+
+    /* ══════════════ LOCK SCREEN ══════════════ */
+    #lockscreen {
+      position: fixed;
+      inset: 0;
+      z-index: 8000;
+      background: #000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    #lockscreen.active {
+      display: flex;
+    }
+
+    #lock-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #lock-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    #lock-icon {
+      font-size: 3rem;
+      filter: drop-shadow(0 0 18px rgba(0, 255, 157, 0.5));
+      animation: lockPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes lockPulse {
+
+      0%,
+      100% {
+        filter: drop-shadow(0 0 10px rgba(0, 255, 157, 0.3))
+      }
+
+      50% {
+        filter: drop-shadow(0 0 28px rgba(0, 255, 157, 0.8))
+      }
+    }
+
+    #lock-time {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(2.5rem, 7vw, 4.5rem);
+      color: rgba(0, 255, 157, 0.85);
+      letter-spacing: 4px;
+      text-shadow: 0 0 30px rgba(0, 255, 157, 0.3);
+    }
+
+    #lock-date-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      color: rgba(0, 200, 255, 0.45);
+      letter-spacing: 3px;
+    }
+
+    #lock-pin-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0, 10, 6, 0.7);
+      border: 1px solid rgba(0, 255, 157, 0.15);
+      border-radius: 8px;
+      padding: 20px 32px;
+    }
+
+    #lock-pin-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      color: rgba(0, 200, 255, 0.4);
+      letter-spacing: 2px;
+    }
+
+    #lock-dots {
+      display: flex;
+      gap: 10px;
+      margin: 8px 0;
+    }
+
+    .ldot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0, 255, 157, 0.4);
+      background: transparent;
+      transition: all 0.15s;
+    }
+
+    .ldot.filled {
+      background: rgba(0, 255, 157, 0.8);
+      border-color: rgba(0, 255, 157, 0.8);
+      box-shadow: 0 0 8px rgba(0, 255, 157, 0.5);
+    }
+
+    #lock-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.2rem;
+      color: transparent;
+      caret-color: transparent;
+      width: 80px;
+      text-align: center;
+      letter-spacing: 8px;
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #lock-numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 52px);
+      gap: 7px;
+    }
+
+    .lkey {
+      width: 52px;
+      height: 42px;
+      background: rgba(0, 20, 12, 0.8);
+      border: 1px solid rgba(0, 255, 157, 0.18);
+      border-radius: 5px;
+      color: rgba(0, 255, 157, 0.7);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .lkey:hover {
+      background: rgba(0, 255, 157, 0.12);
+      border-color: rgba(0, 255, 157, 0.45);
+      color: #00ff9d;
+    }
+
+    .lkey:active {
+      transform: scale(0.93);
+    }
+
+    #lock-err {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      color: rgba(255, 79, 110, 0.8);
+      min-height: 1em;
+      letter-spacing: 1px;
+    }
+
+    #lock-btn {
+      position: fixed;
+      bottom: 48px;
+      right: 120px;
+      z-index: 501;
+      background: transparent;
+      border: 1px solid rgba(0, 255, 157, 0.25);
+      border-radius: 4px;
+      width: 32px;
+      height: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(0, 255, 157, 0.5);
+      font-size: 0.9rem;
+      transition: all 0.15s;
+    }
+
+    #lock-btn:hover {
+      border-color: rgba(0, 255, 157, 0.6);
+      color: rgba(0, 255, 157, 0.9);
+      background: rgba(0, 255, 157, 0.06);
+    }
+
+    /* Push main content up to clear taskbar */
+    #main {
+      padding-bottom: 60px !important;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg2);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    /* ── TAB CANVAS ANIMATIONS ── */
+    #tab-anim-wrap {
+      position: fixed;
+      bottom: 148px;
+      right: 18px;
+      z-index: 49;
+      pointer-events: none;
+    }
+
+    #tab-anim-canvas {
+      display: block;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="toast"></div>
+
+  <!-- ════════════════ SPLASH SCREEN ════════════════ -->
+  <div id="splash">
+    <canvas id="splash-canvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+    <div id="splash-content">
+      <div id="splash-logo">
+        NETOPS
+        <span class="sub">NETWORK SUPPORT TOOLKIT</span>
+      </div>
+      <button id="splash-launch" onclick="launchApp()">▶ LAUNCH</button>
+      <div id="splash-credits">NetOps Toolkit &nbsp;·&nbsp; v3.0</div>
+    </div>
+  </div>
+
+  <!-- ════════════════ TASKBAR ════════════════ -->
+  <div id="taskbar">
+    <button id="tb-start" onclick="toggleStartMenu()" title="Start Menu">
+      <svg id="win-logo" width="22" height="22" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+        <!-- Windows 8 / Metro style logo -->
+        <rect x="0" y="0" width="10" height="10" rx="1" fill="rgba(0,255,157,0.75)" />
+        <rect x="12" y="0" width="10" height="10" rx="1" fill="rgba(0,255,157,0.65)" />
+        <rect x="0" y="12" width="10" height="10" rx="1" fill="rgba(0,255,157,0.65)" />
+        <rect x="12" y="12" width="10" height="10" rx="1" fill="rgba(0,255,157,0.55)" />
+      </svg>
+    </button>
+    <div id="tb-center"></div>
+    <div id="tb-right">
+      <div class="tb-info" id="tb-net" title="Network Status">
+        <div class="tb-net-dot" id="tb-net-dot"></div>
+        <span id="tb-net-label">Checking…</span>
+      </div>
+      <div class="tb-info" id="tb-datetime">
+        <div id="tb-time">00:00</div>
+        <div id="tb-date">---</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- START MENU -->
+  <div id="start-menu">
+    <div class="sm-header">QUICK LAUNCH</div>
+    <a class="sm-item" href="ms-settings:network"><span class="sm-icon">🌐</span>Network Settings</a>
+    <a class="sm-item" href="ms-settings:network-wifi"><span class="sm-icon">📶</span>Wi-Fi</a>
+    <a class="sm-item" href="ms-settings:network-ethernet"><span class="sm-icon">🔌</span>Ethernet</a>
+    <a class="sm-item" href="ms-settings:windowsdefender"><span class="sm-icon">🛡️</span>Firewall</a>
+    <span class="sm-item" onclick="cpToast('ncpa.cpl')"><span class="sm-icon">⚙️</span>ncpa.cpl (Adapters)</span>
+    <span class="sm-item" onclick="cpToast('services.msc')"><span class="sm-icon">⚙️</span>services.msc</span>
+    <span class="sm-item" onclick="cpToast('eventvwr.msc')"><span class="sm-icon">📋</span>eventvwr.msc</span>
+    <span class="sm-item" onclick="cpToast('devmgmt.msc')"><span class="sm-icon">🔧</span>Device Manager</span>
+  </div>
+
+
+
+  <!-- ════════════════ LOCK SCREEN ════════════════ -->
+  <div id="lockscreen">
+    <canvas id="lock-canvas"></canvas>
+    <div id="lock-content">
+      <div id="lock-icon">🔒</div>
+      <div id="lock-time">00:00</div>
+      <div id="lock-date-lbl" id="lock-date-lbl">---</div>
+      <div id="lock-pin-wrap">
+        <div id="lock-pin-lbl">ENTER PIN TO UNLOCK</div>
+        <div id="lock-dots">
+          <div class="ldot" id="ld0"></div>
+          <div class="ldot" id="ld1"></div>
+          <div class="ldot" id="ld2"></div>
+          <div class="ldot" id="ld3"></div>
+        </div>
+        <div id="lock-numpad">
+          <button class="lkey" onclick="lockKey('1')">1</button>
+          <button class="lkey" onclick="lockKey('2')">2</button>
+          <button class="lkey" onclick="lockKey('3')">3</button>
+          <button class="lkey" onclick="lockKey('4')">4</button>
+          <button class="lkey" onclick="lockKey('5')">5</button>
+          <button class="lkey" onclick="lockKey('6')">6</button>
+          <button class="lkey" onclick="lockKey('7')">7</button>
+          <button class="lkey" onclick="lockKey('8')">8</button>
+          <button class="lkey" onclick="lockKey('9')">9</button>
+          <button class="lkey" onclick="lockKey('back')" style="font-size:0.8rem">⌫</button>
+          <button class="lkey" onclick="lockKey('0')">0</button>
+          <button class="lkey" onclick="lockKey('0')" style="opacity:0;pointer-events:none"></button>
+        </div>
+        <div id="lock-err"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lock button in taskbar -->
+  <button id="lock-btn" onclick="lockScreen()" title="Lock Screen">🔒</button>
+
+  <!-- RADAR bottom-right -->
+  <div id="radar-wrap">
+    <canvas id="radar-canvas" width="90" height="90"></canvas>
+  </div>
+
+  <!-- TAB MINI CANVAS ANIM -->
+  <div id="tab-anim-wrap">
+    <canvas id="tab-anim-canvas" width="90" height="60"></canvas>
+  </div>
+
+
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="logo">NET<span>OPS</span> ▸</div>
+    <div class="ip-badge"><span class="dot"></span>PUB: <span class="ip-val" id="pub-ip">…</span></div>
+    <div class="ip-badge">LAN: <span class="ip-val" id="loc-ip">…</span></div>
+    <div class="ip-badge" id="tb-isp-wrap" style="display:none">ISP: <span class="ip-val" id="tb-isp">…</span></div>
+    <div class="ip-badge" id="tb-loc-wrap" style="display:none">LOC: <span class="ip-val" id="tb-loc">…</span></div>
+    <div class="ip-badge" id="tb-asn-wrap" style="display:none">ASN: <span class="ip-val" id="tb-asn">…</span></div>
+    <div class="ip-badge" id="tb-tz-wrap" style="display:none">TZ: <span class="ip-val" id="tb-tz">…</span></div>
+    <button id="power-btn" onclick="if(confirm('Close NetOps Toolkit?'))window.close()" title="Close Tool">⏻</button>
+  </div>
+
+  <!-- NAV with scroll arrows -->
+  <div id="nav-wrap">
+    <button class="nav-arrow" id="nav-left" onclick="navScroll(-1)">&#8249;</button>
+    <div id="nav">
+      <div class="tab active" data-sec="dashboard">📡 Dashboard</div>
+      <div class="tab" data-sec="vault">🔐 Vault</div>
+      <div class="tab" data-sec="urlcheck">🔗 URL Check</div>
+      <div class="tab" data-sec="iplookup">🌍 IP Lookup</div>
+      <div class="tab" data-sec="dns">🌐 DNS</div>
+      <div class="tab" data-sec="emailhdr">📧 Email Hdrs</div>
+      <div class="tab" data-sec="subnet">🧮 Subnet</div>
+      <div class="tab" data-sec="ports">📊 Ports</div>
+      <div class="tab" data-sec="mac">🔌 MAC</div>
+      <div class="tab" data-sec="extract">🧹 Extractor</div>
+      <div class="tab" data-sec="netsh">⚙️ Netsh</div>
+      <div class="tab" data-sec="encoder">📦 Encoder</div>
+      <div class="tab" data-sec="passcheck">🔑 Password</div>
+      <div class="tab" data-sec="iprange">📡 IP Range</div>
+      <div class="tab" data-sec="notes">📝 Notes</div>
+      <div class="tab" data-sec="winlinks">🖥️ Windows</div>
+    </div>
+    <button class="nav-arrow" id="nav-right" onclick="navScroll(1)">&#8250;</button>
+  </div>
+
+  <div id="main">
+
+    <!-- ══════════════════════════ DASHBOARD ══════════════════════════ -->
+    <div id="sec-dashboard" class="section active">
+      <div class="g2">
+        <div class="panel">
+          <div class="pt">Network Identity</div>
+          <div class="igrid">
+            <div class="iitem">
+              <div class="il">Public IP</div>
+              <div class="iv" id="d-pub">…</div>
+            </div>
+            <div class="iitem">
+              <div class="il">Local IP</div>
+              <div class="iv" id="d-lan">…</div>
+            </div>
+            <div class="iitem">
+              <div class="il">ISP</div>
+              <div class="iv" id="d-isp">…</div>
+            </div>
+            <div class="iitem">
+              <div class="il">Location</div>
+              <div class="iv" id="d-loc">…</div>
+            </div>
+            <div class="iitem">
+              <div class="il">ASN</div>
+              <div class="iv" id="d-asn">…</div>
+            </div>
+            <div class="iitem">
+              <div class="il">Timezone</div>
+              <div class="iv" id="d-tz">…</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="pt">Quick Windows Actions</div>
+          <div class="wgrid">
+            <a class="wbtn" href="ms-settings:network">🌐 Network</a>
+            <a class="wbtn" href="ms-settings:network-ethernet">🔌 Ethernet</a>
+            <a class="wbtn" href="ms-settings:network-wifi">📶 Wi-Fi</a>
+            <a class="wbtn" href="ms-settings:network-vpn">🔒 VPN</a>
+            <a class="wbtn" href="ms-settings:windowsdefender">🛡️ Firewall</a>
+            <a class="wbtn" href="ms-settings:network-proxy">🔀 Proxy</a>
+            <span class="wbtn" onclick="cpToast('ncpa.cpl')">⚙️ ncpa.cpl</span>
+            <span class="wbtn" onclick="cpToast('ipconfig /all')">💻 ipconfig</span>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="pt">Quick Check — IP Info or URL Threat</div>
+        <div class="row">
+          <input type="text" id="q-in" placeholder="Enter an IP address or URL…"
+            onkeydown="if(event.key==='Enter')quickCheck()">
+          <button class="btn" onclick="quickCheck()">▶ Check</button>
+        </div>
+        <div class="rbox" id="q-res"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ VAULT ══════════════════════════ -->
+    <div id="sec-vault" class="section">
+      <div class="panel">
+        <div class="pt">🔐 Credential Vault — Hidden Text Storage</div>
+        <p class="note">Paste any text (credentials, configs, logs). It hides when you save. Search it below. Nothing
+          leaves your browser.</p>
+        <button class="btn sm y" id="vbtn" onclick="toggleVault()">📋 Paste / Edit Text</button>
+        <div id="veditor" style="display:none;margin-top:10px;">
+          <textarea id="vtext" style="min-height:200px;font-size:0.76rem;"
+            placeholder="Paste credentials, IP lists, config outputs, server info…"></textarea>
+          <div class="row mt8">
+            <button class="btn sm g" onclick="saveVault()">✔ Save &amp; Hide</button>
+            <button class="btn sm r" onclick="clearVault()">🗑 Clear</button>
+          </div>
+        </div>
+        <div style="margin-top:6px;font-size:0.68rem;color:var(--text3)" id="vstatus">No data loaded.</div>
+      </div>
+      <div class="panel">
+        <div class="pt">Advanced Search</div>
+        <div class="row">
+          <input type="text" id="vs-q" placeholder="Keyword, phrase or regex…"
+            onkeydown="if(event.key==='Enter')vSearch()">
+          <button class="btn" onclick="vSearch()">🔍 Search</button>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:7px;">
+          <div class="trow"><input type="checkbox" id="vs-rx"><label for="vs-rx">Regex</label></div>
+          <div class="trow"><input type="checkbox" id="vs-cs"><label for="vs-cs">Case Sensitive</label></div>
+          <div class="trow"><input type="checkbox" id="vs-ww"><label for="vs-ww">Whole Word</label></div>
+          <div class="trow"><input type="checkbox" id="vs-ctx" checked><label for="vs-ctx">Show Context</label></div>
+        </div>
+        <div style="margin-top:5px;font-size:0.68rem;color:var(--text3)" id="vs-cnt"></div>
+        <div id="vs-res" style="margin-top:9px;max-height:500px;overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ URL CHECK ══════════════════════════ -->
+    <div id="sec-urlcheck" class="section">
+      <div class="panel">
+        <div class="pt">URL / Domain Threat Intelligence</div>
+        <p class="note">Checks <b>urlscan.io</b> database (free, no key, browser-compatible). Also shows direct links to
+          VirusTotal, PhishTank, AbuseIPDB.</p>
+        <div class="row">
+          <input type="text" id="url-in" placeholder="https://suspicious-site.com or domain.com"
+            onkeydown="if(event.key==='Enter')checkURL()">
+          <button class="btn" onclick="checkURL()">🔍 Scan</button>
+        </div>
+        <div class="rbox" id="url-res"></div>
+      </div>
+      <div class="panel">
+        <div class="pt">Bulk URL Check</div>
+        <textarea id="bulk-in" style="min-height:100px;" placeholder="One URL or domain per line…"></textarea>
+        <div class="mt8"><button class="btn" onclick="bulkCheck()">🔍 Check All</button></div>
+        <div id="bulk-res" style="margin-top:10px;max-height:400px;overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ IP LOOKUP ══════════════════════════ -->
+    <div id="sec-iplookup" class="section">
+      <div class="panel">
+        <div class="pt">IP Geolocation &amp; ASN — ip-api.com (free, CORS-OK)</div>
+        <p class="note">Detects proxy/VPN/hosting/mobile flags. Leave blank to look up your own public IP.</p>
+        <div class="row">
+          <input type="text" id="ip-in" placeholder="IP address (blank = your IP)"
+            onkeydown="if(event.key==='Enter')ipLookup()">
+          <button class="btn" onclick="ipLookup()">🌍 Lookup</button>
+        </div>
+        <div class="rbox" id="ip-res"></div>
+      </div>
+      <div class="panel">
+        <div class="pt">Threat Intel Links</div>
+        <div class="row">
+          <input type="text" id="ipt-in" placeholder="IP address…" onkeydown="if(event.key==='Enter')openThreat()">
+          <button class="btn r" onclick="openThreat()">⚠️ Open Threat DBs</button>
+        </div>
+        <div class="rbox" id="ipt-res" style="display:block;color:var(--text3);">Enter an IP then click to get threat
+          intel links.</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ DNS ══════════════════════════ -->
+    <div id="sec-dns" class="section">
+      <div class="panel">
+        <div class="pt">DNS Lookup — Google DNS (browser-compatible)</div>
+        <div class="row">
+          <input type="text" id="dns-in" placeholder="domain.com" onkeydown="if(event.key==='Enter')dnsLookup()">
+          <select id="dns-type" style="width:100px;flex:none;">
+            <option>A</option>
+            <option>AAAA</option>
+            <option>MX</option>
+            <option>TXT</option>
+            <option>NS</option>
+            <option>CNAME</option>
+            <option>SOA</option>
+            <option>PTR</option>
+            <option>CAA</option>
+          </select>
+          <button class="btn" onclick="dnsLookup()">🔍 Lookup</button>
+        </div>
+        <div class="rbox" id="dns-res"></div>
+      </div>
+      <div class="g2">
+        <div class="panel">
+          <div class="pt">WHOIS / RDAP — rdap.org</div>
+          <div class="row">
+            <input type="text" id="whois-in" placeholder="domain.com" onkeydown="if(event.key==='Enter')whoisLookup()">
+            <button class="btn" onclick="whoisLookup()">📋 WHOIS</button>
+          </div>
+          <div class="rbox" id="whois-res"></div>
+        </div>
+        <div class="panel">
+          <div class="pt">SSL / Cert Check — crt.sh (always works)</div>
+          <div class="row">
+            <input type="text" id="ssl-in" placeholder="domain.com" onkeydown="if(event.key==='Enter')sslCheck()">
+            <button class="btn g" onclick="sslCheck()">🔒 Check SSL</button>
+          </div>
+          <div class="rbox" id="ssl-res"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ EMAIL HEADERS ══════════════════════════ -->
+    <div id="sec-emailhdr" class="section">
+      <div class="panel">
+        <div class="pt">Email Header Analyzer — 100% Local</div>
+        <p class="note"><b>Outlook:</b> File → Properties → Internet Headers &nbsp;|&nbsp; <b>Gmail:</b> 3-dot menu →
+          Show Original &nbsp;|&nbsp; <b>O365:</b> View Source</p>
+        <textarea id="ehdr-in" style="min-height:160px;font-size:0.74rem;"
+          placeholder="Paste complete raw email headers here…"></textarea>
+        <div class="row mt8">
+          <button class="btn" onclick="analyzeHeaders()">🔍 Analyze</button>
+          <button class="btn sm r" onclick="G('ehdr-in').value='';G('ehdr-res').innerHTML=''">🗑 Clear</button>
+        </div>
+        <div id="ehdr-res" style="margin-top:11px;"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ SUBNET ══════════════════════════ -->
+    <div id="sec-subnet" class="section">
+      <div class="panel">
+        <div class="pt">Subnet Calculator — Local</div>
+        <div class="row">
+          <input type="text" id="sub-in" placeholder="192.168.1.0/24  or  10.0.0.1/255.255.255.0"
+            onkeydown="if(event.key==='Enter')calcSubnet()">
+          <button class="btn" onclick="calcSubnet()">🧮 Calculate</button>
+        </div>
+        <div id="sub-res"></div>
+      </div>
+      <div class="panel">
+        <div class="pt">CIDR Quick Reference</div>
+        <div class="tags" id="cidr-tags"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ PORTS ══════════════════════════ -->
+    <div id="sec-ports" class="section">
+      <div class="panel">
+        <div class="pt">Port Reference — Local Database</div>
+        <input type="text" id="port-q" class="mb8" style="margin-bottom:9px;"
+          placeholder="Search port number or service name…" oninput="filterPorts()">
+        <div style="max-height:550px;overflow-y:auto;">
+          <table class="ptbl">
+            <thead>
+              <tr>
+                <th>PORT</th>
+                <th>PROTO</th>
+                <th>SERVICE</th>
+                <th>DESCRIPTION</th>
+              </tr>
+            </thead>
+            <tbody id="port-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ MAC ══════════════════════════ -->
+    <div id="sec-mac" class="section">
+      <div class="panel">
+        <div class="pt">MAC Vendor Lookup — macvendors.com</div>
+        <div class="row">
+          <input type="text" id="mac-in" placeholder="00:1A:2B:3C:4D:5E" onkeydown="if(event.key==='Enter')macLookup()">
+          <button class="btn" onclick="macLookup()">🔍 Lookup</button>
+        </div>
+        <div class="rbox" id="mac-res"></div>
+      </div>
+      <div class="panel">
+        <div class="pt">MAC Validator &amp; Formatter — Local</div>
+        <div class="row">
+          <input type="text" id="macf-in" placeholder="Any MAC format…" oninput="macFormat()">
+        </div>
+        <div class="rbox" id="macf-res"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ EXTRACTOR ══════════════════════════ -->
+    <div id="sec-extract" class="section">
+      <div class="panel">
+        <div class="pt">🧹 Auto Extractor — Local Processing</div>
+        <p class="note">Paste logs, configs, emails — auto-extracts IPs, emails, URLs, MACs, domains, hashes, ports.
+          Click any item to copy it.</p>
+        <textarea id="ext-in" style="min-height:140px;font-size:0.76rem;"
+          placeholder="Paste any text — log output, nmap results, config dumps, email bodies…"></textarea>
+        <div class="row mt8">
+          <button class="btn" onclick="extractAll()">🧹 Extract All</button>
+          <button class="btn sm r" onclick="G('ext-in').value='';G('ext-res').innerHTML=''">Clear</button>
+        </div>
+        <div id="ext-res" style="margin-top:11px;"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ NETSH ══════════════════════════ -->
+    <div id="sec-netsh" class="section">
+      <div class="panel">
+        <div class="pt">⚙️ Netsh Command Builder</div>
+        <p class="note">Generates commands — copy &amp; run in <span style="color:var(--accent4)">CMD as
+            Administrator</span>.</p>
+        <div class="g2">
+          <div>
+            <div class="lbl">INTERFACE NAME</div>
+            <input type="text" id="ns-iface" placeholder='Ethernet  or  Wi-Fi' oninput="buildNetsh()">
+          </div>
+          <div>
+            <div class="lbl">ACTION</div>
+            <select id="ns-action" onchange="buildNetsh()">
+              <option value="static">Set Static IPv4</option>
+              <option value="dhcp">Enable DHCP (auto IP)</option>
+              <option value="dns-set">Set Static DNS</option>
+              <option value="dns-dhcp">Set DNS to Auto</option>
+              <option value="flush">Flush DNS Cache</option>
+              <option value="show">Show All IP Config</option>
+              <option value="release">Release DHCP Lease</option>
+              <option value="renew">Renew DHCP Lease</option>
+              <option value="disable">Disable Adapter</option>
+              <option value="enable">Enable Adapter</option>
+              <option value="reset">Reset TCP/IP Stack</option>
+              <option value="winsock">Reset Winsock</option>
+            </select>
+          </div>
+        </div>
+        <div id="ns-extra" class="mt8"></div>
+        <div class="mt12">
+          <div class="lbl">GENERATED COMMAND</div>
+          <div class="cbox"><button class="cbtn" onclick="cpToast(G('ns-cmd').textContent)">Copy</button><span
+              id="ns-cmd">Select an action…</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="pt">Quick CMD Reference — click to copy</div>
+        <div class="tags" id="cmd-tags"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ ENCODER ══════════════════════════ -->
+    <div id="sec-encoder" class="section">
+      <div class="g2">
+        <div class="panel">
+          <div class="pt">Base64 Encode / Decode</div>
+          <textarea id="b64-in" style="min-height:75px;" placeholder="Input…"></textarea>
+          <div class="row mt8"><button class="btn sm g" onclick="b64e()">Encode</button><button class="btn sm"
+              onclick="b64d()">Decode</button><button class="btn sm r"
+              onclick="G('b64-in').value='';G('b64-out').value=''">Clear</button></div>
+          <textarea id="b64-out" readonly style="min-height:75px;margin-top:7px;"></textarea>
+        </div>
+        <div class="panel">
+          <div class="pt">URL Encode / Decode</div>
+          <textarea id="ue-in" style="min-height:75px;" placeholder="Input…"></textarea>
+          <div class="row mt8"><button class="btn sm g" onclick="ue()">Encode</button><button class="btn sm"
+              onclick="ud()">Decode</button><button class="btn sm r"
+              onclick="G('ue-in').value='';G('ue-out').value=''">Clear</button></div>
+          <textarea id="ue-out" readonly style="min-height:75px;margin-top:7px;"></textarea>
+        </div>
+        <div class="panel">
+          <div class="pt">HEX Converter</div>
+          <input type="text" id="hex-in" placeholder="Text or hex string…">
+          <div class="row mt8"><button class="btn sm g" onclick="toHex()">Text → Hex</button><button class="btn sm"
+              onclick="fromHex()">Hex → Text</button></div>
+          <div class="rbox" id="hex-out"></div>
+        </div>
+        <div class="panel">
+          <div class="pt">IP ↔ Integer</div>
+          <input type="text" id="ipi-in" placeholder="192.168.1.1  or  3232235777">
+          <div class="row mt8"><button class="btn sm g" onclick="ipToI()">IP → Int</button><button class="btn sm"
+              onclick="iToIp()">Int → IP</button></div>
+          <div class="rbox" id="ipi-out"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ PASSWORD ══════════════════════════ -->
+    <div id="sec-passcheck" class="section">
+      <div class="panel">
+        <div class="pt">Password Strength Analyzer — Local</div>
+        <p class="note">Nothing sent anywhere. Runs entirely in your browser.</p>
+        <input type="password" id="pw-in" placeholder="Type password to analyze…" oninput="checkPW()">
+        <div class="pwm mt8">
+          <div class="pwmf" id="pw-bar"></div>
+        </div>
+        <div class="rbox" id="pw-res"></div>
+      </div>
+      <div class="panel">
+        <div class="pt">Default Credential Checker — Local (25 pairs)</div>
+        <div class="row mb8">
+          <input type="text" id="dc-u" placeholder="Username">
+          <input type="text" id="dc-p" placeholder="Password">
+          <button class="btn sm" onclick="checkDC()">Check</button>
+        </div>
+        <div class="rbox" id="dc-res"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ IP RANGE ══════════════════════════ -->
+    <div id="sec-iprange" class="section">
+      <div class="g2">
+        <div class="panel">
+          <div class="pt">IP Range Generator</div>
+          <div class="lbl">START IP</div>
+          <input type="text" id="rs-in" placeholder="192.168.1.1" style="margin-bottom:8px;">
+          <div class="lbl">END IP</div>
+          <input type="text" id="re-in" placeholder="192.168.1.254">
+          <div class="row mt8">
+            <button class="btn" onclick="genRange()">Generate</button>
+            <button class="btn sm g" onclick="cpToast(G('range-res').textContent||'')">Copy All</button>
+          </div>
+          <div class="rbox" id="range-res" style="max-height:280px;overflow-y:auto;"></div>
+        </div>
+        <div class="panel">
+          <div class="pt">Ping / Tracert Builder</div>
+          <div class="lbl">TARGET</div>
+          <input type="text" id="ping-t" placeholder="IP or hostname" style="margin-bottom:8px;" oninput="genPing()">
+          <div class="g2" style="gap:7px;margin-bottom:8px;">
+            <div>
+              <div class="lbl">COUNT</div><input type="text" id="ping-c" placeholder="4" oninput="genPing()">
+            </div>
+            <div>
+              <div class="lbl">OS</div><select id="ping-os" onchange="genPing()">
+                <option value="win">Windows</option>
+                <option value="lx">Linux/Mac</option>
+              </select>
+            </div>
+          </div>
+          <div class="lbl">PING</div>
+          <div class="cbox" style="margin-bottom:7px;"><button class="cbtn"
+              onclick="cpToast(G('ping-cmd').textContent)">Copy</button><span id="ping-cmd">Enter target above…</span>
+          </div>
+          <div class="lbl">TRACERT / TRACEROUTE</div>
+          <div class="cbox"><button class="cbtn" onclick="cpToast(G('trace-cmd').textContent)">Copy</button><span
+              id="trace-cmd">Enter target above…</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ NOTES ══════════════════════════ -->
+    <div id="sec-notes" class="section">
+      <div class="panel">
+        <div class="pt">📝 Session Scratchpad — Auto-Saves</div>
+        <div class="row mb8">
+          <button class="btn sm g" onclick="saveNotes()">💾 Save</button>
+          <button class="btn sm r" onclick="clearNotes()">🗑 Clear</button>
+          <button class="btn sm" onclick="cpToast(G('notes-a').value)">📋 Copy All</button>
+          <span id="nsaved" style="font-size:0.68rem;color:var(--text3);align-self:center;"></span>
+        </div>
+        <textarea id="notes-a" style="min-height:340px;font-size:0.8rem;"
+          placeholder="Ticket notes, IPs, incident steps, credentials needed…&#10;Auto-saves to session storage on every keystroke."></textarea>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ WINDOWS ══════════════════════════ -->
+    <div id="sec-winlinks" class="section">
+      <div class="panel">
+        <div class="pt">🖥️ Windows Settings — Direct Launch</div>
+        <div class="wgrid">
+          <a class="wbtn" href="ms-settings:network">🌐 Network &amp; Internet</a>
+          <a class="wbtn" href="ms-settings:network-ethernet">🔌 Ethernet</a>
+          <a class="wbtn" href="ms-settings:network-wifi">📶 Wi-Fi</a>
+          <a class="wbtn" href="ms-settings:network-vpn">🔒 VPN</a>
+          <a class="wbtn" href="ms-settings:network-proxy">🔀 Proxy</a>
+          <a class="wbtn" href="ms-settings:windowsdefender">🛡️ Defender / Firewall</a>
+          <a class="wbtn" href="ms-settings:datausage">📊 Data Usage</a>
+          <a class="wbtn" href="ms-settings:privacy-networkdiscovery">👁️ Network Discovery</a>
+          <span class="wbtn" onclick="cpToast('ncpa.cpl')">⚙️ ncpa.cpl</span>
+          <span class="wbtn" onclick="cpToast('firewall.cpl')">🔥 firewall.cpl</span>
+          <span class="wbtn" onclick="cpToast('devmgmt.msc')">🔧 devmgmt.msc</span>
+          <span class="wbtn" onclick="cpToast('services.msc')">⚙️ services.msc</span>
+          <span class="wbtn" onclick="cpToast('eventvwr.msc')">📋 eventvwr.msc</span>
+          <span class="wbtn" onclick="cpToast('resmon.exe')">📈 resmon.exe</span>
+          <span class="wbtn" onclick="cpToast('compmgmt.msc')">🗂️ compmgmt.msc</span>
+          <span class="wbtn" onclick="cpToast('gpedit.msc')">📜 gpedit.msc</span>
+        </div>
+        <p class="note" style="margin-top:11px;">
+          <b style="color:var(--accent)">ms-settings: links</b> → click to open directly in Windows Settings.<br>
+          <b style="color:var(--accent4)">.cpl / .msc buttons</b> → copies the command. Paste in <b>Run (Win+R)</b> or
+          CMD.
+        </p>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+  <script>
+    'use strict';
+    // ── UTILS ──
+    const G = id => document.getElementById(id);
+    const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    function toast(msg, d = 2400) {
+      const t = G('toast'); t.textContent = msg; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), d);
+    }
+    function cpToast(txt) {
+      if (!txt || txt.trim() === '') return;
+      navigator.clipboard.writeText(txt).then(() => toast('✔ Copied: ' + txt.substring(0, 40))).catch(() => {
+        const el = document.createElement('textarea'); el.value = txt;
+        document.body.appendChild(el); el.select(); document.execCommand('copy');
+        document.body.removeChild(el); toast('✔ Copied!');
+      });
+    }
+    function show(id, html) { const e = G(id); e.innerHTML = html; e.style.display = 'block'; }
+    function loading(id, m = 'Working…') { show(id, `<span class="spin">⟳</span> ${m}`); }
+
+    // ── TAB NAV ──
+    document.querySelectorAll('.tab').forEach(t => {
+      t.addEventListener('click', function () {
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+        this.classList.add('active');
+        G('sec-' + this.dataset.sec).classList.add('active');
+        // scroll active tab into view
+        this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      });
+    });
+
+    // ── NAV SCROLL ARROWS ──
+    let navOffset = 0;
+    function navScroll(dir) {
+      const nav = G('nav');
+      const tabs = nav.querySelectorAll('.tab');
+      const tabW = tabs[0] ? tabs[0].offsetWidth + 1 : 120;
+      navOffset = Math.max(0, Math.min(navOffset + dir * tabW * 3, nav.scrollWidth - nav.offsetWidth));
+      // Use translate instead of scrollLeft since overflow is hidden
+      nav.style.transform = `translateX(-${navOffset}px)`;
+      G('nav-left').style.opacity = navOffset > 0 ? '1' : '0.3';
+      G('nav-right').style.opacity = navOffset < (nav.scrollWidth - nav.offsetWidth) ? '1' : '0.3';
+    }
+
+    // ── PUBLIC IP + INFO ──
+    let pubIP = '';
+    async function initIPs() {
+      try {
+        const r = await fetch('https://api.ipify.org?format=json');
+        const d = await r.json();
+        pubIP = d.ip;
+        G('pub-ip').textContent = d.ip;
+        G('d-pub').textContent = d.ip;
+      } catch (e) { G('pub-ip').textContent = 'N/A'; }
+
+      // ip-api.com full info
+      try {
+        const r = await fetch(`https://ip-api.com/json/?fields=status,country,regionName,city,isp,org,as,timezone,proxy,hosting,mobile,query`);
+        const d = await r.json();
+        if (d.status === 'success') {
+          G('d-isp').textContent = d.isp || d.org || '—';
+          G('d-loc').textContent = [d.city, d.country].filter(Boolean).join(', ') || '—';
+          G('d-asn').textContent = d.as || '—';
+          G('d-tz').textContent = d.timezone || '—';
+          // Populate & show topbar info badges
+          G('tb-isp').textContent = (d.isp || d.org || '—').substring(0, 22);
+          G('tb-loc').textContent = [d.city, d.country].filter(Boolean).join(', ') || '—';
+          G('tb-asn').textContent = (d.as || '—').split(' ')[0];
+          G('tb-tz').textContent = d.timezone || '—';
+          ['tb-isp-wrap', 'tb-loc-wrap', 'tb-asn-wrap', 'tb-tz-wrap'].forEach(id => G(id).style.display = 'flex');
+        }
+      } catch (e) { }
+
+      // Local IP via WebRTC
+      try {
+        const pc = new RTCPeerConnection({ iceServers: [] });
+        pc.createDataChannel('x');
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        await new Promise(r => setTimeout(r, 500));
+        const sdp = pc.localDescription?.sdp || '';
+        const match = sdp.match(/\ba=candidate:.+?(\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)/);
+        if (match && !match[1].startsWith('0.')) {
+          G('loc-ip').textContent = match[1];
+          G('d-lan').textContent = match[1];
+        } else {
+          G('loc-ip').textContent = 'N/A'; G('d-lan').textContent = 'N/A (WebRTC off)';
+        }
+        pc.close();
+      } catch (e) { G('loc-ip').textContent = 'N/A'; }
+    }
+
+    // ── QUICK CHECK ──
+    async function quickCheck() {
+      const v = G('q-in').value.trim();
+      if (!v) return;
+      loading('q-res', 'Checking…'); G('q-res').style.display = 'block';
+      const isIP = /^\d{1,3}(\.\d{1,3}){3}$/.test(v);
+      if (isIP) {
+        try {
+          const r = await fetch(`https://ip-api.com/json/${encodeURIComponent(v)}?fields=status,message,country,regionName,city,isp,org,as,proxy,hosting,mobile,query`);
+          const d = await r.json();
+          if (d.status !== 'success') { show('q-res', `<span class="err">Lookup failed: ${esc(d.message || 'unknown')}</span>`); return; }
+          const fl = [];
+          if (d.proxy) fl.push('<span class="bw badge">Proxy/VPN</span>');
+          if (d.hosting) fl.push('<span class="bw badge">Hosting/DC</span>');
+          if (d.mobile) fl.push('<span class="bi badge">Mobile</span>');
+          show('q-res',
+            `<span class="k">IP:</span>      <span class="v">${esc(d.query)}</span>\n` +
+            `<span class="k">ISP:</span>     <span class="v">${esc(d.isp || '—')}</span>\n` +
+            `<span class="k">Org:</span>     <span class="v">${esc(d.org || '—')}</span>\n` +
+            `<span class="k">ASN:</span>     <span class="v">${esc(d.as || '—')}</span>\n` +
+            `<span class="k">City:</span>    <span class="v">${esc([d.city, d.regionName, d.country].filter(Boolean).join(', '))}</span>` +
+            (fl.length ? `\n<span class="k">Flags:</span>  ${fl.join(' ')}` : '')
+          );
+        } catch (e) { show('q-res', `<span class="err">Error: ${esc(e.message)}</span>`); }
+      } else {
+        const domain = v.replace(/https?:\/\//, '').split('/')[0].split('?')[0].toLowerCase();
+        await urlScanCheck(domain, 'q-res');
+      }
+    }
+
+    // ── URL CHECK (urlscan.io) ──
+    async function urlScanCheck(domain, resId) {
+      try {
+        const r = await fetch(`https://urlscan.io/api/v1/search/?q=domain%3A${encodeURIComponent(domain)}&size=5`, {
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const d = await r.json();
+        if (!d.results || d.results.length === 0) {
+          show(resId,
+            `<span class="ok">✔ Not found in urlscan.io database (no reports)</span>\n` +
+            `<span class="k">Domain:</span> <span class="v">${esc(domain)}</span>\n\n` +
+            `<span class="warn">Verify manually:</span>\n` +
+            `<a href="https://www.virustotal.com/gui/domain/${encodeURIComponent(domain)}" target="_blank">→ VirusTotal ↗</a>\n` +
+            `<a href="https://phishtank.org/phish_search.php?valid=y&active=y&Search=Search&url=${encodeURIComponent('http://' + domain)}" target="_blank">→ PhishTank ↗</a>\n` +
+            `<a href="https://urlscan.io/search/#domain:${encodeURIComponent(domain)}" target="_blank">→ urlscan.io ↗</a>`
+          ); return;
+        }
+        const malicious = d.results.filter(r => r.verdicts?.overall?.malicious);
+        const suspicious = d.results.filter(r => r.verdicts?.overall?.suspicious);
+        const badge = malicious.length ? '<span class="badge bd">⚠ MALICIOUS REPORTS FOUND</span>' :
+          suspicious.length ? '<span class="badge bw">⚠ SUSPICIOUS</span>' :
+            '<span class="badge bs">✔ NO THREATS FOUND</span>';
+        let html = `${badge}\n<span class="k">Domain:</span>     <span class="v">${esc(domain)}</span>\n` +
+          `<span class="k">Total scans:</span> <span class="v">${d.results.length}</span>\n` +
+          `<span class="k">Malicious:</span>   <span class="${malicious.length ? 'err' : 'ok'}">${malicious.length}</span>\n` +
+          `<span class="k">Suspicious:</span>  <span class="${suspicious.length ? 'warn' : 'ok'}">${suspicious.length}</span>\n`;
+        d.results.slice(0, 3).forEach((res, i) => {
+          const v = res.verdicts?.overall;
+          const status = v?.malicious ? '<span class="err">MALICIOUS</span>' : v?.suspicious ? '<span class="warn">SUSPICIOUS</span>' : '<span class="ok">clean</span>';
+          html += `\n<span class="k">Scan ${i + 1}:</span> ${(res.task?.time || '').split('T')[0] || '—'}  ${status}  `;
+          if (res.task?.uuid) html += `<a href="https://urlscan.io/result/${res.task.uuid}/" target="_blank">view ↗</a>`;
+        });
+        html += `\n\n<a href="https://www.virustotal.com/gui/domain/${encodeURIComponent(domain)}" target="_blank">→ VirusTotal ↗</a>  <a href="https://urlscan.io/search/#domain:${encodeURIComponent(domain)}" target="_blank">→ urlscan.io ↗</a>`;
+        show(resId, html);
+      } catch (e) {
+        show(resId,
+          `<span class="warn">⚠ urlscan.io request failed: ${esc(e.message)}</span>\n` +
+          `<span class="note" style="color:var(--text3)">This can happen due to browser security when opening as a local file. Try these manual checks:</span>\n` +
+          `<a href="https://urlscan.io/search/#domain:${encodeURIComponent(domain)}" target="_blank">→ urlscan.io ↗</a>\n` +
+          `<a href="https://www.virustotal.com/gui/domain/${encodeURIComponent(domain)}" target="_blank">→ VirusTotal ↗</a>\n` +
+          `<a href="https://www.abuseipdb.com/" target="_blank">→ AbuseIPDB ↗</a>\n` +
+          `<a href="https://phishtank.org/" target="_blank">→ PhishTank ↗</a>`
+        );
+      }
+    }
+
+    async function checkURL() {
+      const raw = G('url-in').value.trim();
+      if (!raw) return;
+      loading('url-res', 'Querying urlscan.io…'); G('url-res').style.display = 'block';
+      const domain = raw.replace(/https?:\/\//, '').split('/')[0].split('?')[0].toLowerCase();
+      await urlScanCheck(domain, 'url-res');
+    }
+
+    async function bulkCheck() {
+      const lines = G('bulk-in').value.split('\n').map(u => u.trim()).filter(Boolean);
+      if (!lines.length) return;
+      const c = G('bulk-res');
+      c.innerHTML = `<span class="spin">⟳</span> Checking ${lines.length} URLs…`;
+      let html = '';
+      for (const url of lines) {
+        const domain = url.replace(/https?:\/\//, '').split('/')[0].split('?')[0].toLowerCase();
+        try {
+          await new Promise(r => setTimeout(r, 350));
+          const r = await fetch(`https://urlscan.io/api/v1/search/?q=domain%3A${encodeURIComponent(domain)}&size=3`, { headers: { Accept: 'application/json' } });
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          const d = await r.json();
+          const mal = d.results?.some(r => r.verdicts?.overall?.malicious);
+          const found = (d.results?.length || 0) > 0;
+          const badge = found ? (mal ? '<span class="badge bd">FLAGGED</span>' : '<span class="badge bs">CLEAN</span>') : '<span class="badge bi">NO DATA</span>';
+          html += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;">${badge} <span style="color:var(--text2)">${esc(url)}</span></div>`;
+        } catch (e) {
+          html += `<div style="font-family:var(--mono);font-size:0.74rem;padding:5px 0;border-bottom:1px solid var(--border);"><span class="badge bw">ERROR</span> <span style="color:var(--text3)">${esc(url)}</span></div>`;
+        }
+      }
+      c.innerHTML = html;
+    }
+
+    // ── IP LOOKUP ──
+    async function ipLookup() {
+      const ip = G('ip-in').value.trim();
+      loading('ip-res', 'Looking up…'); G('ip-res').style.display = 'block';
+      try {
+        const target = ip || pubIP;
+        const r = await fetch(`https://ip-api.com/json/${encodeURIComponent(target)}?fields=status,message,continent,country,countryCode,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,reverse,mobile,proxy,hosting,query`);
+        const d = await r.json();
+        if (d.status !== 'success') { show('ip-res', `<span class="err">Error: ${esc(d.message || 'lookup failed')}</span>`); return; }
+        const fl = [];
+        if (d.proxy) fl.push('<span class="bw badge">Proxy/VPN</span>');
+        if (d.hosting) fl.push('<span class="bw badge">Hosting/DC</span>');
+        if (d.mobile) fl.push('<span class="bi badge">Mobile</span>');
+        show('ip-res',
+          `<span class="k">IP:</span>       <span class="v">${esc(d.query)}</span>\n` +
+          `<span class="k">Hostname:</span> <span class="v">${esc(d.reverse || '—')}</span>\n` +
+          `<span class="k">ISP:</span>      <span class="v">${esc(d.isp || '—')}</span>\n` +
+          `<span class="k">Org:</span>      <span class="v">${esc(d.org || '—')}</span>\n` +
+          `<span class="k">ASN:</span>      <span class="v">${esc(d.as || '—')} (${esc(d.asname || '—')})</span>\n` +
+          `<span class="k">Country:</span>  <span class="v">${esc(d.country || '—')} (${d.countryCode || '—'})</span>\n` +
+          `<span class="k">Region:</span>   <span class="v">${esc(d.regionName || '—')}</span>\n` +
+          `<span class="k">City:</span>     <span class="v">${esc(d.city || '—')} ${esc(d.zip || '')}</span>\n` +
+          `<span class="k">Coords:</span>   <span class="v">${d.lat}, ${d.lon}</span>\n` +
+          `<span class="k">Timezone:</span> <span class="v">${esc(d.timezone || '—')}</span>` +
+          (fl.length ? `\n<span class="k">Flags:</span>    ${fl.join(' ')}` : '') +
+          `\n\n<a href="https://www.abuseipdb.com/check/${encodeURIComponent(d.query)}" target="_blank">→ AbuseIPDB ↗</a>  <a href="https://otx.alienvault.com/indicator/ip/${encodeURIComponent(d.query)}" target="_blank">→ AlienVault ↗</a>`
+        );
+      } catch (e) { show('ip-res', `<span class="err">Error: ${esc(e.message)}</span>`); }
+    }
+
+    function openThreat() {
+      const ip = G('ipt-in').value.trim();
+      if (!ip) { show('ipt-res', '<span class="warn">Enter an IP address first.</span>'); return; }
+      show('ipt-res',
+        `<span class="k">Threat intel for:</span> <span class="v">${esc(ip)}</span>\n\n` +
+        `<a href="https://www.abuseipdb.com/check/${encodeURIComponent(ip)}" target="_blank">→ AbuseIPDB ↗</a>\n` +
+        `<a href="https://otx.alienvault.com/indicator/ip/${encodeURIComponent(ip)}" target="_blank">→ AlienVault OTX ↗</a>\n` +
+        `<a href="https://www.virustotal.com/gui/ip-address/${encodeURIComponent(ip)}" target="_blank">→ VirusTotal ↗</a>\n` +
+        `<a href="https://shodan.io/host/${encodeURIComponent(ip)}" target="_blank">→ Shodan ↗</a>\n` +
+        `<a href="https://urlscan.io/search/#ip:${encodeURIComponent(ip)}" target="_blank">→ urlscan.io ↗</a>\n` +
+        `<a href="https://bgp.he.net/ip/${encodeURIComponent(ip)}" target="_blank">→ BGP HE.net ↗</a>\n` +
+        `<a href="https://ip.teoh.io/api/threat/${encodeURIComponent(ip)}" target="_blank">→ Teoh Threat API ↗</a>`
+      );
+    }
+
+    // ── DNS ──
+    async function dnsLookup() {
+      const d = G('dns-in').value.trim();
+      const t = G('dns-type').value;
+      if (!d) return;
+      loading('dns-res', `Looking up ${t} records for ${d}…`); G('dns-res').style.display = 'block';
+      try {
+        const r = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(d)}&type=${encodeURIComponent(t)}`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const data = await r.json();
+        const recs = data.Answer || data.Authority || [];
+        if (!recs.length) { show('dns-res', `<span class="warn">No ${t} records found for ${esc(d)}</span>\n<span style="color:var(--text3)">Status: ${data.Status} (0=NOERROR, 3=NXDOMAIN)</span>`); return; }
+        show('dns-res', recs.map(rec =>
+          `<span class="k">${t}</span>  <span class="v">${esc(rec.data)}</span>  <span style="color:var(--text3)">TTL:${rec.TTL}s</span>`
+        ).join('\n'));
+      } catch (e) { show('dns-res', `<span class="err">${esc(e.message)}</span>`); }
+    }
+
+    async function whoisLookup() {
+      const d = G('whois-in').value.trim();
+      if (!d) return;
+      loading('whois-res', 'Fetching RDAP…'); G('whois-res').style.display = 'block';
+      try {
+        const r = await fetch(`https://rdap.org/domain/${encodeURIComponent(d)}`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const data = await r.json();
+        let html = `<span class="k">Domain:</span>  <span class="v">${esc(data.ldhName || d)}</span>\n`;
+        if (data.status) html += `<span class="k">Status:</span>  <span class="v">${data.status.join(', ')}</span>\n`;
+        if (data.events) {
+          const ev = {};
+          data.events.forEach(e => ev[e.eventAction] = e.eventDate?.split('T')[0]);
+          if (ev.registration) html += `<span class="k">Registered:</span> <span class="v">${ev.registration}</span>\n`;
+          if (ev.expiration) {
+            const exp = new Date(ev.expiration), expired = exp < new Date(), days = Math.round((exp - new Date()) / (86400000));
+            html += `<span class="k">Expires:</span>    <span class="${expired ? 'err' : days < 30 ? 'warn' : 'v'}">${ev.expiration} (${expired ? 'EXPIRED' : days + ' days'})</span>\n`;
+          }
+          if (ev['last changed']) html += `<span class="k">Updated:</span>    <span class="v">${ev['last changed']}</span>\n`;
+        }
+        if (data.nameservers) html += `<span class="k">NS:</span>\n${data.nameservers.map(n => `  → <span class="v">${esc(n.ldhName || n.unicodeName || '')}</span>`).join('\n')}\n`;
+        if (data.entities) data.entities.forEach(ent => {
+          const name = ent.vcardArray?.[1]?.find(v => v[0] === 'fn')?.[3] || ent.handle || '';
+          if (ent.roles && name) html += `<span class="k">${ent.roles[0]}:</span>     <span class="v">${esc(name)}</span>\n`;
+        });
+        show('whois-res', html);
+      } catch (e) {
+        show('whois-res',
+          `<span class="warn">RDAP failed — try manually:</span>\n` +
+          `<a href="https://www.whois.com/whois/${encodeURIComponent(d)}" target="_blank">→ whois.com ↗</a>\n` +
+          `<a href="https://lookup.icann.org/lookup?name=${encodeURIComponent(d)}" target="_blank">→ ICANN ↗</a>`
+        );
+      }
+    }
+
+    async function sslCheck() {
+      const d = G('ssl-in').value.trim().replace(/https?:\/\//, '').split('/')[0];
+      if (!d) return;
+      loading('ssl-res', 'Checking certificate transparency logs (crt.sh)…'); G('ssl-res').style.display = 'block';
+      try {
+        const r = await fetch(`https://crt.sh/?q=${encodeURIComponent(d)}&output=json`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const data = await r.json();
+        if (!data.length) { show('ssl-res', `<span class="warn">No certificates found in CT logs for ${esc(d)}</span>`); return; }
+        const sorted = data.sort((a, b) => new Date(b.not_before) - new Date(a.not_before));
+        const cert = sorted[0];
+        const exp = new Date(cert.not_after);
+        const expired = exp < new Date();
+        const days = Math.round((exp - new Date()) / (86400000));
+        show('ssl-res',
+          `<span class="k">Domain:</span>      <span class="v">${esc(d)}</span>\n` +
+          `<span class="k">Certs in log:</span> <span class="v">${data.length}</span>\n` +
+          `<span class="k">Issuer:</span>      <span class="v">${esc(cert.issuer_name || '—')}</span>\n` +
+          `<span class="k">Common Name:</span> <span class="v">${esc(cert.common_name || cert.name_value || '—')}</span>\n` +
+          `<span class="k">Valid From:</span>  <span class="v">${(cert.not_before || '—').split('T')[0]}</span>\n` +
+          `<span class="k">Expires:</span>     <span class="${expired ? 'err' : days < 30 ? 'warn' : 'ok'}">${(cert.not_after || '—').split('T')[0]} (${expired ? 'EXPIRED' : days + ' days left'})</span>\n` +
+          `<a href="https://crt.sh/?q=${encodeURIComponent(d)}" target="_blank">→ View all certs on crt.sh ↗</a>`
+        );
+      } catch (e) {
+        show('ssl-res',
+          `<span class="err">Error: ${esc(e.message)}</span>\n` +
+          `<a href="https://www.ssllabs.com/ssltest/analyze.html?d=${encodeURIComponent(d)}" target="_blank">→ SSL Labs ↗</a>`
+        );
+      }
+    }
+
+    // ── EMAIL HEADERS ──
+    function analyzeHeaders() {
+      const raw = G('ehdr-in').value;
+      if (!raw.trim()) return;
+      const lines = raw.split('\n');
+      const headers = {}; let cur = '';
+      lines.forEach(line => {
+        if (/^\S/.test(line) && line.includes(':')) {
+          const i = line.indexOf(':'); cur = line.substring(0, i).trim().toLowerCase();
+          headers[cur] = (headers[cur] || []).concat(line.substring(i + 1).trim());
+        } else if (cur && /^\s/.test(line)) headers[cur][headers[cur].length - 1] += ' ' + line.trim();
+      });
+      const g = k => headers[k]?.[0] || '—';
+      const from = g('from'), replyTo = g('reply-to'), retPath = g('return-path'), to = g('to'), subj = g('subject'), date = g('date'), msgId = g('message-id');
+      const auth = g('authentication-results');
+      const spf = auth.match(/spf=(pass|fail|softfail|neutral|none)/i)?.[1] || '—';
+      const dkim = auth.match(/dkim=(pass|fail|neutral|none)/i)?.[1] || '—';
+      const dmarc = auth.match(/dmarc=(pass|fail|bestguesspass|none)/i)?.[1] || '—';
+      const sc = v => v === 'pass' ? 'ok' : v === 'fail' || v === 'softfail' ? 'err' : 'warn';
+      const received = headers['received'] || [];
+      const hopIPs = [...new Set(received.flatMap(r => (r.match(/\b(\d{1,3}\.){3}\d{1,3}\b/g) || [])
+        .filter(ip => !ip.startsWith('127.') && !ip.startsWith('10.') && !ip.startsWith('192.168.'))))];
+      const flags = [];
+      const fd = from.match(/@([\w.-]+)/)?.[1] || '';
+      const rd = replyTo.match(/@([\w.-]+)/)?.[1] || '';
+      const rtd = retPath.match(/@([\w.-]+)/)?.[1] || '';
+      if (rd && fd && rd !== fd) flags.push('Reply-To domain differs from From domain');
+      if (rtd && fd && rtd !== fd) flags.push('Return-Path domain differs from From domain');
+      if (spf === 'fail' || spf === 'softfail') flags.push(`SPF ${spf}`);
+      if (dkim === 'fail') flags.push('DKIM fail');
+      if (dmarc === 'fail') flags.push('DMARC fail');
+      let html = `<table class="htbl">
+    <tr><td>From</td><td>${esc(from)}</td></tr>
+    <tr><td>Reply-To</td><td>${esc(replyTo)}</td></tr>
+    <tr><td>Return-Path</td><td>${esc(retPath)}</td></tr>
+    <tr><td>To</td><td>${esc(to)}</td></tr>
+    <tr><td>Subject</td><td>${esc(subj)}</td></tr>
+    <tr><td>Date</td><td>${esc(date)}</td></tr>
+    <tr><td>Message-ID</td><td>${esc(msgId)}</td></tr>
+    <tr><td>SPF</td><td><span class="${sc(spf)}">${spf}</span></td></tr>
+    <tr><td>DKIM</td><td><span class="${sc(dkim)}">${dkim}</span></td></tr>
+    <tr><td>DMARC</td><td><span class="${sc(dmarc)}">${dmarc}</span></td></tr>
+  </table>`;
+      if (hopIPs.length) {
+        html += `<div style="margin-top:10px"><div class="pt" style="font-size:0.6rem">ROUTING IPs — click to copy</div>`;
+        html += hopIPs.map(ip => `<span class="ex-item" onclick="cpToast('${ip}')">${ip}</span>`).join('');
+        html += `</div>`;
+      }
+      if (received.length) {
+        html += `<div style="margin-top:9px"><div class="pt" style="font-size:0.6rem">RECEIVED HOPS (${received.length})</div>`;
+        html += received.map((r, i) => `<div style="font-family:var(--mono);font-size:0.7rem;color:var(--text3);padding:3px 0;border-bottom:1px solid rgba(30,52,72,0.3)"><span style="color:var(--text2)">Hop ${i + 1}:</span> ${esc(r.substring(0, 120))}${r.length > 120 ? '...' : ''}</div>`).join('');
+        html += `</div>`;
+      }
+      if (flags.length) {
+        html += `<div style="margin-top:9px"><div class="pt" style="font-size:0.6rem;color:var(--accent3)">⚠ INDICATORS (${flags.length})</div>`;
+        html += flags.map(f => `<div class="err" style="font-family:var(--mono);font-size:0.74rem;padding:2px 0">⚠ ${f}</div>`).join('');
+      } else html += `<div class="ok" style="margin-top:7px;font-family:var(--mono);font-size:0.74rem">✔ No obvious spam indicators</div>`;
+      G('ehdr-res').innerHTML = html;
+    }
+
+    // ── SUBNET ──
+    function calcSubnet() {
+      const inp = G('sub-in').value.trim();
+      const c = G('sub-res');
+      let ip, prefix;
+      const cm = inp.match(/^(\d+\.\d+\.\d+\.\d+)\/(\d+)$/);
+      const mm = inp.match(/^(\d+\.\d+\.\d+\.\d+)\/(\d+\.\d+\.\d+\.\d+)$/);
+      if (cm) { ip = cm[1]; prefix = +cm[2]; }
+      else if (mm) { ip = mm[1]; prefix = (mm[2].split('.').map(Number).map(o => o.toString(2).padStart(8, '0')).join('').match(/1/g) || []).length; }
+      else { c.innerHTML = '<div class="rbox" style="display:block"><span class="err">Use: 192.168.1.0/24 or 192.168.1.0/255.255.255.0</span></div>'; return; }
+      if (prefix < 0 || prefix > 32) { c.innerHTML = '<div class="rbox" style="display:block"><span class="err">Prefix must be 0–32</span></div>'; return; }
+      const o = ip.split('.').map(Number);
+      const ipI = o.reduce((a, v) => (a << 8) + v, 0) >>> 0;
+      const mask = prefix === 0 ? 0 : (0xFFFFFFFF << (32 - prefix)) >>> 0;
+      const net = (ipI & mask) >>> 0;
+      const bcast = (net | (~mask >>> 0)) >>> 0;
+      const first = prefix < 31 ? net + 1 : net, last = prefix < 31 ? bcast - 1 : bcast;
+      const hosts = prefix >= 31 ? Math.pow(2, 32 - prefix) : Math.pow(2, 32 - prefix) - 2;
+      const i2s = n => [(n >>> 24) & 0xFF, (n >>> 16) & 0xFF, (n >>> 8) & 0xFF, n & 0xFF].join('.');
+      const cls = o[0] < 128 ? 'A' : o[0] < 192 ? 'B' : o[0] < 224 ? 'C' : o[0] < 240 ? 'D' : 'E';
+      c.innerHTML = `<div class="sgrid">
+    <div class="sitem"><div class="sl">Network</div><div class="sv">${i2s(net)}</div></div>
+    <div class="sitem"><div class="sl">Broadcast</div><div class="sv">${i2s(bcast)}</div></div>
+    <div class="sitem"><div class="sl">Subnet Mask</div><div class="sv">${i2s(mask)}</div></div>
+    <div class="sitem"><div class="sl">Wildcard</div><div class="sv">${i2s(~mask >>> 0)}</div></div>
+    <div class="sitem"><div class="sl">First Host</div><div class="sv">${i2s(first)}</div></div>
+    <div class="sitem"><div class="sl">Last Host</div><div class="sv">${i2s(last)}</div></div>
+    <div class="sitem"><div class="sl">Usable Hosts</div><div class="sv">${hosts.toLocaleString()}</div></div>
+    <div class="sitem"><div class="sl">CIDR</div><div class="sv">/${prefix}</div></div>
+    <div class="sitem"><div class="sl">Class</div><div class="sv">${cls}</div></div>
+    <div class="sitem"><div class="sl">Binary Mask</div><div class="sv" style="font-size:0.66rem;">${mask.toString(2).padStart(32, '0').replace(/(.{8})/g, '$1 ')}</div></div>
+  </div>`;
+    }
+    function buildCIDR() {
+      G('cidr-tags').innerHTML = [[32, 1], [31, 2], [30, 2], [29, 6], [28, 14], [27, 30], [26, 62], [25, 126], [24, 254], [23, 510], [22, 1022], [21, 2046], [20, 4094], [16, 65534], [8, '16M+']]
+        .map(([p, h]) => `<span class="tag" onclick="G('sub-in').value='192.168.1.0/${p}';calcSubnet()">/${p} — ${typeof h === 'number' ? h.toLocaleString() : h} hosts</span>`).join('');
+    }
+
+    // ── PORTS ──
+    const PORTS = [
+      [20, 'TCP', 'FTP-DATA', 'FTP data transfer'], [21, 'TCP', 'FTP', 'FTP control'], [22, 'TCP', 'SSH', 'Secure Shell'],
+      [23, 'TCP', 'Telnet', 'Telnet (insecure!)'], [25, 'TCP', 'SMTP', 'Email sending'], [53, 'TCP/UDP', 'DNS', 'Domain Name System'],
+      [67, 'UDP', 'DHCP-S', 'DHCP server'], [68, 'UDP', 'DHCP-C', 'DHCP client'], [69, 'UDP', 'TFTP', 'Trivial FTP / PXE'],
+      [80, 'TCP', 'HTTP', 'Web (plain)'], [110, 'TCP', 'POP3', 'Email retrieval'], [123, 'UDP', 'NTP', 'Network Time Protocol'],
+      [135, 'TCP', 'RPC', 'Windows RPC'], [137, 'UDP', 'NetBIOS', 'NetBIOS Name'], [138, 'UDP', 'NetBIOS', 'NetBIOS Datagram'],
+      [139, 'TCP', 'NetBIOS', 'NetBIOS Session'], [143, 'TCP', 'IMAP', 'Email (IMAP)'], [161, 'UDP', 'SNMP', 'Network monitoring'],
+      [162, 'UDP', 'SNMP-T', 'SNMP trap'], [179, 'TCP', 'BGP', 'Border Gateway Protocol'],
+      [389, 'TCP', 'LDAP', 'Directory Services'], [443, 'TCP', 'HTTPS', 'Secure web (TLS)'],
+      [445, 'TCP', 'SMB', 'Windows file sharing'], [465, 'TCP', 'SMTPS', 'SMTP over TLS'],
+      [500, 'UDP', 'IKE', 'IPsec VPN key exchange'], [514, 'UDP', 'Syslog', 'System logging'],
+      [515, 'TCP', 'LPD', 'Line printer'], [587, 'TCP', 'SMTP', 'Email submission'],
+      [636, 'TCP', 'LDAPS', 'Secure LDAP'], [993, 'TCP', 'IMAPS', 'Secure IMAP'],
+      [995, 'TCP', 'POP3S', 'Secure POP3'], [1080, 'TCP', 'SOCKS', 'SOCKS proxy'],
+      [1194, 'UDP', 'OpenVPN', 'OpenVPN'], [1433, 'TCP', 'MSSQL', 'MS SQL Server'],
+      [1521, 'TCP', 'Oracle', 'Oracle DB'], [1723, 'TCP', 'PPTP', 'PPTP VPN'],
+      [3306, 'TCP', 'MySQL', 'MySQL / MariaDB'], [3389, 'TCP', 'RDP', 'Remote Desktop'],
+      [4444, 'TCP', 'Metasploit', 'Meterpreter / malware'], [5432, 'TCP', 'PostgreSQL', 'PostgreSQL'],
+      [5900, 'TCP', 'VNC', 'Virtual Network Computing'], [6379, 'TCP', 'Redis', 'Redis (often exposed)'],
+      [8080, 'TCP', 'HTTP-Alt', 'HTTP proxy / alt web'], [8443, 'TCP', 'HTTPS-Alt', 'Alternate HTTPS'],
+      [9200, 'TCP', 'Elasticsearch', 'Elasticsearch HTTP'], [27017, 'TCP', 'MongoDB', 'MongoDB'],
+    ];
+    function renderPorts(rows) {
+      G('port-body').innerHTML = rows.map(([p, pr, s, d]) =>
+        `<tr><td class="pnum">${p}</td><td>${pr}</td><td style="color:var(--accent2)">${s}</td><td>${d}</td></tr>`
+      ).join('');
+    }
+    function filterPorts() {
+      const q = G('port-q').value.toLowerCase();
+      renderPorts(q ? PORTS.filter(([p, pr, s, d]) => p.toString().includes(q) || s.toLowerCase().includes(q) || d.toLowerCase().includes(q)) : PORTS);
+    }
+
+    // ── MAC ──
+    async function macLookup() {
+      const mac = G('mac-in').value.trim();
+      if (!mac) return;
+      loading('mac-res', 'Looking up vendor…'); G('mac-res').style.display = 'block';
+      try {
+        const r = await fetch(`https://api.macvendors.com/${encodeURIComponent(mac)}`);
+        if (r.status === 429) { show('mac-res', '<span class="warn">Rate limited. Try again in a few seconds.</span>\n<a href="https://maclookup.app/macaddress/' + encodeURIComponent(mac) + '" target="_blank">→ maclookup.app ↗</a>'); return; }
+        if (r.status === 404) { show('mac-res', `<span class="warn">Vendor not found for OUI: ${esc(mac.replace(/[:-]/g, '').substring(0, 6).toUpperCase())}</span>`); return; }
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const vendor = await r.text();
+        show('mac-res',
+          `<span class="k">MAC:</span>    <span class="v">${esc(mac)}</span>\n` +
+          `<span class="k">OUI:</span>    <span class="v">${mac.replace(/[:-]/g, '').substring(0, 6).toUpperCase()}</span>\n` +
+          `<span class="k">Vendor:</span> <span class="ok">${esc(vendor)}</span>`
+        );
+      } catch (e) {
+        show('mac-res', `<span class="err">Error: ${esc(e.message)}</span>\n<a href="https://maclookup.app/macaddress/${encodeURIComponent(mac)}" target="_blank">→ Try maclookup.app ↗</a>`);
+      }
+    }
+    function macFormat() {
+      const raw = G('macf-in').value.trim();
+      const clean = raw.replace(/[^0-9a-fA-F]/g, '');
+      if (clean.length !== 12) { if (clean.length > 0) show('macf-res', `<span class="warn">Need 12 hex digits, got ${clean.length}</span>`); else G('macf-res').style.display = 'none'; return; }
+      const o = clean.match(/.{2}/g), fb = parseInt(o[0], 16);
+      show('macf-res',
+        `<span class="k">Colon:</span> <span class="v">${o.join(':').toUpperCase()}</span>\n` +
+        `<span class="k">Dash:</span>  <span class="v">${o.join('-').toUpperCase()}</span>\n` +
+        `<span class="k">Cisco:</span> <span class="v">${[o.slice(0, 3).join(''), o.slice(3).join('')].join('.').toUpperCase()}</span>\n` +
+        `<span class="k">Plain:</span> <span class="v">${clean.toUpperCase()}</span>\n` +
+        `<span class="k">OUI:</span>   <span class="v">${o.slice(0, 3).join(':').toUpperCase()}</span>\n` +
+        `<span class="k">Type:</span>  <span class="v">${(fb & 1) ? '<span class="warn">Multicast</span>' : '<span class="ok">Unicast</span>'}</span>\n` +
+        `<span class="k">Admin:</span> <span class="v">${(fb & 2) ? '<span class="warn">Locally Administered</span>' : '<span class="ok">Globally Unique</span>'}</span>`
+      );
+    }
+
+    // ── EXTRACTOR ──
+    function extractAll() {
+      const txt = G('ext-in').value; if (!txt.trim()) return;
+      const ipv4 = [...new Set(txt.match(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g) || [])].filter(ip => ip.split('.').every(o => +o <= 255));
+      const emails = [...new Set(txt.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g) || [])];
+      const urls = [...new Set(txt.match(/https?:\/\/[^\s"'<>\]]+/g) || [])];
+      const macs = [...new Set(txt.match(/\b([0-9a-fA-F]{2}[:\-]){5}[0-9a-fA-F]{2}\b/g) || [])];
+      const hashes = [...new Set(txt.match(/\b[0-9a-fA-F]{32}\b|\b[0-9a-fA-F]{40}\b|\b[0-9a-fA-F]{64}\b/g) || [])];
+      const ports = [...new Set((txt.match(/:\d{1,5}\b/g) || []).map(p => p.slice(1)).filter(p => +p > 0 && +p <= 65535))];
+      const sec = (title, items) => {
+        if (!items.length) return '';
+        return `<div class="ex-sec"><h4>${title} (${items.length})</h4>${items.slice(0, 80).map(i => `<span class="ex-item" onclick="cpToast('${esc(i)}')" title="click to copy">${esc(i)}</span>`).join('')}</div>`;
+      };
+      G('ext-res').innerHTML = sec('IPv4 Addresses', ipv4) + sec('Email Addresses', emails) + sec('URLs', urls) + sec('MAC Addresses', macs) + sec('Hashes', hashes) + sec('Ports', ports) || '<span style="color:var(--text3);font-size:0.78rem">No network artifacts found in the text.</span>';
+    }
+
+    // ── NETSH ──
+    const nsExtras = {
+      static: `<div class="g2" style="gap:8px;margin-top:8px;">
+    <div><div class="lbl">IP ADDRESS</div><input type="text" id="ns-ip" placeholder="192.168.1.100" oninput="buildNetsh()"></div>
+    <div><div class="lbl">SUBNET MASK</div><input type="text" id="ns-mask" placeholder="255.255.255.0" oninput="buildNetsh()"></div>
+    <div><div class="lbl">GATEWAY</div><input type="text" id="ns-gw" placeholder="192.168.1.1" oninput="buildNetsh()"></div>
+    <div><div class="lbl">DNS</div><input type="text" id="ns-dns" placeholder="8.8.8.8" oninput="buildNetsh()"></div>
+  </div>`,
+      'dns-set': `<div class="g2" style="gap:8px;margin-top:8px;">
+    <div><div class="lbl">PRIMARY DNS</div><input type="text" id="ns-dns1" placeholder="8.8.8.8" oninput="buildNetsh()"></div>
+    <div><div class="lbl">SECONDARY DNS</div><input type="text" id="ns-dns2" placeholder="8.8.4.4" oninput="buildNetsh()"></div>
+  </div>`
+    };
+    function buildNetsh() {
+      const iface = G('ns-iface').value || 'Ethernet';
+      const action = G('ns-action').value;
+      G('ns-extra').innerHTML = nsExtras[action] || '';
+      const gv = id => { const e = G(id); return e ? e.value.trim() : ''; }
+      let cmd = '';
+      switch (action) {
+        case 'static':
+          cmd = `netsh interface ip set address "${iface}" static ${gv('ns-ip') || '192.168.1.100'} ${gv('ns-mask') || '255.255.255.0'} ${gv('ns-gw') || '192.168.1.1'}\nnetsh interface ip set dns "${iface}" static ${gv('ns-dns') || '8.8.8.8'}`; break;
+        case 'dhcp':
+          cmd = `netsh interface ip set address "${iface}" dhcp\nnetsh interface ip set dns "${iface}" dhcp`; break;
+        case 'dns-set':
+          cmd = `netsh interface ip set dns "${iface}" static ${gv('ns-dns1') || '8.8.8.8'}\nnetsh interface ip add dns "${iface}" ${gv('ns-dns2') || '8.8.4.4'} index=2`; break;
+        case 'dns-dhcp': cmd = `netsh interface ip set dns "${iface}" dhcp`; break;
+        case 'flush': cmd = `ipconfig /flushdns`; break;
+        case 'show': cmd = `netsh interface ip show config`; break;
+        case 'release': cmd = `ipconfig /release "${iface}"`; break;
+        case 'renew': cmd = `ipconfig /renew "${iface}"`; break;
+        case 'disable': cmd = `netsh interface set interface "${iface}" disable`; break;
+        case 'enable': cmd = `netsh interface set interface "${iface}" enable`; break;
+        case 'reset': cmd = `netsh int ip reset\nnetsh int ipv6 reset\nipconfig /flushdns\nnetsh winsock reset\nipconfig /release\nipconfig /renew`; break;
+        case 'winsock': cmd = `netsh winsock reset\nipconfig /flushdns`; break;
+      }
+      G('ns-cmd').textContent = cmd;
+    }
+    function buildCmdTags() {
+      const cmds = ['ipconfig /all', 'ipconfig /release', 'ipconfig /renew', 'ipconfig /flushdns', 'netstat -an', 'netstat -b', 'arp -a', 'nslookup google.com', 'tracert 8.8.8.8', 'ping -t 8.8.8.8', 'route print', 'netsh wlan show profiles', 'netsh wlan show interfaces', 'netsh interface ip show config', 'netsh advfirewall show allprofiles', 'net user', 'whoami /all', 'systeminfo', 'tasklist', 'netsh int ip reset'];
+      G('cmd-tags').innerHTML = cmds.map(c => `<span class="tag" onclick="cpToast('${c.replace(/'/g, "\\'")}');toast('✔ Copied')">${c}</span>`).join('');
+    }
+
+    // ── ENCODER ──
+    function b64e() { try { G('b64-out').value = btoa(unescape(encodeURIComponent(G('b64-in').value))); } catch (e) { toast('Encode error'); } }
+    function b64d() { try { G('b64-out').value = decodeURIComponent(escape(atob(G('b64-in').value))); } catch (e) { toast('Invalid base64'); } }
+    function ue() { G('ue-out').value = encodeURIComponent(G('ue-in').value); }
+    function ud() { try { G('ue-out').value = decodeURIComponent(G('ue-in').value); } catch (e) { toast('Invalid URL encoding'); } }
+    function toHex() { const s = G('hex-in').value; show('hex-out', s.split('').map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ')); }
+    function fromHex() { try { show('hex-out', G('hex-in').value.replace(/\s/g, '').match(/.{2}/g).map(h => String.fromCharCode(parseInt(h, 16))).join('')); } catch (e) { show('hex-out', '<span class="err">Invalid hex</span>'); } }
+    function ipToI() { const o = G('ipi-in').value.trim().split('.'); if (o.length === 4 && o.every(x => !isNaN(x) && +x >= 0 && +x <= 255)) { const n = o.reduce((a, v) => (a * 256) + +v, 0); show('ipi-out', `<span class="k">Integer:</span> <span class="v">${n}</span>\n<span class="k">Hex:</span> <span class="v">0x${n.toString(16).toUpperCase().padStart(8, '0')}</span>`); } else show('ipi-out', '<span class="err">Invalid IP</span>'); }
+    function iToIp() { const n = parseInt(G('ipi-in').value.trim()); if (!isNaN(n) && n >= 0 && n <= 4294967295) { show('ipi-out', `<span class="k">IP:</span> <span class="v">${[(n >>> 24) & 0xFF, (n >>> 16) & 0xFF, (n >>> 8) & 0xFF, n & 0xFF].join('.')}</span>`); } else show('ipi-out', '<span class="err">Invalid integer (0–4294967295)</span>'); }
+
+    // ── PASSWORD ──
+    const DC = [['admin', 'admin'], ['admin', 'password'], ['admin', '1234'], ['admin', '12345'], ['admin', '123456'], ['admin', 'admin123'], ['admin', ''], ['root', 'root'], ['root', 'toor'], ['root', 'password'], ['user', 'user'], ['user', 'password'], ['guest', 'guest'], ['guest', ''], ['test', 'test'], ['cisco', 'cisco'], ['ubnt', 'ubnt'], ['admin', 'pass'], ['supervisor', 'supervisor'], ['support', 'support'], ['operator', 'operator'], ['manager', 'manager'], ['pi', 'raspberry'], ['admin', 'ubnt'], ['netgear', 'password']];
+    function checkPW() {
+      const pw = G('pw-in').value, bar = G('pw-bar');
+      if (!pw) { bar.style.width = '0'; G('pw-res').style.display = 'none'; return; }
+      const checks = []; let sc = 0;
+      const add = (p, m) => { if (p) sc++; checks.push([p, m]); };
+      add(pw.length >= 8, `Length ${pw.length} (min 8)`);
+      add(pw.length >= 12, `Length ≥ 12 (good)`);
+      add(/[A-Z]/.test(pw), 'Has uppercase');
+      add(/[a-z]/.test(pw), 'Has lowercase');
+      add(/[0-9]/.test(pw), 'Has numbers');
+      add(/[^A-Za-z0-9]/.test(pw), 'Has special chars');
+      add(!/(.)\1{2,}/.test(pw), 'No repeated chars');
+      add(!/^(password|qwerty|123456|letmein|welcome|admin|pass)/i.test(pw), 'Not a common pattern');
+      const pct = Math.round(sc / 8 * 100);
+      const col = pct < 40 ? '#ff4f6e' : pct < 65 ? '#ffb800' : '#00ff9d';
+      const lbl = pct < 40 ? 'WEAK' : pct < 65 ? 'MODERATE' : 'STRONG';
+      bar.style.width = pct + '%'; bar.style.background = col;
+      const charSet = (/[a-z]/.test(pw) ? 26 : 0) + (/[A-Z]/.test(pw) ? 26 : 0) + (/[0-9]/.test(pw) ? 10 : 0) + (/[^A-Za-z0-9]/.test(pw) ? 32 : 0);
+      const entropy = charSet > 0 ? Math.round(pw.length * Math.log2(charSet)) : 0;
+      show('pw-res',
+        `<span style="color:${col};font-size:0.95rem;font-weight:700">${lbl} — ${pct}%</span>\n\n` +
+        checks.map(([p, m]) => `<span class="${p ? 'ok' : 'err'}">${p ? '✔' : '✘'} ${m}</span>`).join('\n') +
+        `\n\n<span class="k">Entropy:</span> <span class="v">~${entropy} bits</span>`
+      );
+    }
+    function checkDC() {
+      const u = G('dc-u').value.toLowerCase().trim(), p = G('dc-p').value.toLowerCase().trim();
+      show('dc-res', DC.find(([a, b]) => a === u && b === p)
+        ? `<span class="err">⚠ MATCH: "${esc(u)}" / "${esc(p)}" is a known default credential!</span>\n<span class="warn">Change this immediately — critical security risk.</span>`
+        : `<span class="ok">✔ Not found in default credentials list (${DC.length} pairs checked)</span>`
+      );
+    }
+
+    // ── IP RANGE ──
+    function genRange() {
+      const s = G('rs-in').value.trim(), e = G('re-in').value.trim();
+      const toI = ip => ip.split('.').reduce((a, o) => (a * 256) + +o, 0);
+      const toS = n => [(n >>> 24) & 0xFF, (n >>> 16) & 0xFF, (n >>> 8) & 0xFF, n & 0xFF].join('.');
+      const si = toI(s), ei = toI(e);
+      if (isNaN(si) || isNaN(ei) || si > ei) { show('range-res', '<span class="err">Invalid range</span>'); return; }
+      if (ei - si > 65535) { show('range-res', '<span class="warn">Max 65536 IPs at once</span>'); return; }
+      const ips = []; for (let i = si; i <= ei; i++)ips.push(toS(i));
+      show('range-res', ips.join('\n'));
+    }
+    function genPing() {
+      const t = G('ping-t').value.trim(), c = G('ping-c').value || '4', os = G('ping-os').value;
+      G('ping-cmd').textContent = t ? (os === 'win' ? `ping -n ${c} ${t}` : `ping -c ${c} ${t}`) : 'Enter target above…';
+      G('trace-cmd').textContent = t ? (os === 'win' ? `tracert ${t}` : `traceroute ${t}`) : 'Enter target above…';
+    }
+
+    // ── VAULT ──
+    let vaultData = '';
+    function toggleVault() {
+      const ed = G('veditor'), btn = G('vbtn');
+      if (ed.style.display === 'none') { ed.style.display = 'block'; G('vtext').value = vaultData; btn.textContent = '▲ Close'; }
+      else { ed.style.display = 'none'; btn.textContent = '📋 Paste / Edit Text'; }
+    }
+    function saveVault() {
+      vaultData = G('vtext').value;
+      G('veditor').style.display = 'none'; G('vbtn').textContent = '📋 Paste / Edit Text';
+      G('vstatus').textContent = `✔ Loaded: ${vaultData.length} chars, ${vaultData.split('\n').filter(l => l.trim()).length} lines`;
+      toast('✔ Vault saved & hidden');
+    }
+    function clearVault() {
+      vaultData = ''; G('vtext').value = ''; G('vstatus').textContent = 'No data loaded.';
+      G('vs-res').innerHTML = ''; G('vs-cnt').textContent = ''; toast('🗑 Vault cleared');
+    }
+    function vSearch() {
+      const q = G('vs-q').value; if (!q) return;
+      if (!vaultData) { G('vs-res').innerHTML = '<span class="warn" style="font-size:0.78rem">⚠ Load vault text first.</span>'; return; }
+      const rx = G('vs-rx').checked, cs = G('vs-cs').checked, ww = G('vs-ww').checked, ctx = G('vs-ctx').checked;
+      let pat;
+      try {
+        let p = rx ? q : q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        if (ww && !rx) p = `\\b${p}\\b`;
+        pat = new RegExp(p, cs ? 'g' : 'gi');
+      } catch (e) { G('vs-res').innerHTML = `<span class="err">Invalid regex: ${esc(e.message)}</span>`; return; }
+      const lines = vaultData.split('\n');
+      const res = lines.map((line, i) => { const m = [...line.matchAll(pat)]; return m.length ? { line, i, m } : null }).filter(Boolean);
+      G('vs-cnt').textContent = `${res.length} line${res.length !== 1 ? 's' : ''} — ${res.reduce((a, r) => a + r.m.length, 0)} total matches`;
+      if (!res.length) { G('vs-res').innerHTML = '<div style="color:var(--text3);font-size:0.78rem;padding:7px 0">No matches found.</div>'; return; }
+      G('vs-res').innerHTML = res.map(({ line, i }) => {
+        const hi = line.replace(pat, m => `<span class="mh">${esc(m)}</span>`);
+        return `<div class="vmatch"><span class="vln">L${i + 1}</span>${ctx ? hi : ''}</div>`;
+      }).join('');
+    }
+
+    // ── NOTES ──
+    function saveNotes() { sessionStorage.setItem('nettool_notes', G('notes-a').value); G('nsaved').textContent = '✔ Saved'; setTimeout(() => G('nsaved').textContent = '', 2000); }
+    function clearNotes() { G('notes-a').value = ''; sessionStorage.removeItem('nettool_notes'); }
+    G('notes-a').addEventListener('input', () => sessionStorage.setItem('nettool_notes', G('notes-a').value));
+
+
+    // ── TAB MINI ANIMATIONS ──
+    const tabAnimDefs = {
+      dashboard: function (ctx, W, H, t) {
+        // Pulse rings like a network beacon
+        ctx.clearRect(0, 0, W, H);
+        const cx = W / 2, cy = H / 2;
+        for (let i = 3; i >= 0; i--) {
+          const phase = (t * 0.04 + i * 0.25) % 1;
+          const r = phase * Math.min(W, H) * 0.46;
+          const alpha = (1 - phase) * 0.55;
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(0,200,255,${alpha})`; ctx.lineWidth = 1.5; ctx.stroke();
+        }
+        ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,200,255,0.9)'; ctx.fill();
+      },
+      vault: function (ctx, W, H, t) {
+        // Binary stream raining down
+        ctx.clearRect(0, 0, W, H);
+        ctx.font = '7px Share Tech Mono,monospace';
+        for (let col = 0; col < Math.floor(W / 8); col++) {
+          const x = col * 8 + 2;
+          for (let row = 0; row < 8; row++) {
+            const seed = (col * 17 + row * 31 + Math.floor(t * 0.03 + col * 0.7)) % 2;
+            const a = seed === 1 ? 0.7 : 0.15;
+            ctx.fillStyle = `rgba(0,255,120,${a})`;
+            ctx.fillText(seed, x, row * 8 + 6);
+          }
+        }
+      },
+      urlcheck: function (ctx, W, H, t) {
+        // Shield pulse
+        ctx.clearRect(0, 0, W, H);
+        const cx = W / 2, cy = H / 2 + 4;
+        const pulse = 0.85 + Math.sin(t * 0.07) * 0.15;
+        ctx.save(); ctx.scale(pulse, pulse); ctx.translate(cx * (1 - pulse) / pulse * 0, 0);
+        const sh = [0, -22, 16, -10, 16, 10, 0, 22, -16, 10, -16, -10];
+        ctx.beginPath();
+        ctx.moveTo(cx + sh[0], cy + sh[1]);
+        for (let i = 2; i < sh.length; i += 2) ctx.lineTo(cx + sh[i], cy + sh[i + 1]);
+        ctx.closePath();
+        ctx.strokeStyle = `rgba(0,255,157,0.7)`; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.fillStyle = 'rgba(0,255,157,0.07)'; ctx.fill();
+        ctx.restore();
+        // scan line inside shield
+        const sy = cy - 10 + (((t * 0.05) % 1) * 22);
+        ctx.beginPath(); ctx.moveTo(cx - 10, sy); ctx.lineTo(cx + 10, sy);
+        ctx.strokeStyle = 'rgba(0,255,157,0.5)'; ctx.lineWidth = 1; ctx.stroke();
+      },
+      iplookup: function (ctx, W, H, t) {
+        // Globe grid with rotating meridian
+        ctx.clearRect(0, 0, W, H);
+        const cx = W / 2, cy = H / 2, R = 22;
+        // Latitude rings
+        for (let i = -2; i <= 2; i++) {
+          const y = cy + i * (R / 2.5);
+          const rx = Math.sqrt(Math.max(0, R * R - (y - cy) * (y - cy)));
+          ctx.beginPath(); ctx.ellipse(cx, y, rx, rx * 0.35, 0, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(0,200,255,0.25)'; ctx.lineWidth = 0.8; ctx.stroke();
+        }
+        // Outer circle
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0,200,255,0.4)'; ctx.lineWidth = 1; ctx.stroke();
+        // Rotating meridian
+        const a = t * 0.04;
+        ctx.beginPath(); ctx.ellipse(cx, cy, Math.abs(Math.cos(a)) * R, R, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(0,255,157,0.6)`; ctx.lineWidth = 1; ctx.stroke();
+      },
+      dns: function (ctx, W, H, t) {
+        // Packet nodes connecting
+        ctx.clearRect(0, 0, W, H);
+        const nodes = [{ x: W / 2, y: 8 }, { x: 12, y: H - 10 }, { x: W - 12, y: H - 10 }, { x: W / 2, y: H / 2 }];
+        const phase = (t * 0.02) % 1;
+        nodes.forEach((n, i) => {
+          nodes.forEach((m, j) => {
+            if (i >= j) return;
+            ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(m.x, m.y);
+            ctx.strokeStyle = 'rgba(0,200,255,0.15)'; ctx.lineWidth = 0.7; ctx.stroke();
+            // travelling dot
+            if ((i + j) % 3 === Math.floor(t * 0.03) % 3) {
+              const px = n.x + (m.x - n.x) * phase, py = n.y + (m.y - n.y) * phase;
+              ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI * 2);
+              ctx.fillStyle = 'rgba(0,200,255,0.8)'; ctx.fill();
+            }
+          });
+          ctx.beginPath(); ctx.arc(n.x, n.y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(0,255,157,0.7)'; ctx.fill();
+        });
+      },
+      emailhdr: function (ctx, W, H, t) {
+        // Envelope with moving @ signal
+        ctx.clearRect(0, 0, W, H);
+        const x = 8, y = 14, w = W - 16, h = H - 24;
+        ctx.strokeStyle = 'rgba(0,200,255,0.5)'; ctx.lineWidth = 1.2;
+        ctx.strokeRect(x, y, w, h);
+        // Flap
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w / 2, y + h * 0.5); ctx.lineTo(x + w, y);
+        ctx.strokeStyle = 'rgba(0,200,255,0.5)'; ctx.stroke();
+        // Traveling dot along flap
+        const p = (Math.sin(t * 0.05) + 1) / 2;
+        const dx = x + (w / 2) * p * 2 * (p < 0.5 ? 1 : 0) + (x + w - (x + w / 2 + p * (x + w - x - w / 2) * 2)) * ((p >= 0.5) ? 1 : 0);
+        // simple: bounce left-right
+        const bx = x + w * (Math.sin(t * 0.05) * 0.5 + 0.5);
+        const by = y + (h * 0.5) * (1 - Math.abs(Math.sin(t * 0.05)));
+        ctx.beginPath(); ctx.arc(bx, by, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,184,0,0.85)'; ctx.fill();
+      },
+      subnet: function (ctx, W, H, t) {
+        // Binary tree / network split
+        ctx.clearRect(0, 0, W, H);
+        const drawNode = (x, y, r, depth) => {
+          ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+          const a = 0.3 + depth * 0.2;
+          ctx.fillStyle = `rgba(0,200,255,${a})`; ctx.fill();
+          if (depth < 3) {
+            const spread = 18 / depth, ny = y + 12;
+            [[x - spread, ny], [x + spread, ny]].forEach(([nx, _ny]) => {
+              ctx.beginPath(); ctx.moveTo(x, y + r); ctx.lineTo(nx, _ny - 3);
+              ctx.strokeStyle = 'rgba(0,200,255,0.25)'; ctx.lineWidth = 0.8; ctx.stroke();
+              drawNode(nx, _ny, r * 0.7, depth + 1);
+            });
+          }
+        };
+        drawNode(W / 2, 8, 4, 1);
+      },
+      ports: function (ctx, W, H, t) {
+        // Port scanner horizontal bars
+        ctx.clearRect(0, 0, W, H);
+        const ports = [22, 80, 443, 3389, 8080];
+        ports.forEach((p, i) => {
+          const y = 4 + i * (H / 5);
+          const phase = ((t * 0.04 + i * 0.2) % 1);
+          const open = Math.sin(t * 0.03 + i) > 0.3;
+          // background bar
+          ctx.fillStyle = 'rgba(30,52,72,0.5)';
+          ctx.fillRect(4, y, W - 8, 8);
+          // fill
+          const col = open ? 'rgba(0,255,157,0.7)' : 'rgba(255,79,110,0.5)';
+          ctx.fillStyle = col;
+          ctx.fillRect(4, y, phase * (W - 8), 8);
+          // port label
+          ctx.fillStyle = 'rgba(200,220,232,0.6)';
+          ctx.font = '5px Share Tech Mono,monospace';
+          ctx.fillText(p, 5, y + 6);
+        });
+      },
+      mac: function (ctx, W, H, t) {
+        // Chip / circuit board pattern
+        ctx.clearRect(0, 0, W, H);
+        const dots = [[W / 2, H / 2], [15, 15], [W - 15, 15], [15, H - 15], [W - 15, H - 15]];
+        dots.forEach(([x, y], i) => {
+          ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,184,0,${0.4 + Math.sin(t * 0.05 + i) * 0.3})`; ctx.fill();
+        });
+        // lines between them
+        [[0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [3, 4]].forEach(([a, b]) => {
+          ctx.beginPath(); ctx.moveTo(dots[a][0], dots[a][1]); ctx.lineTo(dots[b][0], dots[b][1]);
+          ctx.strokeStyle = 'rgba(255,184,0,0.15)'; ctx.lineWidth = 0.8; ctx.stroke();
+          // pulse
+          const phase = ((t * 0.03 + a * 0.3 + b * 0.2) % 1);
+          const px = dots[a][0] + (dots[b][0] - dots[a][0]) * phase;
+          const py = dots[a][1] + (dots[b][1] - dots[a][1]) * phase;
+          ctx.beginPath(); ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255,184,0,0.8)'; ctx.fill();
+        });
+      },
+      extract: function (ctx, W, H, t) {
+        // Text scanning lines (like grep)
+        ctx.clearRect(0, 0, W, H);
+        ctx.font = '5px Share Tech Mono,monospace';
+        const lines = ['192.168.1.1', 'user@corp.com', 'https://...', '00:1A:2B:...'];
+        lines.forEach((line, i) => {
+          const a = Math.sin(t * 0.04 + i * 1.2) * 0.4 + 0.4;
+          ctx.fillStyle = `rgba(0,200,255,${a * 0.6})`;
+          ctx.fillText(line, 2, i * 13 + 10);
+        });
+        // scan highlight
+        const sy = (((t * 0.03) % 1) * H);
+        ctx.fillStyle = 'rgba(0,255,157,0.07)';
+        ctx.fillRect(0, sy - 3, W, 6);
+        ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy);
+        ctx.strokeStyle = 'rgba(0,255,157,0.5)'; ctx.lineWidth = 0.8; ctx.stroke();
+      },
+      netsh: function (ctx, W, H, t) {
+        // Terminal cursor blinking with cmd lines
+        ctx.clearRect(0, 0, W, H);
+        ctx.font = '5px Share Tech Mono,monospace';
+        const cmds = ['> netsh', '> ipconfig', '>_'];
+        cmds.forEach((c, i) => {
+          const visible = i < 2 || (Math.floor(t * 0.06) % 2 === 0);
+          ctx.fillStyle = `rgba(0,255,157,${i === 2 ? 0.9 : 0.45})`;
+          if (visible) ctx.fillText(c, 2, i * 16 + 12);
+        });
+        // progress bar
+        const p = ((t * 0.02) % 1);
+        ctx.fillStyle = 'rgba(30,52,72,0.7)'; ctx.fillRect(2, H - 9, W - 4, 6);
+        ctx.fillStyle = 'rgba(0,255,157,0.6)'; ctx.fillRect(2, H - 9, p * (W - 4), 6);
+      },
+      encoder: function (ctx, W, H, t) {
+        // Binary/hex transformation effect
+        ctx.clearRect(0, 0, W, H);
+        ctx.font = '5.5px Share Tech Mono,monospace';
+        const chars = '0123456789ABCDEF';
+        for (let col = 0; col < 10; col++) {
+          for (let row = 0; row < 5; row++) {
+            const idx = Math.floor(Math.abs(Math.sin(t * 0.04 + col * 2.1 + row * 3.7)) * 16);
+            const a = 0.15 + Math.sin(t * 0.05 + col + row) * 0.25;
+            ctx.fillStyle = `rgba(0,200,255,${Math.max(0.05, a)})`;
+            ctx.fillText(chars[idx], col * 9 + 1, row * 11 + 10);
+          }
+        }
+      },
+      passcheck: function (ctx, W, H, t) {
+        // Lock with fill bar
+        ctx.clearRect(0, 0, W, H);
+        const cx = W / 2, cy = H / 2 + 5;
+        // shackle
+        ctx.beginPath();
+        ctx.arc(cx, cy - 12, 10, Math.PI, 0);
+        ctx.strokeStyle = 'rgba(0,200,255,0.5)'; ctx.lineWidth = 2; ctx.stroke();
+        // body
+        const strength = ((Math.sin(t * 0.03) + 1) / 2);
+        const bodyCol = strength < 0.4 ? 'rgba(255,79,110,0.6)' : strength < 0.7 ? 'rgba(255,184,0,0.6)' : 'rgba(0,255,157,0.6)';
+        ctx.fillStyle = 'rgba(15,25,35,0.9)';
+        ctx.fillRect(cx - 13, cy - 4, 26, 18);
+        ctx.strokeStyle = bodyCol; ctx.lineWidth = 1.5;
+        ctx.strokeRect(cx - 13, cy - 4, 26, 18);
+        ctx.fillStyle = bodyCol;
+        ctx.fillRect(cx - 12, cy - 3, 24 * strength, 16);
+        // keyhole
+        ctx.beginPath(); ctx.arc(cx, cy + 4, 3, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(8,12,16,0.9)'; ctx.fill();
+      },
+      iprange: function (ctx, W, H, t) {
+        // Sweeping horizontal scan across IP range
+        ctx.clearRect(0, 0, W, H);
+        const sweep = ((t * 0.025) % 1) * W;
+        // draw IP grid dots
+        for (let x = 6; x < W; x += 8) {
+          for (let y = 6; y < H; y += 10) {
+            const scanned = x <= sweep;
+            ctx.beginPath(); ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+            ctx.fillStyle = scanned ? 'rgba(0,255,157,0.6)' : 'rgba(30,52,72,0.5)'; ctx.fill();
+          }
+        }
+        // sweep line
+        ctx.beginPath(); ctx.moveTo(sweep, 0); ctx.lineTo(sweep, H);
+        ctx.strokeStyle = 'rgba(0,200,255,0.7)'; ctx.lineWidth = 1; ctx.stroke();
+      },
+      notes: function (ctx, W, H, t) {
+        // Pen writing lines
+        ctx.clearRect(0, 0, W, H);
+        const lines = 4;
+        for (let i = 0; i < lines; i++) {
+          const y = 8 + i * (H / lines);
+          const progress = Math.min(1, Math.max(0, ((t * 0.02) % (lines)) - i));
+          ctx.beginPath(); ctx.moveTo(4, y); ctx.lineTo(4 + progress * (W - 8), y);
+          ctx.strokeStyle = `rgba(255,184,0,${0.4 + i * 0.1})`; ctx.lineWidth = 1.2; ctx.stroke();
+        }
+        // blinking cursor
+        if (Math.floor(t * 0.06) % 2) {
+          const curLine = Math.floor((t * 0.02) % lines);
+          const curX = 4 + (((t * 0.02) % 1) * (W - 8));
+          const curY = 8 + curLine * (H / lines);
+          ctx.fillStyle = 'rgba(255,184,0,0.9)';
+          ctx.fillRect(curX, curY - 6, 1.5, 8);
+        }
+      },
+      winlinks: function (ctx, W, H, t) {
+        // Windows logo rotating / glowing
+        ctx.clearRect(0, 0, W, H);
+        const cx = W / 2, cy = H / 2;
+        const glow = 0.5 + Math.sin(t * 0.06) * 0.3;
+        const colors = ['rgba(0,200,255,', 'rgba(0,200,255,', 'rgba(0,255,157,', 'rgba(0,255,157,'];
+        const quads = [[cx - 12, cy - 12, 10, 10], [cx + 2, cy - 12, 10, 10], [cx - 12, cy + 2, 10, 10], [cx + 2, cy + 2, 10, 10]];
+        quads.forEach(([x, y, w, h], i) => {
+          ctx.fillStyle = colors[i] + (glow * 0.6) + ')';
+          ctx.fillRect(x, y, w, h);
+          ctx.strokeStyle = colors[i] + '0.9)'; ctx.lineWidth = 0.8; ctx.strokeRect(x, y, w, h);
+        });
+        // scan ring
+        const phase = (t * 0.04) % 1;
+        ctx.beginPath(); ctx.arc(cx, cy, 14 + phase * 8, (1 - phase) * Math.PI * 2, 0, false);
+        ctx.strokeStyle = `rgba(0,200,255,${(1 - phase) * 0.5})`; ctx.lineWidth = 1.5; ctx.stroke();
+      }
+    };
+
+    let tabAnimFrame = 0;
+    let currentTabAnim = 'dashboard';
+
+    function runTabAnims() {
+      const canvas = G('tab-anim-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const fn = tabAnimDefs[currentTabAnim];
+      if (fn) fn(ctx, canvas.width, canvas.height, tabAnimFrame);
+      tabAnimFrame++;
+      requestAnimationFrame(runTabAnims);
+    }
+
+    // Hook tab switches to change animation
+    document.querySelectorAll('.tab').forEach(t => {
+      t.addEventListener('click', function () {
+        currentTabAnim = this.dataset.sec;
+        tabAnimFrame = 0;
+      });
+    });
+
+    // ── RADAR ANIMATION ──
+    (function () {
+      const canvas = document.getElementById('radar-canvas');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+      const cx = W / 2, cy = H / 2, R = W / 2 - 4;
+      let angle = 0;
+      let blips = [];
+
+      // Spawn random blips occasionally
+      function maybeSpawnBlip() {
+        if (Math.random() < 0.04) {
+          const a = Math.random() * Math.PI * 2;
+          const r = Math.random() * R * 0.85;
+          blips.push({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r, alpha: 1.0, size: Math.random() * 2 + 1 });
+        }
+        // fade old blips
+        blips = blips.filter(b => b.alpha > 0.02);
+        blips.forEach(b => b.alpha *= 0.975);
+      }
+
+      function drawRadar() {
+        ctx.clearRect(0, 0, W, H);
+
+        // Outer dark bg circle
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(2,14,8,0.92)';
+        ctx.fill();
+
+        // Rings
+        [0.25, 0.5, 0.75, 1].forEach(f => {
+          ctx.beginPath();
+          ctx.arc(cx, cy, R * f, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(0,200,80,${0.06 + f * 0.08})`;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        });
+
+        // Crosshairs
+        ctx.strokeStyle = 'rgba(0,200,80,0.1)';
+        ctx.lineWidth = 0.7;
+        ctx.beginPath(); ctx.moveTo(cx - R, cy); ctx.lineTo(cx + R, cy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx, cy - R); ctx.lineTo(cx, cy + R); ctx.stroke();
+
+        // Diagonal faint lines
+        ctx.strokeStyle = 'rgba(0,200,80,0.055)';
+        ctx.beginPath(); ctx.moveTo(cx - R * 0.72, cy - R * 0.72); ctx.lineTo(cx + R * 0.72, cy + R * 0.72); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx + R * 0.72, cy - R * 0.72); ctx.lineTo(cx - R * 0.72, cy + R * 0.72); ctx.stroke();
+
+        // Sweep gradient (the green pie slice)
+        const sweepSpan = Math.PI * 0.65;
+        const grad = ctx.createConicalGradient
+          ? null // not standard, use manual
+          : null;
+
+        // Draw sweep as filled arc segments fading
+        for (let i = 0; i < 60; i++) {
+          const a0 = angle - (i / 60) * sweepSpan;
+          const a1 = angle - ((i + 1) / 60) * sweepSpan;
+          const alpha = (1 - i / 60) * 0.45;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.arc(cx, cy, R, a0, a1, true);
+          ctx.closePath();
+          ctx.fillStyle = `rgba(0,230,90,${alpha})`;
+          ctx.fill();
+        }
+
+        // Sweep line (bright leading edge)
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(angle) * R, cy + Math.sin(angle) * R);
+        ctx.strokeStyle = 'rgba(0,255,110,0.9)';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+        // glow tip
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(angle) * R, cy + Math.sin(angle) * R, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,255,110,0.95)';
+        ctx.fill();
+
+        // Blips
+        blips.forEach(b => {
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(0,255,120,${b.alpha})`;
+          ctx.fill();
+          // glow ring
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.size * 2.5, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(0,255,120,${b.alpha * 0.35})`;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        });
+
+        // Center dot
+        ctx.beginPath();
+        ctx.arc(cx, cy, 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,255,120,0.9)';
+        ctx.fill();
+
+        // Outer ring border
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0,200,80,0.35)';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        // Spawn and tick blips
+        maybeSpawnBlip();
+        // Spawn a blip near the sweep line tip to look like detection
+        if (Math.random() < 0.025) {
+          const dist = (Math.random() * 0.6 + 0.25) * R;
+          blips.push({
+            x: cx + Math.cos(angle) * dist,
+            y: cy + Math.sin(angle) * dist,
+            alpha: 0.95,
+            size: Math.random() * 2 + 0.8
+          });
+        }
+
+        angle += 0.028;
+        requestAnimationFrame(drawRadar);
+      }
+      drawRadar();
+    })();
+    window.addEventListener('load', () => {
+      initIPs();
+      renderPorts(PORTS);
+      buildCIDR();
+      buildNetsh();
+      buildCmdTags();
+      const saved = sessionStorage.getItem('nettool_notes');
+      if (saved) G('notes-a').value = saved;
+      G('ns-action').addEventListener('change', buildNetsh);
+      G('ns-iface').addEventListener('input', buildNetsh);
+      G('ping-t').addEventListener('input', genPing);
+      G('ping-c').addEventListener('input', genPing);
+      // Init nav arrow visibility
+      setTimeout(() => navScroll(0), 100);
+      // Start tab animations
+      runTabAnims();
+    });
+
+    // ══════════════ SPLASH ══════════════
+    function launchApp() {
+      // Request fullscreen
+      const el = document.documentElement;
+      try {
+        if (el.requestFullscreen) el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+        else if (el.msRequestFullscreen) el.msRequestFullscreen();
+      } catch (e) { }
+      const splash = G('splash');
+      splash.style.transition = 'opacity 0.7s';
+      splash.style.opacity = '0';
+      splash.style.pointerEvents = 'none';
+      setTimeout(() => { splash.style.display = 'none'; }, 750);
+    }
+
+    // Splash canvas — flipping green numbers on pure black
+    (function () {
+      const canvas = G('splash-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const COL_W = 22, ROW_H = 26;
+      let W, H, cols, rows, cells;
+
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        cols = Math.ceil(W / COL_W);
+        rows = Math.ceil(H / ROW_H);
+        cells = [];
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            cells.push({
+              c, r,
+              cur: Math.random() * 10 | 0,
+              next: Math.random() * 10 | 0,
+              prog: Math.random(),
+              spd: 0.008 + Math.random() * 0.022,
+              bright: 0.06 + Math.random() * 0.22,
+              phase: Math.random() * Math.PI * 2
+            });
+          }
+        }
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      let tick = 0;
+      function drawSplash() {
+        // Pure black background — no trails, pure dark
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, W, H);
+
+        tick++;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        cells.forEach(cell => {
+          cell.prog += cell.spd;
+          if (cell.prog >= 1) {
+            cell.prog = 0;
+            cell.cur = cell.next;
+            cell.next = Math.random() * 10 | 0;
+            if (Math.random() < 0.3) cell.spd = 0.008 + Math.random() * 0.022;
+            if (Math.random() < 0.2) cell.bright = 0.06 + Math.random() * 0.22;
+          }
+
+          const mid = Math.abs(cell.prog - 0.5);
+          const flash = Math.max(0, 0.18 - mid * 2.5);
+          const wave = Math.sin(tick * 0.018 + cell.c * 0.25 + cell.r * 0.18) * 0.5 + 0.5;
+          const digit = cell.prog < 0.5 ? cell.cur : cell.next;
+          const scaleY = Math.abs(Math.cos(cell.prog * Math.PI));
+          const colPulse = Math.sin(tick * 0.04 + cell.c * 0.8) > 0.85 ? 0.55 : 0;
+          const finalAlpha = Math.min(1, cell.bright + wave * 0.18 + flash + colPulse);
+          const fontSize = 13 + (colPulse > 0 ? 1 : 0);
+
+          const x = cell.c * COL_W + COL_W / 2;
+          const y = cell.r * ROW_H + ROW_H / 2;
+
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.scale(1, Math.max(0.05, scaleY));
+          ctx.font = fontSize + "px 'Share Tech Mono', monospace";
+
+          if (flash > 0.05) {
+            ctx.fillStyle = 'rgba(200,255,230,' + Math.min(1, flash * 4) + ')';
+          } else if (colPulse > 0) {
+            ctx.fillStyle = 'rgba(0,255,100,' + finalAlpha + ')';
+          } else {
+            ctx.fillStyle = 'rgba(0,' + (180 + Math.floor(wave * 60)) + ',' + (50 + Math.floor(wave * 30)) + ',' + finalAlpha + ')';
+          }
+
+          ctx.fillText(String(digit), 0, 0);
+          ctx.restore();
+        });
+
+        requestAnimationFrame(drawSplash);
+      }
+      drawSplash();
+    })();
+
+    // ══════════════ TASKBAR ══════════════
+    function updateClock() {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      G('tb-time').textContent = hh + ':' + mm;
+      G('tb-date').textContent = days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()];
+    }
+    updateClock();
+    setInterval(updateClock, 15000);
+
+    function updateNetStatus() {
+      const online = navigator.onLine;
+      const dot = G('tb-net-dot');
+      const lbl = G('tb-net-label');
+      dot.className = 'tb-net-dot ' + (online ? 'online' : 'offline');
+      lbl.textContent = online ? 'Connected' : 'No Internet';
+    }
+    updateNetStatus();
+    window.addEventListener('online', updateNetStatus);
+    window.addEventListener('offline', updateNetStatus);
+
+    function toggleStartMenu() {
+      const sm = G('start-menu');
+      sm.classList.toggle('open');
+    }
+    // Close start menu when clicking elsewhere
+    document.addEventListener('click', e => {
+      if (!G('tb-start').contains(e.target) && !G('start-menu').contains(e.target)) {
+        G('start-menu').classList.remove('open');
+      }
+    });
+
+
+    // ══════════════ LOCK SCREEN ══════════════
+    const LOCK_PIN = '1234';
+    let lockEntry = '';
+
+    function lockScreen() {
+      lockEntry = '';
+      updateLockDots();
+      G('lock-err').textContent = '';
+      updateLockClock();
+      G('lockscreen').classList.add('active');
+      startLockAnim();
+    }
+
+    function lockKey(k) {
+      if (k === 'back') {
+        lockEntry = lockEntry.slice(0, -1);
+      } else if (lockEntry.length < 4) {
+        lockEntry += k;
+      }
+      updateLockDots();
+      G('lock-err').textContent = '';
+      if (lockEntry.length === 4) {
+        if (lockEntry === LOCK_PIN) {
+          G('lockscreen').classList.remove('active');
+          lockEntry = '';
+          updateLockDots();
+        } else {
+          G('lock-err').textContent = '✘ INCORRECT PIN';
+          G('lock-dots').animate([{ transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(0)' }], { duration: 320 });
+          setTimeout(() => { lockEntry = ''; updateLockDots(); G('lock-err').textContent = ''; }, 700);
+        }
+      }
+    }
+
+    function updateLockDots() {
+      for (let i = 0; i < 4; i++) {
+        G('ld' + i).classList.toggle('filled', i < lockEntry.length);
+      }
+    }
+
+    function updateLockClock() {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const lt = G('lock-time'); if (lt) lt.textContent = hh + ':' + mm;
+      const ld = G('lock-date-lbl'); if (ld) ld.textContent = days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate();
+    }
+    setInterval(() => { if (G('lockscreen').classList.contains('active')) updateLockClock(); }, 10000);
+
+    // Lock screen canvas — same slow flipping numbers
+    let lockAnimRunning = false;
+    function startLockAnim() {
+      if (lockAnimRunning) return;
+      lockAnimRunning = true;
+      const canvas = G('lock-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const COL_W = 22, ROW_H = 26;
+      let W, H, cells;
+      function resize() {
+        W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight;
+        const cols = Math.ceil(W / COL_W), rows = Math.ceil(H / ROW_H);
+        cells = [];
+        for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++)
+          cells.push({ c, r, cur: Math.random() * 10 | 0, next: Math.random() * 10 | 0, prog: Math.random(), spd: 0.008 + Math.random() * 0.022, bright: 0.04 + Math.random() * 0.14 });
+      }
+      resize();
+      let t2 = 0;
+      function draw() {
+        if (!G('lockscreen').classList.contains('active')) { lockAnimRunning = false; return; }
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+        t2++; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        cells.forEach(cell => {
+          cell.prog += cell.spd;
+          if (cell.prog >= 1) { cell.prog = 0; cell.cur = cell.next; cell.next = Math.random() * 10 | 0; }
+          const mid = Math.abs(cell.prog - 0.5), flash = Math.max(0, 0.18 - mid * 2.5);
+          const wave = (Math.sin(t2 * 0.018 + cell.c * 0.25 + cell.r * 0.18) * 0.5 + 0.5);
+          const digit = cell.prog < 0.5 ? cell.cur : cell.next;
+          const scaleY = Math.abs(Math.cos(cell.prog * Math.PI));
+          const alpha = Math.min(1, cell.bright + wave * 0.12 + flash);
+          const x = cell.c * COL_W + COL_W / 2, y = cell.r * ROW_H + ROW_H / 2;
+          ctx.save(); ctx.translate(x, y); ctx.scale(1, Math.max(0.05, scaleY));
+          ctx.font = "12px 'Share Tech Mono',monospace";
+          ctx.fillStyle = flash > 0.05 ? 'rgba(180,255,210,' + Math.min(1, flash * 3) + ')' : 'rgba(0,' + (160 + Math.floor(wave * 50)) + ',' + (40 + Math.floor(wave * 25)) + ',' + alpha + ')';
+          ctx.fillText(String(digit), 0, 0);
+          ctx.restore();
+        });
+        requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    // Keyboard support for lock screen
+    document.addEventListener('keydown', e => {
+      if (!G('lockscreen').classList.contains('active')) return;
+      if (e.key >= '0' && e.key <= '9') lockKey(e.key);
+      else if (e.key === 'Backspace') lockKey('back');
+      e.preventDefault();
+    });
+
+  </script>
+</body>
+
+</html>
