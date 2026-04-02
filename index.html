@@ -48,32 +48,75 @@
   --text:#c8dce8;--text2:#6a8fa8;--text3:#2e4a62;
   --mono:'Share Tech Mono',monospace;--sans:'Exo 2',sans-serif;
 }
+/* ── LIGHT THEME ── */
+body.light-theme{
+  --bg:#eef2f7;--bg2:#e4eaf2;--bg3:#d8e0ec;--panel:#f0f4fa;--panel2:#e0e8f4;
+  --border:#b8c8dc;--accent:#006fb5;--accent2:#1a7a3c;--accent3:#c0001e;--accent4:#a06000;
+  --text:#1a2535;--text2:#3a5070;--text3:#7a9ab8;
+}
+body.light-theme #topbar{background:rgba(235,242,252,0.98);}
+body.light-theme #nav-wrap{background:#e0e8f4;}
+body.light-theme #taskbar{background:rgba(220,230,245,0.97);}
+body.light-theme body::before{background-image:linear-gradient(rgba(0,100,180,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,100,180,0.04) 1px,transparent 1px);}
+body.light-theme .rbox{background:var(--bg2);}
+body.light-theme .tab.active{background:var(--panel);}
+body.light-theme #radar-canvas{filter:hue-rotate(180deg) brightness(0.85);}
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{max-width:100vw;overflow-x:hidden;}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;padding-top:42px;}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,200,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.022) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
 
 /* ── TOPBAR ── */
 #topbar{
-  position:sticky;top:0;z-index:200;
-  background:rgba(8,12,16,0.98);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
-  padding:0 16px;display:flex;align-items:center;gap:10px;height:50px;
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  background:rgba(6,10,14,0.98);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(30,52,72,0.5);
+  padding:0 12px;display:flex;align-items:center;gap:8px;height:42px;
   width:100%;
+  transition:box-shadow 0.3s,border-bottom-color 0.3s;
 }
-.logo{font-family:var(--mono);font-size:0.95rem;color:var(--accent);letter-spacing:3px;text-shadow:0 0 12px rgba(0,200,255,0.45);white-space:nowrap;flex-shrink:0;}
+#topbar:hover{
+  box-shadow:0 0 28px rgba(0,255,157,0.1),0 2px 14px rgba(0,255,157,0.05);
+  border-bottom-color:rgba(0,255,157,0.25);
+}
+.logo{font-family:var(--mono);font-size:0.88rem;color:var(--accent);letter-spacing:3px;text-shadow:0 0 12px rgba(0,200,255,0.45);white-space:nowrap;flex-shrink:0;}
 .logo span{color:var(--accent2);}
-.ip-badge{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:0.72rem;color:var(--text2);background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:3px 10px;white-space:nowrap;flex-shrink:0;}
+.ip-badge{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:0.68rem;color:var(--text2);background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:2px 8px;white-space:nowrap;flex-shrink:0;}
 .dot{width:5px;height:5px;border-radius:50%;background:var(--accent2);box-shadow:0 0 5px var(--accent2);animation:blink 2s infinite;flex-shrink:0;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.15}}
 .ip-val{color:var(--accent);}
 .wm{margin-left:auto;font-family:var(--mono);font-size:0.65rem;color:var(--text3);letter-spacing:1.5px;white-space:nowrap;flex-shrink:0;border-left:1px solid var(--border);padding-left:12px;}
 .wm em{color:var(--accent2);font-style:normal;font-weight:700;}
-#power-btn{margin-left:auto;background:transparent;border:1px solid rgba(255,79,110,0.35);border-radius:4px;color:rgba(255,79,110,0.6);font-size:1rem;width:30px;height:30px;cursor:pointer;transition:all 0.2s;flex-shrink:0;display:flex;align-items:center;justify-content:center;}#power-btn:hover{background:rgba(255,79,110,0.12);border-color:var(--accent3);color:var(--accent3);box-shadow:0 0 12px rgba(255,79,110,0.2);}
+.topbar-btn{
+  background:transparent;border-radius:4px;font-size:0.82rem;
+  width:26px;height:26px;cursor:pointer;transition:all 0.18s;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  outline:none;
+}
+#tb-min-btn{border:1px solid rgba(255,184,0,0.28);color:rgba(255,184,0,0.45);}
+#tb-min-btn:hover{background:rgba(255,184,0,0.1);border-color:var(--accent4);color:var(--accent4);box-shadow:0 0 9px rgba(255,184,0,0.2);}
+#tb-fs-btn{border:1px solid rgba(0,200,255,0.28);color:rgba(0,200,255,0.45);}
+#tb-fs-btn:hover{background:rgba(0,200,255,0.08);border-color:var(--accent);color:var(--accent);box-shadow:0 0 9px rgba(0,200,255,0.2);}
+#power-btn{border:1px solid rgba(255,79,110,0.32);color:rgba(255,79,110,0.55);}
+#power-btn:hover{background:rgba(255,79,110,0.1);border-color:var(--accent3);color:var(--accent3);box-shadow:0 0 10px rgba(255,79,110,0.2);}
+
+/* ── NETWORK IDENTITY STRIP ── */
+.ni-strip{
+  display:flex;flex-wrap:wrap;gap:5px;align-items:center;
+  background:var(--panel);border:1px solid var(--border);border-radius:5px;
+  padding:7px 12px;margin-bottom:11px;
+}
+.ni-strip-lbl{font-family:var(--mono);font-size:0.56rem;color:var(--text3);
+  letter-spacing:2px;text-transform:uppercase;margin-right:4px;white-space:nowrap;}
+.ni-chip{display:inline-flex;align-items:center;gap:4px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:3px;padding:2px 8px;
+  font-family:var(--mono);font-size:0.69rem;white-space:nowrap;}
+.ni-chip-lbl{color:var(--text3);font-size:0.56rem;letter-spacing:1px;text-transform:uppercase;}
+.ni-chip-val{color:var(--accent2);}
 
 /* ── NAV — fixed width, arrows to scroll ── */
 #nav-wrap{
-  position:sticky;top:50px;z-index:199;
+  position:sticky;top:42px;z-index:199;
   background:var(--bg2);border-bottom:1px solid var(--border);
   display:flex;align-items:stretch;width:100%;
 }
@@ -228,22 +271,6 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 
 
 /* ── WATERMARK ASCII ── */
-#watermark{
-  position:fixed;bottom:46px;left:50%;transform:translateX(-50%);
-  pointer-events:none;z-index:50;
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-}
-#wm-ascii{
-  font-family:var(--mono);font-size:0.38rem;line-height:1.3;
-  color:rgba(0,200,255,0.13);letter-spacing:0.5px;white-space:pre;
-  text-align:center;
-}
-#wm-text{
-  font-family:var(--mono);font-size:0.58rem;color:rgba(0,200,255,0.22);
-  letter-spacing:3px;text-align:center;
-}
-
-
 /* ══════════════ SPLASH SCREEN ══════════════ */
 #splash{
   position:fixed;inset:0;z-index:9000;
@@ -293,6 +320,59 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
   background:rgba(0,255,157,0.02);
   text-shadow:0 0 12px rgba(0,255,157,0.15);
 }
+
+/* ── LOGIN FORM on Splash ── */
+#login-box{
+  background:rgba(8,18,12,0.88);
+  border:1px solid rgba(0,255,157,0.18);
+  border-radius:8px;
+  padding:28px 32px;
+  width:340px;
+  display:flex;flex-direction:column;gap:14px;
+  box-shadow:0 0 40px rgba(0,255,157,0.07);
+}
+#login-box input[type=text],#login-box input[type=password]{
+  background:rgba(0,12,6,0.7);
+  border:1px solid rgba(0,200,255,0.2);
+  border-radius:4px;
+  color:#c8dce8;
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.85rem;
+  padding:10px 13px;
+  width:100%;
+  outline:none;
+  transition:border-color 0.15s;
+}
+#login-box input:focus{border-color:rgba(0,255,157,0.5);}
+#login-submit{
+  font-family:'Share Tech Mono',monospace;font-size:0.9rem;letter-spacing:3px;
+  text-transform:uppercase;color:#000;
+  background:linear-gradient(135deg,#00ff9d,#00c8ff);
+  border:none;border-radius:5px;padding:12px;cursor:pointer;font-weight:700;
+  transition:transform 0.1s,box-shadow 0.15s;
+  box-shadow:0 0 20px rgba(0,255,157,0.3);
+}
+#login-submit:hover{transform:scale(1.02);box-shadow:0 0 35px rgba(0,255,157,0.55);}
+#login-err{font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#ff4f6e;min-height:1em;text-align:center;letter-spacing:1px;}
+#login-role-badge{
+  font-family:'Share Tech Mono',monospace;font-size:0.62rem;
+  padding:2px 9px;border-radius:3px;
+  background:rgba(0,255,157,0.1);border:1px solid rgba(0,255,157,0.25);
+  color:rgba(0,255,157,0.8);letter-spacing:1px;text-transform:uppercase;
+  flex-shrink:0;
+}
+/* Admin panel modal */
+#admin-panel{
+  position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,0.7);
+  display:none;align-items:center;justify-content:center;
+}
+#admin-panel.open{display:flex;}
+#admin-box{
+  background:var(--panel);border:1px solid var(--border);border-radius:8px;
+  padding:24px;width:min(500px,90vw);max-height:80vh;overflow-y:auto;
+}
+#admin-box h2{font-family:var(--mono);font-size:0.8rem;color:var(--accent);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;}
 #splash-launch{
   font-family:'Share Tech Mono',monospace;
   font-size:1rem;letter-spacing:4px;text-transform:uppercase;
@@ -389,6 +469,81 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 .sm-icon{font-size:1rem;width:22px;text-align:center;}
 
 
+
+/* ══════════════ ASSET MONITOR ══════════════ */
+.monitor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:11px;margin-top:11px;}
+.monitor-card{
+  background:var(--bg3);border:1px solid var(--border);border-radius:5px;
+  padding:13px 15px;display:flex;flex-direction:column;gap:8px;
+  transition:border-color 0.3s,box-shadow 0.3s;position:relative;overflow:hidden;
+}
+.monitor-card.online{border-color:rgba(0,255,157,0.35);box-shadow:0 0 12px rgba(0,255,157,0.05);}
+.monitor-card.offline{border-color:rgba(255,79,110,0.45);box-shadow:0 0 16px rgba(255,79,110,0.08);animation:cardPulse 1.5s ease-in-out infinite;}
+.monitor-card.checking{border-color:rgba(255,184,0,0.25);}
+@keyframes cardPulse{0%,100%{box-shadow:0 0 12px rgba(255,79,110,0.08)}50%{box-shadow:0 0 28px rgba(255,79,110,0.22)}}
+.mc-top{display:flex;align-items:center;gap:9px;}
+.mc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;transition:all 0.4s;}
+.mc-dot.online{background:#00ff9d;box-shadow:0 0 8px rgba(0,255,157,0.8);animation:dotPulse 2s infinite;}
+.mc-dot.offline{background:#ff4f6e;box-shadow:0 0 8px rgba(255,79,110,0.8);}
+.mc-dot.checking{background:#ffb800;box-shadow:0 0 6px rgba(255,184,0,0.5);animation:dotPulse 0.6s infinite;}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.mc-name{font-family:var(--mono);font-size:0.82rem;color:var(--text);font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mc-status{font-family:var(--mono);font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;}
+
+.mc-badge{font-family:var(--mono);font-size:0.63rem;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:3px;white-space:nowrap;}
+.mc-badge.online{color:rgba(0,255,157,0.9);background:rgba(0,255,157,0.1);border:1px solid rgba(0,255,157,0.2);}
+.mc-badge.offline{color:rgba(255,79,110,0.9);background:rgba(255,79,110,0.1);border:1px solid rgba(255,79,110,0.2);}
+.mc-badge.checking{color:rgba(255,184,0,0.9);background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.18);}
+.mc-badge.idle-stat{color:var(--text3);border:1px solid var(--border);}
+.mc-dot.idle-dot{background:var(--text3);box-shadow:none;animation:none;}
+.monitor-card.checking{border-color:rgba(255,184,0,0.3);}
+
+.mc-status.online{color:rgba(0,255,157,0.7);}
+.mc-status.offline{color:rgba(255,79,110,0.8);}
+.mc-status.checking{color:rgba(255,184,0,0.7);}
+.mc-ip{font-family:var(--mono);font-size:0.72rem;color:var(--text3);}
+.mc-meta{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:0.64rem;color:var(--text3);}
+.mc-since{color:var(--text3);}
+.mc-edit{display:flex;gap:6px;margin-top:4px;}
+.mc-edit input{flex:1;font-size:0.74rem;padding:5px 8px;}
+.mc-actions{display:flex;gap:5px;margin-top:3px;}
+.mon-settings{background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:14px;margin-bottom:11px;}
+.mon-settings-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
+.mon-settings-row label{font-size:0.68rem;color:var(--text3);white-space:nowrap;}
+.mon-settings-row input{flex:1;min-width:100px;font-size:0.76rem;}
+#mon-alert-bar{
+  background:rgba(255,79,110,0.12);border:2px solid rgba(255,79,110,0.5);
+  border-radius:5px;padding:12px 16px;margin-bottom:11px;
+  font-family:var(--mono);font-size:0.78rem;color:#ff6b85;
+  display:none;
+}
+#mon-alert-bar.active{display:block;animation:alertBorderFlash 0.7s ease-in-out infinite alternate;}
+@keyframes alertBorderFlash{from{border-color:rgba(255,79,110,0.4);background:rgba(255,79,110,0.08)}to{border-color:rgba(255,79,110,0.85);background:rgba(255,79,110,0.18)}}
+@keyframes alertFlash{from{opacity:0.6}to{opacity:1}}
+
+
+/* ══════════ SUPPORT LOG ══════════ */
+.slog-card{
+  background:var(--bg3);border:1px solid var(--border);border-radius:5px;
+  padding:12px 14px;margin-bottom:8px;transition:border-color 0.2s;
+}
+.slog-card:hover{border-color:rgba(0,200,255,0.25);}
+.slog-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.slog-id{font-family:var(--mono);font-size:0.6rem;color:var(--text3);}
+.slog-who{font-family:var(--mono);font-size:0.72rem;color:var(--accent);font-weight:bold;}
+.slog-time{font-family:var(--mono);font-size:0.62rem;color:var(--text3);}
+.slog-badge{font-size:0.6rem;padding:2px 7px;border-radius:3px;font-family:var(--mono);letter-spacing:1px;}
+.slog-badge.request{background:rgba(0,200,255,0.1);color:rgba(0,200,255,0.8);border:1px solid rgba(0,200,255,0.2);}
+.slog-badge.done{background:rgba(0,255,157,0.08);color:rgba(0,255,157,0.7);border:1px solid rgba(0,255,157,0.15);}
+.slog-badge.pending{background:rgba(255,184,0,0.08);color:rgba(255,184,0,0.7);border:1px solid rgba(255,184,0,0.15);}
+.slog-title{font-size:0.82rem;color:var(--text);font-weight:600;margin-bottom:4px;}
+.slog-desc{font-size:0.74rem;color:var(--text2);line-height:1.6;}
+.slog-actions{display:flex;gap:6px;margin-top:8px;}
+.slog-form{background:var(--bg3);border:1px solid rgba(0,200,255,0.15);border-radius:5px;padding:14px;margin-bottom:12px;}
+.slog-form .row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.slog-form input,.slog-form textarea,.slog-form select{font-size:0.74rem;padding:6px 10px;}
+.slog-empty{text-align:center;color:var(--text3);font-size:0.75rem;padding:30px;font-family:var(--mono);}
+
 /* ══════════════ LOCK SCREEN ══════════════ */
 #lockscreen{
   position:fixed;inset:0;z-index:8000;
@@ -464,21 +619,16 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 ::-webkit-scrollbar-track{background:var(--bg2);}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 /* ── TAB CANVAS ANIMATIONS ── */
-#tab-anim-wrap{
-  position:fixed;bottom:148px;right:18px;z-index:49;
-  pointer-events:none;
-}
-#tab-anim-canvas{
-  display:block;
-  border-radius:6px;
-}
+.tab-anim-inline{display:flex;justify-content:flex-start;align-items:center;margin-bottom:14px;padding:8px 12px;background:rgba(0,200,255,0.03);border:1px solid rgba(0,200,255,0.08);border-radius:6px;pointer-events:none;gap:12px;}
+.tab-anim-inline canvas{border-radius:4px;opacity:0.9;}
+.tab-anim-label{font-family:var(--mono);font-size:0.62rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;}
 
 </style>
 </head>
 <body>
 <div id="toast"></div>
 
-<!-- ════════════════ SPLASH SCREEN ════════════════ -->
+<!-- ════════════════ SPLASH / LOGIN SCREEN ════════════════ -->
 <div id="splash">
   <canvas id="splash-canvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
   <div id="splash-content">
@@ -486,8 +636,45 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
       NETOPS
       <span class="sub">NETWORK SUPPORT TOOLKIT</span>
     </div>
-    <button id="splash-launch" onclick="launchApp()">▶ LAUNCH</button>
+    <div id="login-box">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(0,200,255,0.45);letter-spacing:3px;text-align:center;text-transform:uppercase;">Sign In to Continue</div>
+      <input type="text" id="login-user" placeholder="Username" autocomplete="username" onkeydown="if(event.key==='Enter')G('login-pass').focus()">
+      <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <button id="login-submit" onclick="doLogin()">▶ LOGIN</button>
+      <div id="login-err"></div>
+    </div>
     <div id="splash-credits">© M Kamjo 2026</div>
+  </div>
+</div>
+
+<!-- Admin management panel -->
+<div id="admin-panel">
+  <div id="admin-box">
+    <h2>⚙ Admin — Manage Users</h2>
+    <div style="margin-bottom:14px;">
+      <div class="lbl" style="margin-bottom:4px;">ADMIN PASSWORD</div>
+      <div class="row">
+        <input type="password" id="adm-admin-pw" placeholder="New admin password…">
+        <button class="btn sm g" onclick="adminSavePW('admin')">Save</button>
+      </div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div class="lbl" style="margin-bottom:4px;">USER PASSWORD</div>
+      <div class="row">
+        <input type="password" id="adm-user-pw" placeholder="New user password…">
+        <button class="btn sm g" onclick="adminSavePW('user')">Save</button>
+      </div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div class="lbl" style="margin-bottom:4px;">CURRENT CREDENTIALS (click to reveal)</div>
+      <div id="adm-creds" style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;
+        background:var(--bg3);border:1px solid var(--border);border-radius:4px;
+        padding:10px 13px;line-height:2;cursor:pointer;color:var(--text3);"
+        onclick="adminShowCreds(this)">Click to reveal current passwords</div>
+    </div>
+    <div class="row">
+      <button class="btn sm r" onclick="G('admin-panel').classList.remove('open')">✕ Close</button>
+    </div>
   </div>
 </div>
 
@@ -522,10 +709,10 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
   <a class="sm-item" href="ms-settings:network-wifi"><span class="sm-icon">📶</span>Wi-Fi</a>
   <a class="sm-item" href="ms-settings:network-ethernet"><span class="sm-icon">🔌</span>Ethernet</a>
   <a class="sm-item" href="ms-settings:windowsdefender"><span class="sm-icon">🛡️</span>Firewall</a>
-  <span class="sm-item" onclick="cpToast('ncpa.cpl')"><span class="sm-icon">⚙️</span>ncpa.cpl (Adapters)</span>
-  <span class="sm-item" onclick="cpToast('services.msc')"><span class="sm-icon">⚙️</span>services.msc</span>
-  <span class="sm-item" onclick="cpToast('eventvwr.msc')"><span class="sm-icon">📋</span>eventvwr.msc</span>
-  <span class="sm-item" onclick="cpToast('devmgmt.msc')"><span class="sm-icon">🔧</span>Device Manager</span>
+  <span class="sm-item" onclick="launchWin('ncpa.cpl')"><span class="sm-icon">⚙️</span>ncpa.cpl (Adapters)</span>
+  <span class="sm-item" onclick="launchWin('services.msc')"><span class="sm-icon">⚙️</span>services.msc</span>
+  <span class="sm-item" onclick="launchWin('eventvwr.msc')"><span class="sm-icon">📋</span>eventvwr.msc</span>
+  <span class="sm-item" onclick="launchWin('devmgmt.msc')"><span class="sm-icon">🔧</span>Device Manager</span>
 </div>
 
 
@@ -565,7 +752,7 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 </div>
 
 <!-- Lock button in taskbar -->
-<button id="lock-btn" onclick="lockScreen()" title="Lock Screen">🔒</button>
+<button id="lock-btn" onclick="logoutUser()" title="Lock / Logout">🔒</button>
 
 <!-- RADAR bottom-right -->
 <div id="radar-wrap">
@@ -573,17 +760,8 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 </div>
 
 <!-- TAB MINI CANVAS ANIM -->
-<div id="tab-anim-wrap">
-  <canvas id="tab-anim-canvas" width="90" height="60"></canvas>
-</div>
 
-<!-- ASCII WATERMARK bottom-center -->
-<div id="watermark">
-  <div id="wm-ascii">████──██─██──────────█───█────█──█─████─█───█───██─████
-█──██──███───────────██─██────█─█──█──█─██─██────█─█──█
-████────█────────────█─█─█────██───████─█─█─█────█─█──█
-█──██───█────────────█───█────█─█──█──█─█───█─█──█─█──█
-████────█────────────█───█────█──█─█──█─█───█─████─████</div>
+
 </div>
 
 <!-- TOPBAR -->
@@ -595,29 +773,30 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
   <div class="ip-badge" id="tb-loc-wrap" style="display:none">LOC: <span class="ip-val" id="tb-loc">…</span></div>
   <div class="ip-badge" id="tb-asn-wrap" style="display:none">ASN: <span class="ip-val" id="tb-asn">…</span></div>
   <div class="ip-badge" id="tb-tz-wrap" style="display:none">TZ: <span class="ip-val" id="tb-tz">…</span></div>
-  <button id="power-btn" onclick="if(confirm('Close NetOps Toolkit?'))window.close()" title="Close Tool">⏻</button>
+  <span style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(0,255,157,0.3);letter-spacing:2px;margin-left:auto;padding-right:6px;white-space:nowrap;">© M Kamjo</span>
+  <button id="tb-theme-btn" class="topbar-btn" onclick="toggleTheme()" title="Toggle Dark/Light Theme" style="font-size:0.78rem;letter-spacing:0.5px;">🌙</button>
+  <button id="tb-min-btn" class="topbar-btn" onclick="tbMinimize()" title="Exit Fullscreen / Restore browser window">⬜</button>
+  <button id="tb-fs-btn"  class="topbar-btn" onclick="tbToggleFS()"  title="Toggle Fullscreen (F11)">⛶</button>
+  <button id="power-btn"  class="topbar-btn" onclick="tbPowerOff()"  title="Exit fullscreen &amp; close tab">⏻</button>
 </div>
 
 <!-- NAV with scroll arrows -->
 <div id="nav-wrap">
   <button class="nav-arrow" id="nav-left" onclick="navScroll(-1)">&#8249;</button>
-  <div id="nav">
-    <div class="tab active" data-sec="dashboard">📡 Dashboard</div>
-    <div class="tab" data-sec="vault">🔐 Vault</div>
-    <div class="tab" data-sec="urlcheck">🔗 URL Check</div>
-    <div class="tab" data-sec="iplookup">🌍 IP Lookup</div>
-    <div class="tab" data-sec="dns">🌐 DNS</div>
-    <div class="tab" data-sec="emailhdr">📧 Email Hdrs</div>
-    <div class="tab" data-sec="subnet">🧮 Subnet</div>
-    <div class="tab" data-sec="ports">📊 Ports</div>
-    <div class="tab" data-sec="mac">🔌 MAC</div>
-    <div class="tab" data-sec="extract">🧹 Extractor</div>
-    <div class="tab" data-sec="netsh">⚙️ Netsh</div>
-    <div class="tab" data-sec="encoder">📦 Encoder</div>
-    <div class="tab" data-sec="passcheck">🔑 Password</div>
-    <div class="tab" data-sec="iprange">📡 IP Range</div>
-    <div class="tab" data-sec="notes">📝 Notes</div>
-    <div class="tab" data-sec="winlinks">🖥️ Windows</div>
+  <div id="nav" ondragover="event.preventDefault()" ondrop="tabDrop(event)">
+    <div class="tab active" draggable="true" data-sec="dashboard" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">📡 Dashboard</div>
+    <div class="tab" draggable="true" data-sec="vault" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔐 Vault</div>
+    <div class="tab" draggable="true" data-sec="urlcheck" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔗 URL Check</div>
+    <div class="tab" draggable="true" data-sec="iplookup" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🌍 IP Lookup</div>
+    <div class="tab" draggable="true" data-sec="dns" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🌐 DNS</div>
+    <div class="tab" draggable="true" data-sec="emailhdr" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">📧 Email Hdrs</div>
+    <div class="tab" draggable="true" data-sec="nettools" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔧 Net Tools</div>
+    <div class="tab" draggable="true" data-sec="ports" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">📊 Ports</div>
+    <div class="tab" draggable="true" data-sec="mac" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔌 MAC</div>
+    <div class="tab" draggable="true" data-sec="extract" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🧹 Extractor</div>
+    <div class="tab" draggable="true" data-sec="passcheck" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔑 Password</div>
+    <div class="tab" draggable="true" data-sec="notes" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">📝 Notes</div>
+    <div class="tab" draggable="true" data-sec="printer" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🖨️ Printer</div>
   </div>
   <button class="nav-arrow" id="nav-right" onclick="navScroll(1)">&#8250;</button>
 </div>
@@ -626,32 +805,174 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 
 <!-- ══════════════════════════ DASHBOARD ══════════════════════════ -->
 <div id="sec-dashboard" class="section active">
-  <div class="g2">
-    <div class="panel">
-      <div class="pt">Network Identity</div>
-      <div class="igrid">
-        <div class="iitem"><div class="il">Public IP</div><div class="iv" id="d-pub">…</div></div>
-        <div class="iitem"><div class="il">Local IP</div><div class="iv" id="d-lan">…</div></div>
-        <div class="iitem"><div class="il">ISP</div><div class="iv" id="d-isp">…</div></div>
-        <div class="iitem"><div class="il">Location</div><div class="iv" id="d-loc">…</div></div>
-        <div class="iitem"><div class="il">ASN</div><div class="iv" id="d-asn">…</div></div>
-        <div class="iitem"><div class="il">Timezone</div><div class="iv" id="d-tz">…</div></div>
+
+  <!-- Network Identity — compact single-row strip -->
+  <div class="ni-strip">
+    <span class="ni-strip-lbl">NET ID</span>
+    <span class="ni-chip"><span class="ni-chip-lbl">PUB</span><span class="ni-chip-val" id="d-pub">…</span></span>
+    <span class="ni-chip"><span class="ni-chip-lbl">LAN</span><span class="ni-chip-val" id="d-lan">…</span></span>
+    <span class="ni-chip" id="d-isp-chip"><span class="ni-chip-lbl">ISP</span><span class="ni-chip-val" id="d-isp">…</span></span>
+    <span class="ni-chip" id="d-loc-chip"><span class="ni-chip-lbl">LOC</span><span class="ni-chip-val" id="d-loc">…</span></span>
+    <span class="ni-chip" id="d-asn-chip"><span class="ni-chip-lbl">ASN</span><span class="ni-chip-val" id="d-asn">…</span></span>
+    <span class="ni-chip" id="d-tz-chip"><span class="ni-chip-lbl">TZ</span><span class="ni-chip-val" id="d-tz">…</span></span>
+  </div>
+
+  <!-- Windows Quick Launch — full width -->
+  <div class="panel" style="margin-bottom:13px;">
+      <div class="pt" style="justify-content:space-between;">
+        <span>⚡ Windows Quick Launch</span>
+        <button onclick="toggleWinEditMode()" id="win-edit-btn" class="btn sm" style="font-size:0.6rem;padding:3px 9px;margin-left:auto;">✏️ Customize</button>
       </div>
-    </div>
-    <div class="panel">
-      <div class="pt">Quick Windows Actions</div>
-      <div class="wgrid">
+      <div id="win-edit-hint" style="display:none;font-size:0.65rem;color:var(--accent4);margin-bottom:8px;">Click ✕ on any button to hide it. Click <b>Done</b> to save.</div>
+
+      <div class="wgrid" style="margin-top:6px;">
         <a class="wbtn" href="ms-settings:network">🌐 Network</a>
         <a class="wbtn" href="ms-settings:network-ethernet">🔌 Ethernet</a>
         <a class="wbtn" href="ms-settings:network-wifi">📶 Wi-Fi</a>
         <a class="wbtn" href="ms-settings:network-vpn">🔒 VPN</a>
-        <a class="wbtn" href="ms-settings:windowsdefender">🛡️ Firewall</a>
         <a class="wbtn" href="ms-settings:network-proxy">🔀 Proxy</a>
-        <span class="wbtn" onclick="cpToast('ncpa.cpl')">⚙️ ncpa.cpl</span>
-        <span class="wbtn" onclick="cpToast('ipconfig /all')">💻 ipconfig</span>
+        <a class="wbtn" href="ms-settings:datausage">📊 Data Usage</a>
+        <span class="wbtn" onclick="launchWin('ncpa.cpl')">⚙️ Network Adapters</span>
+        <span class="wbtn" onclick="launchWin('firewall.cpl')">🔥 Firewall CPL</span>
+        <span class="wbtn" onclick="launchWin('taskmgr.exe')">📊 Task Manager</span>
+        <span class="wbtn" onclick="launchWin('devmgmt.msc')">🔧 Device Manager</span>
+        <span class="wbtn" onclick="launchWin('services.msc')">⚙️ Services</span>
+        <span class="wbtn" onclick="launchWin('eventvwr.msc')">📋 Event Viewer</span>
+        <span class="wbtn" onclick="launchWin('compmgmt.msc')">🗂️ Comp Mgmt</span>
+        <span class="wbtn" onclick="launchWin('resmon.exe')">📈 Res Monitor</span>
+        <span class="wbtn" onclick="launchWin('msconfig.exe')">🔩 System Config</span>
+        <span class="wbtn" onclick="launchWin('control.exe')">🎛️ Control Panel</span>
+        <span class="wbtn" onclick="launchWin('gpedit.msc')">📜 Group Policy</span>
+        <span class="wbtn" onclick="launchWin('sysdm.cpl')">⚙️ System Props</span>
+        <span class="wbtn" onclick="launchWin('mstsc.exe')">🖥️ Remote Desktop</span>
+        <span class="wbtn" onclick="launchWin('mmc.exe')">🔧 MMC Console</span>
+        <a class="wbtn" href="ms-settings:windowsdefender">🛡️ Defender</a>
+        <a class="wbtn" href="ms-settings:windowsupdate">🔄 Windows Update</a>
+        <a class="wbtn" href="ms-settings:privacy">🔏 Privacy</a>
+        <span class="wbtn" onclick="launchWin('certmgr.msc')">🔐 Cert Manager</span>
+        <span class="wbtn" onclick="launchWin('secpol.msc')">🔒 Security Policy</span>
+        <span class="wbtn" onclick="launchWin('diskmgmt.msc')">💾 Disk Mgmt</span>
+        <span class="wbtn" onclick="launchWin('dfrgui.exe')">🔧 Defrag</span>
+        <span class="wbtn" onclick="launchWin('cleanmgr.exe')">🧹 Disk Cleanup</span>
+        <span class="wbtn" onclick="launchWin('explorer.exe')">📁 File Explorer</span>
+        <span class="wbtn" onclick="launchWin('fsmgmt.msc')">📂 Shared Folders</span>
+        <span class="wbtn" onclick="launchWin('lusrmgr.msc')">👥 Local Users</span>
+        <span class="wbtn" onclick="launchWin('netplwiz.exe')">🔑 User Accounts</span>
+        <a class="wbtn" href="ms-settings:display">🖥️ Display</a>
+        <a class="wbtn" href="ms-settings:sound">🔊 Sound</a>
+        <a class="wbtn" href="ms-settings:dateandtime">🕐 Date & Time</a>
+        <a class="wbtn" href="ms-settings:regionlanguage">🌐 Region</a>
+        <span class="wbtn" onclick="launchWin('powershell.exe')">⚡ PowerShell</span>
+        <span class="wbtn" onclick="launchWin('cmd.exe')">💻 CMD</span>
+        <span class="wbtn" onclick="launchWin('shell:AppsFolder\\Microsoft.WindowsRun')
+          ;cpToast('Win+R')">▶ Run (Win+R)</span>
+        <span class="wbtn" onclick="launchWin('wt.exe')">🖥️ Terminal</span>
+      </div>
+  </div>
+
+  <!-- ── ASSET MONITOR ── -->
+  <div class="panel">
+    <div class="pt" style="margin-bottom:6px;">🖥️ Asset Monitor — Live Status</div>
+
+    <!-- Alert bar -->
+    <div id="mon-alert-bar">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:1.1rem;animation:alertFlash 0.4s infinite alternate;">🚨</span>
+        <span id="mon-alert-text" style="flex:1;"></span>
+        <button onclick="stopAlarm()" style="
+          background:rgba(255,79,110,0.25);border:1px solid rgba(255,79,110,0.6);
+          color:#ff4f6e;font-family:var(--mono);font-size:0.72rem;letter-spacing:1px;
+          padding:5px 14px;border-radius:4px;cursor:pointer;white-space:nowrap;
+          animation:none;transition:all 0.15s;font-weight:bold;
+        " onmouseover="this.style.background='rgba(255,79,110,0.45)'"
+           onmouseout="this.style.background='rgba(255,79,110,0.25)'">
+          🔕 STOP ALARM
+        </button>
+      </div>
+      <div id="mon-alert-list" style="margin-top:8px;font-size:0.68rem;color:rgba(255,79,110,0.7);line-height:1.8;"></div>
+    </div>
+
+    <!-- Settings row -->
+    <div class="mon-settings">
+
+      <!-- ROW 1: Ping backend status — always full width, always visible -->
+      <div id="ping-backend-status" style="
+        font-family:var(--mono);font-size:0.72rem;
+        padding:8px 14px;border-radius:4px;margin-bottom:10px;
+        background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.25);
+        color:rgba(255,184,0,0.85);display:flex;align-items:center;gap:8px;
+      ">⏳ Checking ping backend status…</div>
+
+      <!-- ROW 2: Controls -->
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="font-size:0.68rem;color:var(--text3);">Interval:</span>
+        <select id="mon-interval" style="width:90px;font-size:0.72rem;padding:4px 6px;" onchange="setMonitorInterval()">
+          <option value="10000">10s</option>
+          <option value="30000" selected>30s</option>
+          <option value="60000">1 min</option>
+          <option value="300000">5 min</option>
+        </select>
+        <span style="font-size:0.68rem;color:var(--text3);">Packets:</span>
+        <select id="mon-sensitivity" style="width:190px;font-size:0.72rem;padding:4px 6px;" onchange="saveSensitivity()" title="How many ICMP packets per check. Online = at least 1 reply received.">
+          <option value="5|81" selected>5 pkts — 1 reply = ONLINE ✅</option>
+          <option value="3|66">3 pkts — 1 reply = ONLINE</option>
+          <option value="2|50">2 pkts — 1 reply = ONLINE</option>
+          <option value="1|50">1 pkt  — fastest check</option>
+        </select>
+        <span style="font-size:0.68rem;color:var(--text3);">Alarm:</span>
+        <select id="mon-alarm-select" style="width:170px;font-size:0.72rem;padding:4px 6px;" onchange="saveAlarmChoice()" title="Choose alarm sound">
+          <option value="igi_prison">🚨 IGI Prison Siren</option>
+          <option value="nuclear">☢️ Nuclear Alert</option>
+          <option value="submarine">🌊 Submarine Dive</option>
+          <option value="police">🚔 Police Siren</option>
+          <option value="radar_beep">📡 Radar Beep</option>
+          <option value="klaxon">📣 Klaxon Horn</option>
+          <option value="heartbeat">💓 Heartbeat Critical</option>
+          <option value="off">🔇 No Sound</option>
+        </select>
+        <button class="btn sm y" onclick="testAlarm()" id="test-alarm-btn">🔊 Test</button>
+        <button class="btn sm g" onclick="monitorCheckAll()">▶ Check Now</button>
+        <span id="mon-next" style="font-family:var(--mono);font-size:0.62rem;color:var(--text3);"></span>
+        <button class="btn sm" onclick="monitorAddCard()" style="margin-left:auto;">+ Add Asset</button>
+      </div>
+
+      <!-- EMAIL CONFIG ROW -->
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding:10px;background:rgba(0,200,255,0.04);border:1px solid rgba(0,200,255,0.1);border-radius:4px;">
+        <span style="font-size:0.65rem;color:var(--text3);letter-spacing:1px;white-space:nowrap;">📧 EMAIL ALERTS</span>
+        <input type="email" id="em-from" placeholder="Your Gmail (sender)" style="flex:1;min-width:160px;font-size:0.72rem;padding:4px 8px;">
+        <input type="password" id="em-pass" placeholder="Gmail App Password" style="flex:1;min-width:150px;font-size:0.72rem;padding:4px 8px;" title="Not your normal password — generate App Password in Google Account settings">
+        <input type="text" id="em-to" placeholder="Recipient email(s) comma separated" style="flex:2;min-width:180px;font-size:0.72rem;padding:4px 8px;">
+        <button class="btn sm g" onclick="saveEmailConfig()">💾 Save</button>
+        <button class="btn sm" onclick="testEmailAlert()">📤 Test Email</button>
+        <span id="em-status" style="font-family:var(--mono);font-size:0.62rem;color:var(--text3);"></span>
+      </div>
+
+      <div style="font-size:0.63rem;color:var(--text3);line-height:1.7;">
+        <span style="color:var(--accent2);">🟢 ONLINE</span> = reachable &nbsp;·&nbsp;
+        <span style="color:rgba(255,79,110,0.8);">🔴 OFFLINE</span> = unreachable &nbsp;·&nbsp;
+        Alert fires on state change only &nbsp;·&nbsp;
+        <strong style="color:rgba(255,184,0,0.7);">For phones &amp; servers without web services: run START_PING_SERVER.bat for real ICMP ping</strong>
       </div>
     </div>
+
+    <!-- Monitor cards grid -->
+    <div class="monitor-grid" id="monitor-grid"></div>
   </div>
+
+  <!-- ── INLINE CMD RUNNER ── -->
+  <div class="panel">
+    <div class="pt">💻 Command Runner — via Backend (localhost:5199)</div>
+    <p class="note" style="margin-bottom:8px;">Runs CMD commands server-side via ping backend. Safe commands only. Must run <b>START_PING_SERVER.bat</b> first.</p>
+    <div class="row">
+      <input type="text" id="cmd-run-in" placeholder="ipconfig /all  ·  netstat -an  ·  arp -a  ·  whoami  ·  systeminfo…"
+        onkeydown="if(event.key==='Enter')runCmd()" style="flex:1;font-family:var(--mono);font-size:0.8rem;">
+      <button class="btn g" onclick="runCmd()">▶ Run</button>
+      <button class="btn sm r" onclick="G('cmd-run-out').style.display='none';G('cmd-run-in').value=''">✕</button>
+    </div>
+    <div class="tags" style="margin-top:7px;" id="cmd-quick-tags"></div>
+    <div id="cmd-run-out" style="display:none;margin-top:9px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:11px;font-family:var(--mono);font-size:0.75rem;line-height:1.7;max-height:320px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;color:var(--accent2);"></div>
+  </div>
+
   <div class="panel">
     <div class="pt">Quick Check — IP Info or URL Threat</div>
     <div class="row">
@@ -664,6 +985,7 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 
 <!-- ══════════════════════════ VAULT ══════════════════════════ -->
 <div id="sec-vault" class="section">
+  <div class="tab-anim-inline"><canvas class="tab-anim-canvas" width="90" height="60" data-sec="vault"></canvas></div>
   <div class="panel">
     <div class="pt">🔐 Credential Vault — Hidden Text Storage</div>
     <p class="note">Paste any text (credentials, configs, logs). It hides when you save. Search it below. Nothing leaves your browser.</p>
@@ -678,24 +1000,74 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
     <div style="margin-top:6px;font-size:0.68rem;color:var(--text3)" id="vstatus">No data loaded.</div>
   </div>
   <div class="panel">
-    <div class="pt">Advanced Search</div>
-    <div class="row">
-      <input type="text" id="vs-q" placeholder="Keyword, phrase or regex…" onkeydown="if(event.key==='Enter')vSearch()">
+    <div class="pt">Advanced Search — Vault</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:8px;">
+      <input type="text" id="vs-q"  placeholder="🔑 Keyword 1 / regex…"       oninput="vSearch()" onkeydown="if(event.key==='Enter')vSearch()">
+      <input type="text" id="vs-q2" placeholder="🔑 Keyword 2 (AND)…"          oninput="vSearch()" onkeydown="if(event.key==='Enter')vSearch()">
+      <input type="text" id="vs-q3" placeholder="🔑 Keyword 3 (AND)…"          oninput="vSearch()" onkeydown="if(event.key==='Enter')vSearch()">
+      <input type="text" id="vs-q4" placeholder="👤 Person name (AND)…"        oninput="vSearch()" onkeydown="if(event.key==='Enter')vSearch()">
+      <input type="text" id="vs-q5" placeholder="📋 Task / request title (AND)…" oninput="vSearch()" onkeydown="if(event.key==='Enter')vSearch()">
       <button class="btn" onclick="vSearch()">🔍 Search</button>
     </div>
-    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:7px;">
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:4px;">
       <div class="trow"><input type="checkbox" id="vs-rx"><label for="vs-rx">Regex</label></div>
       <div class="trow"><input type="checkbox" id="vs-cs"><label for="vs-cs">Case Sensitive</label></div>
       <div class="trow"><input type="checkbox" id="vs-ww"><label for="vs-ww">Whole Word</label></div>
       <div class="trow"><input type="checkbox" id="vs-ctx" checked><label for="vs-ctx">Show Context</label></div>
     </div>
     <div style="margin-top:5px;font-size:0.68rem;color:var(--text3)" id="vs-cnt"></div>
-    <div id="vs-res" style="margin-top:9px;max-height:500px;overflow-y:auto;"></div>
+    <div id="vs-res" style="margin-top:9px;max-height:400px;overflow-y:auto;"></div>
+  </div>
+
+  <!-- ══ SUPPORT LOG ══ -->
+  <div class="panel">
+    <div class="pt" style="margin-bottom:8px;">📋 Support Log — Daily Events & Requests</div>
+
+    <!-- New Entry Form -->
+    <div class="slog-form" id="slog-form" style="display:none;">
+      <div style="font-size:0.65rem;color:var(--accent2);letter-spacing:1px;margin-bottom:10px;">NEW LOG ENTRY</div>
+      <div class="row">
+        <input type="text" id="sl-who" placeholder="Requester name / department…" style="flex:1;">
+        <input type="text" id="sl-title" placeholder="Task / request title…" style="flex:2;">
+      </div>
+      <div class="row">
+        <select id="sl-type" style="width:130px;">
+          <option value="request">📥 Request</option>
+          <option value="done">✅ Completed</option>
+          <option value="pending">⏳ Pending</option>
+        </select>
+        <input type="text" id="sl-tags" placeholder="Tags (comma separated, e.g. windows, install, network)…" style="flex:1;">
+      </div>
+      <textarea id="sl-desc" style="min-height:90px;font-size:0.74rem;" placeholder="What was done / what was requested…"></textarea>
+      <div class="row mt8">
+        <button class="btn sm g" onclick="slogSave()">✔ Save Entry</button>
+        <button class="btn sm" onclick="slogCancelForm()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Search + controls -->
+    <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+      <input type="text" id="sl-search-who" placeholder="Search by name…" style="width:150px;font-size:0.72rem;padding:5px 8px;" oninput="slogRender()">
+      <input type="text" id="sl-search-title" placeholder="Search by task…" style="width:160px;font-size:0.72rem;padding:5px 8px;" oninput="slogRender()">
+      <input type="text" id="sl-search-tag" placeholder="Search by tag…" style="width:120px;font-size:0.72rem;padding:5px 8px;" oninput="slogRender()">
+      <select id="sl-filter-type" style="font-size:0.72rem;padding:5px 6px;" onchange="slogRender()">
+        <option value="">All types</option>
+        <option value="request">Requests</option>
+        <option value="done">Completed</option>
+        <option value="pending">Pending</option>
+      </select>
+      <button class="btn sm g" onclick="slogShowForm()" style="margin-left:auto;">+ New Entry</button>
+      <span id="sl-count" style="font-family:var(--mono);font-size:0.62rem;color:var(--text3);"></span>
+    </div>
+
+    <!-- Log list -->
+    <div id="slog-list" style="max-height:500px;overflow-y:auto;"></div>
   </div>
 </div>
 
 <!-- ══════════════════════════ URL CHECK ══════════════════════════ -->
 <div id="sec-urlcheck" class="section">
+  <div class="tab-anim-inline"><canvas class="tab-anim-canvas" width="90" height="60" data-sec="urlcheck"></canvas></div>
   <div class="panel">
     <div class="pt">URL / Domain Threat Intelligence</div>
     <p class="note">Checks <b>urlscan.io</b> database (free, no key, browser-compatible). Also shows direct links to VirusTotal, PhishTank, AbuseIPDB.</p>
@@ -715,6 +1087,7 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 
 <!-- ══════════════════════════ IP LOOKUP ══════════════════════════ -->
 <div id="sec-iplookup" class="section">
+  <div class="tab-anim-inline"><canvas class="tab-anim-canvas" width="90" height="60" data-sec="iplookup"></canvas></div>
   <div class="panel">
     <div class="pt">IP Geolocation &amp; ASN — ip-api.com (free, CORS-OK)</div>
     <p class="note">Detects proxy/VPN/hosting/mobile flags. Leave blank to look up your own public IP.</p>
@@ -736,6 +1109,7 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 
 <!-- ══════════════════════════ DNS ══════════════════════════ -->
 <div id="sec-dns" class="section">
+  <div class="tab-anim-inline"><canvas class="tab-anim-canvas" width="90" height="60" data-sec="dns"></canvas></div>
   <div class="panel">
     <div class="pt">DNS Lookup — Google DNS (browser-compatible)</div>
     <div class="row">
@@ -771,6 +1145,7 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 
 <!-- ══════════════════════════ EMAIL HEADERS ══════════════════════════ -->
 <div id="sec-emailhdr" class="section">
+  <div class="tab-anim-inline"><canvas class="tab-anim-canvas" width="90" height="60" data-sec="emailhdr"></canvas></div>
   <div class="panel">
     <div class="pt">Email Header Analyzer — 100% Local</div>
     <p class="note"><b>Outlook:</b> File → Properties → Internet Headers &nbsp;|&nbsp; <b>Gmail:</b> 3-dot menu → Show Original &nbsp;|&nbsp; <b>O365:</b> View Source</p>
@@ -784,23 +1159,91 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 </div>
 
 <!-- ══════════════════════════ SUBNET ══════════════════════════ -->
-<div id="sec-subnet" class="section">
-  <div class="panel">
-    <div class="pt">Subnet Calculator — Local</div>
-    <div class="row">
-      <input type="text" id="sub-in" placeholder="192.168.1.0/24  or  10.0.0.1/255.255.255.0" onkeydown="if(event.key==='Enter')calcSubnet()">
-      <button class="btn" onclick="calcSubnet()">🧮 Calculate</button>
+<div id="sec-nettools" class="section">
+  <div class="tab-anim-inline"><canvas class="tab-anim-canvas" width="90" height="60" data-sec="nettools"></canvas></div>
+  <div class="g2">
+    <!-- ── SUBNET CALCULATOR ── -->
+    <div>
+      <div class="panel">
+        <div class="pt">🧮 Subnet Calculator</div>
+        <div class="row">
+          <input type="text" id="sub-in" placeholder="192.168.1.0/24  or  10.0.0.1/255.255.255.0" onkeydown="if(event.key==='Enter')calcSubnet()">
+          <button class="btn" onclick="calcSubnet()">Calculate</button>
+        </div>
+        <div id="sub-res"></div>
+      </div>
+      <div class="panel">
+        <div class="pt">CIDR Quick Reference</div>
+        <div class="tags" id="cidr-tags"></div>
+      </div>
+      <!-- ── IP RANGE GENERATOR ── -->
+      <div class="panel">
+        <div class="pt">📡 IP Range Generator</div>
+        <div class="g2" style="gap:8px;">
+          <div><div class="lbl">START IP</div><input type="text" id="rs-in" placeholder="10.0.0.1"></div>
+          <div><div class="lbl">END IP</div><input type="text" id="re-in" placeholder="10.0.0.254"></div>
+        </div>
+        <div class="row mt8">
+          <button class="btn" onclick="genRange()">Generate</button>
+          <button class="btn sm g" onclick="cpToast(G('range-res').textContent||'')" >Copy All</button>
+        </div>
+        <div class="rbox" id="range-res" style="max-height:200px;overflow-y:auto;"></div>
+      </div>
+      <!-- ── PING / TRACERT BUILDER ── -->
+      <div class="panel">
+        <div class="pt">🏓 Ping / Tracert Builder</div>
+        <input type="text" id="ping-t" placeholder="IP or hostname" style="margin-bottom:8px;" oninput="genPing()">
+        <div class="g2" style="gap:7px;margin-bottom:8px;">
+          <div><div class="lbl">COUNT</div><input type="text" id="ping-c" placeholder="4" oninput="genPing()"></div>
+          <div><div class="lbl">OS</div><select id="ping-os" onchange="genPing()"><option value="win">Windows</option><option value="lx">Linux/Mac</option></select></div>
+        </div>
+        <div class="lbl">PING COMMAND</div>
+        <div class="cbox" style="margin-bottom:7px;"><button class="cbtn" onclick="cpToast(G('ping-cmd').textContent)">Copy</button><span id="ping-cmd">Enter target above…</span></div>
+        <div class="lbl">TRACERT COMMAND</div>
+        <div class="cbox"><button class="cbtn" onclick="cpToast(G('trace-cmd').textContent)">Copy</button><span id="trace-cmd">Enter target above…</span></div>
+      </div>
     </div>
-    <div id="sub-res"></div>
-  </div>
-  <div class="panel">
-    <div class="pt">CIDR Quick Reference</div>
-    <div class="tags" id="cidr-tags"></div>
+    <!-- ── NETSH BUILDER ── -->
+    <div>
+      <div class="panel">
+        <div class="pt">⚙️ Netsh Command Builder</div>
+        <p class="note">Copy &amp; run in <span style="color:var(--accent4)">CMD as Administrator</span>.</p>
+        <div class="g2">
+          <div><div class="lbl">INTERFACE</div><input type="text" id="ns-iface" placeholder="Ethernet  or  Wi-Fi" oninput="buildNetsh()"></div>
+          <div><div class="lbl">ACTION</div>
+            <select id="ns-action" onchange="buildNetsh()">
+              <option value="static">Set Static IPv4</option>
+              <option value="dhcp">Enable DHCP</option>
+              <option value="dns-set">Set Static DNS</option>
+              <option value="dns-dhcp">DNS to Auto</option>
+              <option value="flush">Flush DNS Cache</option>
+              <option value="show">Show IP Config</option>
+              <option value="release">Release DHCP</option>
+              <option value="renew">Renew DHCP</option>
+              <option value="disable">Disable Adapter</option>
+              <option value="enable">Enable Adapter</option>
+              <option value="reset">Reset TCP/IP Stack</option>
+              <option value="winsock">Reset Winsock</option>
+            </select>
+          </div>
+        </div>
+        <div id="ns-extra" class="mt8"></div>
+        <div class="mt12">
+          <div class="lbl">GENERATED COMMAND</div>
+          <div class="cbox"><button class="cbtn" onclick="cpToast(G('ns-cmd').textContent)">Copy</button><span id="ns-cmd">Select an action…</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="pt">Quick CMD Snippets</div>
+        <div class="tags" id="cmd-tags"></div>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- ══════════════════════════ PORTS ══════════════════════════ -->
 <div id="sec-ports" class="section">
+  <div class="tab-anim-inline"><canvas class="tab-anim-canvas" width="90" height="60" data-sec="ports"></canvas></div>
   <div class="panel">
     <div class="pt">Port Reference — Local Database</div>
     <input type="text" id="port-q" class="mb8" style="margin-bottom:9px;" placeholder="Search port number or service name…" oninput="filterPorts()">
@@ -813,6 +1256,7 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 
 <!-- ══════════════════════════ MAC ══════════════════════════ -->
 <div id="sec-mac" class="section">
+  <div class="tab-anim-inline"><canvas class="tab-anim-canvas" width="90" height="60" data-sec="mac"></canvas></div>
   <div class="panel">
     <div class="pt">MAC Vendor Lookup — macvendors.com</div>
     <div class="row">
@@ -832,6 +1276,7 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 
 <!-- ══════════════════════════ EXTRACTOR ══════════════════════════ -->
 <div id="sec-extract" class="section">
+  <div class="tab-anim-inline"><canvas class="tab-anim-canvas" width="90" height="60" data-sec="extract"></canvas></div>
   <div class="panel">
     <div class="pt">🧹 Auto Extractor — Local Processing</div>
     <p class="note">Paste logs, configs, emails — auto-extracts IPs, emails, URLs, MACs, domains, hashes, ports. Click any item to copy it.</p>
@@ -844,129 +1289,75 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
   </div>
 </div>
 
-<!-- ══════════════════════════ NETSH ══════════════════════════ -->
-<div id="sec-netsh" class="section">
-  <div class="panel">
-    <div class="pt">⚙️ Netsh Command Builder</div>
-    <p class="note">Generates commands — copy &amp; run in <span style="color:var(--accent4)">CMD as Administrator</span>.</p>
-    <div class="g2">
-      <div>
-        <div class="lbl">INTERFACE NAME</div>
-        <input type="text" id="ns-iface" placeholder='Ethernet  or  Wi-Fi' oninput="buildNetsh()">
-      </div>
-      <div>
-        <div class="lbl">ACTION</div>
-        <select id="ns-action" onchange="buildNetsh()">
-          <option value="static">Set Static IPv4</option>
-          <option value="dhcp">Enable DHCP (auto IP)</option>
-          <option value="dns-set">Set Static DNS</option>
-          <option value="dns-dhcp">Set DNS to Auto</option>
-          <option value="flush">Flush DNS Cache</option>
-          <option value="show">Show All IP Config</option>
-          <option value="release">Release DHCP Lease</option>
-          <option value="renew">Renew DHCP Lease</option>
-          <option value="disable">Disable Adapter</option>
-          <option value="enable">Enable Adapter</option>
-          <option value="reset">Reset TCP/IP Stack</option>
-          <option value="winsock">Reset Winsock</option>
-        </select>
-      </div>
-    </div>
-    <div id="ns-extra" class="mt8"></div>
-    <div class="mt12">
-      <div class="lbl">GENERATED COMMAND</div>
-      <div class="cbox"><button class="cbtn" onclick="cpToast(G('ns-cmd').textContent)">Copy</button><span id="ns-cmd">Select an action…</span></div>
-    </div>
-  </div>
-  <div class="panel">
-    <div class="pt">Quick CMD Reference — click to copy</div>
-    <div class="tags" id="cmd-tags"></div>
-  </div>
-</div>
-
-<!-- ══════════════════════════ ENCODER ══════════════════════════ -->
-<div id="sec-encoder" class="section">
-  <div class="g2">
-    <div class="panel">
-      <div class="pt">Base64 Encode / Decode</div>
-      <textarea id="b64-in" style="min-height:75px;" placeholder="Input…"></textarea>
-      <div class="row mt8"><button class="btn sm g" onclick="b64e()">Encode</button><button class="btn sm" onclick="b64d()">Decode</button><button class="btn sm r" onclick="G('b64-in').value='';G('b64-out').value=''">Clear</button></div>
-      <textarea id="b64-out" readonly style="min-height:75px;margin-top:7px;"></textarea>
-    </div>
-    <div class="panel">
-      <div class="pt">URL Encode / Decode</div>
-      <textarea id="ue-in" style="min-height:75px;" placeholder="Input…"></textarea>
-      <div class="row mt8"><button class="btn sm g" onclick="ue()">Encode</button><button class="btn sm" onclick="ud()">Decode</button><button class="btn sm r" onclick="G('ue-in').value='';G('ue-out').value=''">Clear</button></div>
-      <textarea id="ue-out" readonly style="min-height:75px;margin-top:7px;"></textarea>
-    </div>
-    <div class="panel">
-      <div class="pt">HEX Converter</div>
-      <input type="text" id="hex-in" placeholder="Text or hex string…">
-      <div class="row mt8"><button class="btn sm g" onclick="toHex()">Text → Hex</button><button class="btn sm" onclick="fromHex()">Hex → Text</button></div>
-      <div class="rbox" id="hex-out"></div>
-    </div>
-    <div class="panel">
-      <div class="pt">IP ↔ Integer</div>
-      <input type="text" id="ipi-in" placeholder="192.168.1.1  or  3232235777">
-      <div class="row mt8"><button class="btn sm g" onclick="ipToI()">IP → Int</button><button class="btn sm" onclick="iToIp()">Int → IP</button></div>
-      <div class="rbox" id="ipi-out"></div>
-    </div>
-  </div>
-</div>
-
 <!-- ══════════════════════════ PASSWORD ══════════════════════════ -->
 <div id="sec-passcheck" class="section">
-  <div class="panel">
-    <div class="pt">Password Strength Analyzer — Local</div>
-    <p class="note">Nothing sent anywhere. Runs entirely in your browser.</p>
-    <input type="password" id="pw-in" placeholder="Type password to analyze…" oninput="checkPW()">
-    <div class="pwm mt8"><div class="pwmf" id="pw-bar"></div></div>
-    <div class="rbox" id="pw-res"></div>
-  </div>
-  <div class="panel">
-    <div class="pt">Default Credential Checker — Local (25 pairs)</div>
-    <div class="row mb8">
-      <input type="text" id="dc-u" placeholder="Username">
-      <input type="text" id="dc-p" placeholder="Password">
-      <button class="btn sm" onclick="checkDC()">Check</button>
-    </div>
-    <div class="rbox" id="dc-res"></div>
-  </div>
-</div>
-
-<!-- ══════════════════════════ IP RANGE ══════════════════════════ -->
-<div id="sec-iprange" class="section">
+  <div class="tab-anim-inline"><canvas class="tab-anim-canvas" width="90" height="60" data-sec="passcheck"></canvas></div>
   <div class="g2">
-    <div class="panel">
-      <div class="pt">IP Range Generator</div>
-      <div class="lbl">START IP</div>
-      <input type="text" id="rs-in" placeholder="192.168.1.1" style="margin-bottom:8px;">
-      <div class="lbl">END IP</div>
-      <input type="text" id="re-in" placeholder="192.168.1.254">
-      <div class="row mt8">
-        <button class="btn" onclick="genRange()">Generate</button>
-        <button class="btn sm g" onclick="cpToast(G('range-res').textContent||'')">Copy All</button>
+    <div>
+      <div class="panel">
+        <div class="pt">Password Strength Analyzer — Local</div>
+        <p class="note">Nothing sent anywhere. Runs entirely in your browser.</p>
+        <input type="password" id="pw-in" placeholder="Type password to analyze…" oninput="checkPW()">
+        <div class="pwm mt8"><div class="pwmf" id="pw-bar"></div></div>
+        <div class="rbox" id="pw-res"></div>
       </div>
-      <div class="rbox" id="range-res" style="max-height:280px;overflow-y:auto;"></div>
-    </div>
-    <div class="panel">
-      <div class="pt">Ping / Tracert Builder</div>
-      <div class="lbl">TARGET</div>
-      <input type="text" id="ping-t" placeholder="IP or hostname" style="margin-bottom:8px;" oninput="genPing()">
-      <div class="g2" style="gap:7px;margin-bottom:8px;">
-        <div><div class="lbl">COUNT</div><input type="text" id="ping-c" placeholder="4" oninput="genPing()"></div>
-        <div><div class="lbl">OS</div><select id="ping-os" onchange="genPing()"><option value="win">Windows</option><option value="lx">Linux/Mac</option></select></div>
+      <div class="panel">
+        <div class="pt">Default Credential Checker — Local (25 pairs)</div>
+        <div class="row mb8">
+          <input type="text" id="dc-u" placeholder="Username">
+          <input type="text" id="dc-p" placeholder="Password">
+          <button class="btn sm" onclick="checkDC()">Check</button>
+        </div>
+        <div class="rbox" id="dc-res"></div>
       </div>
-      <div class="lbl">PING</div>
-      <div class="cbox" style="margin-bottom:7px;"><button class="cbtn" onclick="cpToast(G('ping-cmd').textContent)">Copy</button><span id="ping-cmd">Enter target above…</span></div>
-      <div class="lbl">TRACERT / TRACEROUTE</div>
-      <div class="cbox"><button class="cbtn" onclick="cpToast(G('trace-cmd').textContent)">Copy</button><span id="trace-cmd">Enter target above…</span></div>
     </div>
+    <div>
+      <div class="panel">
+        <div class="pt">🎲 Password Generator</div>
+        <p class="note">Generate strong passwords. Choose what to include.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+          <div class="trow"><input type="checkbox" id="pg-upper" checked><label for="pg-upper">Uppercase (A–Z)</label></div>
+          <div class="trow"><input type="checkbox" id="pg-lower" checked><label for="pg-lower">Lowercase (a–z)</label></div>
+          <div class="trow"><input type="checkbox" id="pg-num"   checked><label for="pg-num">Numbers (0–9)</label></div>
+          <div class="trow"><input type="checkbox" id="pg-sym"   checked><label for="pg-sym">Symbols (!@#…)</label></div>
+          <div class="trow"><input type="checkbox" id="pg-ambig"><label for="pg-ambig">Exclude ambiguous (0,O,l,I)</label></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span style="font-size:0.68rem;color:var(--text3);">Length:</span>
+          <input type="range" id="pg-len" min="6" max="64" value="16" oninput="G('pg-len-v').textContent=this.value;pgGen()" style="flex:1;accent-color:var(--accent2);">
+          <span id="pg-len-v" style="font-family:var(--mono);color:var(--accent2);font-size:0.82rem;min-width:24px;">16</span>
+          <span style="font-size:0.68rem;color:var(--text3);">Count:</span>
+          <select id="pg-count" style="width:60px;" onchange="pgGen()">
+            <option>1</option><option>3</option><option selected>5</option>
+            <option>10</option><option>20</option>
+          </select>
+        </div>
+        <button class="btn g" onclick="pgGen()">🎲 Generate</button>
+        <div id="pg-out" style="margin-top:10px;max-height:280px;overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HIBP Password Leak Checker ── -->
+  <div class="panel">
+    <div class="pt">🔍 Password Leak Checker — HaveIBeenPwned (k-anonymity, safe)</div>
+    <p class="note">
+      Checks if passwords appear in known data breaches. Only the first 5 chars of the SHA-1 hash are sent — never the actual password.<br>
+      Format: one entry per line. Password starts <b>one space after</b> the <b>|</b> character.<br>
+      <span style="color:var(--accent);font-family:var(--mono)">John Smith | mypassword123</span>&nbsp;&nbsp;or just a bare password per line.
+    </p>
+    <textarea id="hibp-in" style="min-height:100px;font-size:0.76rem;" placeholder="John Smith | password123&#10;IT Admin | Adm!n@2024&#10;Router | admin&#10;password123&#10;Summer2024!"></textarea>
+    <div class="row mt8">
+      <button class="btn r" onclick="hibpCheckAll()">🔍 Check All for Leaks</button>
+      <button class="btn sm" onclick="G('hibp-in').value='';G('hibp-out').innerHTML=''">Clear</button>
+    </div>
+    <div id="hibp-out" style="margin-top:11px;max-height:400px;overflow-y:auto;"></div>
   </div>
 </div>
 
 <!-- ══════════════════════════ NOTES ══════════════════════════ -->
 <div id="sec-notes" class="section">
+  <div class="tab-anim-inline"><canvas class="tab-anim-canvas" width="90" height="60" data-sec="notes"></canvas></div>
   <div class="panel">
     <div class="pt">📝 Session Scratchpad — Auto-Saves</div>
     <div class="row mb8">
@@ -980,31 +1371,42 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 </div>
 
 <!-- ══════════════════════════ WINDOWS ══════════════════════════ -->
-<div id="sec-winlinks" class="section">
+
+
+<!-- ══════════════════════════ PRINTER ══════════════════════════ -->
+<div id="sec-printer" class="section">
+  <div class="tab-anim-inline"><canvas class="tab-anim-canvas" width="90" height="60" data-sec="printer"></canvas></div>
   <div class="panel">
-    <div class="pt">🖥️ Windows Settings — Direct Launch</div>
-    <div class="wgrid">
-      <a class="wbtn" href="ms-settings:network">🌐 Network &amp; Internet</a>
-      <a class="wbtn" href="ms-settings:network-ethernet">🔌 Ethernet</a>
-      <a class="wbtn" href="ms-settings:network-wifi">📶 Wi-Fi</a>
-      <a class="wbtn" href="ms-settings:network-vpn">🔒 VPN</a>
-      <a class="wbtn" href="ms-settings:network-proxy">🔀 Proxy</a>
-      <a class="wbtn" href="ms-settings:windowsdefender">🛡️ Defender / Firewall</a>
-      <a class="wbtn" href="ms-settings:datausage">📊 Data Usage</a>
-      <a class="wbtn" href="ms-settings:privacy-networkdiscovery">👁️ Network Discovery</a>
-      <span class="wbtn" onclick="cpToast('ncpa.cpl')">⚙️ ncpa.cpl</span>
-      <span class="wbtn" onclick="cpToast('firewall.cpl')">🔥 firewall.cpl</span>
-      <span class="wbtn" onclick="cpToast('devmgmt.msc')">🔧 devmgmt.msc</span>
-      <span class="wbtn" onclick="cpToast('services.msc')">⚙️ services.msc</span>
-      <span class="wbtn" onclick="cpToast('eventvwr.msc')">📋 eventvwr.msc</span>
-      <span class="wbtn" onclick="cpToast('resmon.exe')">📈 resmon.exe</span>
-      <span class="wbtn" onclick="cpToast('compmgmt.msc')">🗂️ compmgmt.msc</span>
-      <span class="wbtn" onclick="cpToast('gpedit.msc')">📜 gpedit.msc</span>
+    <div class="pt">🖨️ Printer Web Interface</div>
+    <p class="note">Most network printers host a web page at their IP (port 80 or 443). Enter the printer IP to open its configuration/status page. IPs are saved locally.</p>
+    <div id="printer-list"></div>
+    <div class="row mt8" style="align-items:center;">
+      <input type="text" id="prt-new-name" placeholder="Printer name (e.g. HP LaserJet 1)…" style="flex:1;min-width:140px;">
+      <input type="text" id="prt-new-ip" placeholder="IP address (e.g. 192.168.1.50)…" style="flex:1;min-width:140px;">
+      <select id="prt-new-proto" style="width:90px;">
+        <option value="http">HTTP</option>
+        <option value="https">HTTPS</option>
+      </select>
+      <input type="text" id="prt-new-port" placeholder="Port (blank=80/443)" style="width:90px;">
+      <button class="btn sm g" onclick="prtAdd()">+ Add</button>
     </div>
-    <p class="note" style="margin-top:11px;">
-      <b style="color:var(--accent)">ms-settings: links</b> → click to open directly in Windows Settings.<br>
-      <b style="color:var(--accent4)">.cpl / .msc buttons</b> → copies the command. Paste in <b>Run (Win+R)</b> or CMD.
-    </p>
+  </div>
+  <div class="panel">
+    <div class="pt">🌐 Open Printer Page</div>
+    <p class="note">Click <b style="color:var(--accent2)">Open Page</b> to access the printer's built-in web interface in a new tab. Most HP, Canon, Brother, Ricoh, Xerox, and Kyocera printers support this.</p>
+    <div class="row" style="margin-top:6px;">
+      <input type="text" id="prt-quick-ip" placeholder="Quick open: enter any printer IP…">
+      <select id="prt-quick-proto" style="width:90px;"><option>http</option><option>https</option></select>
+      <button class="btn g" onclick="prtQuickOpen()">🌐 Open Page</button>
+      <button class="btn" onclick="prtQuickSNMP()">📋 SNMP Info</button>
+    </div>
+    <div class="rbox" id="prt-snmp-res"></div>
+    <div style="margin-top:11px;font-size:0.68rem;color:var(--text3);line-height:1.8;">
+      Common printer web ports: <span style="color:var(--accent)">80</span> (HTTP), <span style="color:var(--accent)">443</span> (HTTPS), <span style="color:var(--accent)">631</span> (IPP/CUPS) &nbsp;·&nbsp;
+      HP EWS typically on <span style="color:var(--accent)">http://&lt;IP&gt;</span> &nbsp;·&nbsp;
+      Brother on <span style="color:var(--accent)">http://&lt;IP&gt;</span> &nbsp;·&nbsp;
+      Ricoh on <span style="color:var(--accent)">http://&lt;IP&gt;</span>
+    </div>
   </div>
 </div>
 
@@ -1027,6 +1429,37 @@ function cpToast(txt){
     document.body.appendChild(el); el.select(); document.execCommand('copy');
     document.body.removeChild(el); toast('✔ Copied!');
   });
+}
+
+async function launchWin(cmd){
+  // Try backend /run first (most reliable, no shell: needed)
+  try {
+    const ctrl = new AbortController();
+    setTimeout(()=>ctrl.abort(), 3000);
+    const r = await fetch('http://localhost:5199/run?cmd='+encodeURIComponent(cmd),
+      {signal:ctrl.signal, cache:'no-store'});
+    if(r.ok){
+      const d = await r.json();
+      if(d.ok){ toast('▶ Launched: '+cmd); return; }
+    }
+  } catch(e){}
+  // Fallback: shell: protocol (works when loaded from localhost in Edge/Chrome)
+  try {
+    const a = document.createElement('a');
+    a.href = 'shell:' + cmd; a.click();
+    toast('▶ Launching '+cmd+' via shell:');
+  } catch(e){
+    cpToast(cmd);
+    toast('📋 Copied "'+cmd+'" — paste in Run (Win+R)');
+  }
+}
+
+function launchExe(cmd){
+  // For .exe and .msc — use shell: or copy
+  try {
+    window.location.href = 'shell:' + cmd;
+    toast('▶ Launching '+cmd+'…');
+  } catch(e){ cpToast(cmd); }
 }
 function show(id, html){ const e=G(id); e.innerHTML=html; e.style.display='block'; }
 function loading(id, m='Working…'){ show(id,`<span class="spin">⟳</span> ${m}`); }
@@ -1069,8 +1502,10 @@ async function initIPs(){
 
   // ip-api.com full info
   try {
-    const r = await fetch(`https://ip-api.com/json/?fields=status,country,regionName,city,isp,org,as,timezone,proxy,hosting,mobile,query`);
-    const d = await r.json();
+    let d = null;
+    try { const r=await fetch(`https://ip-api.com/json/?fields=status,country,regionName,city,isp,org,as,timezone,proxy,hosting,mobile,query`,{mode:'cors',cache:'no-store'}); if(r.ok) d=await r.json(); } catch(e){}
+    if(!d) { try { const rb=await fetch(`http://localhost:5199/iplookup?ip=`,{cache:'no-store'}); if(rb.ok) d=await rb.json(); } catch(e){} }
+    if(!d) throw new Error('no data');
     if(d.status==='success'){
       G('d-isp').textContent = d.isp||d.org||'—';
       G('d-loc').textContent = [d.city,d.country].filter(Boolean).join(', ')||'—';
@@ -1112,9 +1547,13 @@ async function quickCheck(){
   const isIP = /^\d{1,3}(\.\d{1,3}){3}$/.test(v);
   if(isIP){
     try {
-      const r = await fetch(`https://ip-api.com/json/${encodeURIComponent(v)}?fields=status,message,country,regionName,city,isp,org,as,proxy,hosting,mobile,query`);
-      const d = await r.json();
-      if(d.status!=='success'){ show('q-res',`<span class="err">Lookup failed: ${esc(d.message||'unknown')}</span>`); return; }
+      let d = null;
+      try {
+        const r = await fetch(`https://ip-api.com/json/${encodeURIComponent(v)}?fields=status,message,country,regionName,city,isp,org,as,proxy,hosting,mobile,query`,{mode:'cors',cache:'no-store'});
+        if(r.ok) d = await r.json();
+      } catch(e2){}
+      if(!d) { try{ const rb=await fetch(`http://localhost:5199/iplookup?ip=${encodeURIComponent(v)}`,{cache:'no-store'}); if(rb.ok) d=await rb.json(); }catch(e3){} }
+      if(!d || d.status!=='success'){ show('q-res',`<span class="err">Lookup failed: ${esc((d&&d.message)||'Check internet connection')}</span>`); return; }
       const fl=[];
       if(d.proxy) fl.push('<span class="bw badge">Proxy/VPN</span>');
       if(d.hosting) fl.push('<span class="bw badge">Hosting/DC</span>');
@@ -1218,9 +1657,21 @@ async function ipLookup(){
   const ip = G('ip-in').value.trim();
   loading('ip-res','Looking up…'); G('ip-res').style.display='block';
   try {
-    const target = ip||pubIP;
-    const r = await fetch(`https://ip-api.com/json/${encodeURIComponent(target)}?fields=status,message,continent,country,countryCode,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,reverse,mobile,proxy,hosting,query`);
-    const d = await r.json();
+    const target = ip||pubIP||'';
+    let d = null;
+    // Try ip-api.com directly first
+    try {
+      const r = await fetch(`https://ip-api.com/json/${encodeURIComponent(target)}?fields=status,message,continent,country,countryCode,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,reverse,mobile,proxy,hosting,query`,{mode:'cors',cache:'no-store'});
+      if(r.ok) d = await r.json();
+    } catch(e) { /* will try alternate */ }
+    // Fallback: try via backend proxy
+    if(!d || d.status !== 'success') {
+      try {
+        const r2 = await fetch(`http://localhost:5199/iplookup?ip=${encodeURIComponent(target)}`,{cache:'no-store'});
+        if(r2.ok) d = await r2.json();
+      } catch(e2) {}
+    }
+    if(!d) throw new Error('All IP lookup sources failed. Check internet connection.');
     if(d.status!=='success'){ show('ip-res',`<span class="err">Error: ${esc(d.message||'lookup failed')}</span>`); return; }
     const fl=[];
     if(d.proxy) fl.push('<span class="bw badge">Proxy/VPN</span>');
@@ -1264,16 +1715,26 @@ async function dnsLookup(){
   const t = G('dns-type').value;
   if(!d) return;
   loading('dns-res',`Looking up ${t} records for ${d}…`); G('dns-res').style.display='block';
-  try {
-    const r = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(d)}&type=${encodeURIComponent(t)}`);
-    if(!r.ok) throw new Error(`HTTP ${r.status}`);
-    const data = await r.json();
-    const recs = data.Answer||data.Authority||[];
-    if(!recs.length){ show('dns-res',`<span class="warn">No ${t} records found for ${esc(d)}</span>\n<span style="color:var(--text3)">Status: ${data.Status} (0=NOERROR, 3=NXDOMAIN)</span>`); return; }
-    show('dns-res', recs.map(rec=>
-      `<span class="k">${t}</span>  <span class="v">${esc(rec.data)}</span>  <span style="color:var(--text3)">TTL:${rec.TTL}s</span>`
-    ).join('\n'));
-  } catch(e){ show('dns-res',`<span class="err">${esc(e.message)}</span>`); }
+  // Try Cloudflare DoH first, then Google, then backend proxy
+  const _dnsApis = [
+    `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(d)}&type=${encodeURIComponent(t)}`,
+    `https://dns.google/resolve?name=${encodeURIComponent(d)}&type=${encodeURIComponent(t)}`,
+    `http://localhost:5199/dns?name=${encodeURIComponent(d)}&type=${encodeURIComponent(t)}`
+  ];
+  let data = null, lastErr = '';
+  for(const url of _dnsApis){
+    try {
+      const r = await fetch(url, {headers:{'Accept':'application/dns-json,application/json'},mode:'cors',cache:'no-store'});
+      if(!r.ok) throw new Error(`HTTP ${r.status}`);
+      data = await r.json(); break;
+    } catch(e){ lastErr = e.message; }
+  }
+  if(!data){ show('dns-res',`<span class="err">DNS lookup failed: ${esc(lastErr)}</span>\n<span style="color:var(--text3)">All DNS providers unreachable. Check your internet connection.</span>\n<a href="https://toolbox.googleapps.com/apps/dig/#${t}/${encodeURIComponent(d)}" target="_blank">→ Try Google Dig Tool ↗</a>`); return; }
+  const recs = data.Answer||data.Authority||[];
+  if(!recs.length){ show('dns-res',`<span class="warn">No ${t} records found for ${esc(d)}</span>\n<span style="color:var(--text3)">Status code: ${data.Status} (0=NOERROR, 3=NXDOMAIN, 2=SERVFAIL)</span>`); return; }
+  show('dns-res', recs.map(rec=>
+    `<span class="k">${t}</span>  <span class="v">${esc(rec.data)}</span>  <span style="color:var(--text3)">TTL:${rec.TTL}s</span>`
+  ).join('\n'));
 }
 
 async function whoisLookup(){
@@ -1463,10 +1924,18 @@ const PORTS=[
   [8080,'TCP','HTTP-Alt','HTTP proxy / alt web'],[8443,'TCP','HTTPS-Alt','Alternate HTTPS'],
   [9200,'TCP','Elasticsearch','Elasticsearch HTTP'],[27017,'TCP','MongoDB','MongoDB'],
 ];
+const DANGER_PORTS = new Set([23,21,69,135,137,138,139,445,1433,1521,3389,5900,4444,6379,27017,9200,512,513,514,1080,3306,5432,1723,11211]);
+const WARN_PORTS  = new Set([22,25,53,80,110,143,161,389,443,636,993,995]);
 function renderPorts(rows){
-  G('port-body').innerHTML=rows.map(([p,pr,s,d])=>
-    `<tr><td class="pnum">${p}</td><td>${pr}</td><td style="color:var(--accent2)">${s}</td><td>${d}</td></tr>`
-  ).join('');
+  G('port-body').innerHTML=rows.map(([p,pr,s,d])=>{
+    const isDanger = DANGER_PORTS.has(+p);
+    const isWarn   = WARN_PORTS.has(+p);
+    const rowStyle = isDanger ? 'background:rgba(255,79,110,0.07);' : '';
+    const portCol  = isDanger ? 'color:var(--accent3)!important;font-weight:700;' : 'color:var(--accent4);';
+    const svcCol   = isDanger ? 'color:var(--accent3);font-weight:700;' : isWarn ? 'color:var(--accent4);' : 'color:var(--accent2);';
+    const riskBadge= isDanger ? ' <span style="font-size:0.58rem;padding:1px 5px;border-radius:2px;background:rgba(255,79,110,0.2);color:var(--accent3);letter-spacing:0.5px;border:1px solid rgba(255,79,110,0.3);">HIGH RISK</span>' : '';
+    return `<tr style="${rowStyle}"><td style="${portCol}">${p}</td><td>${pr}</td><td style="${svcCol}">${s}${riskBadge}</td><td>${d}</td></tr>`;
+  }).join('');
 }
 function filterPorts(){
   const q=G('port-q').value.toLowerCase();
@@ -1648,22 +2117,36 @@ function clearVault(){
   G('vs-res').innerHTML=''; G('vs-cnt').textContent=''; toast('🗑 Vault cleared');
 }
 function vSearch(){
-  const q=G('vs-q').value; if(!q) return;
-  if(!vaultData){G('vs-res').innerHTML='<span class="warn" style="font-size:0.78rem">⚠ Load vault text first.</span>';return;}
+  // Collect all non-empty search terms from all 5 fields
+  const terms = ['vs-q','vs-q2','vs-q3','vs-q4','vs-q5'].map(id=>G(id)?.value.trim()).filter(Boolean);
+  if(!terms.length){ G('vs-res').innerHTML=''; G('vs-cnt').textContent=''; return; }
+  if(!vaultData){G('vs-res').innerHTML='<span class="warn" style="font-size:0.78rem">⚠ Load vault text first (Paste &amp; Save).</span>';return;}
   const rx=G('vs-rx').checked, cs=G('vs-cs').checked, ww=G('vs-ww').checked, ctx=G('vs-ctx').checked;
-  let pat;
-  try{
-    let p=rx?q:q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    if(ww&&!rx)p=`\\b${p}\\b`;
-    pat=new RegExp(p,cs?'g':'gi');
-  }catch(e){G('vs-res').innerHTML=`<span class="err">Invalid regex: ${esc(e.message)}</span>`;return;}
-  const lines=vaultData.split('\n');
-  const res=lines.map((line,i)=>{const m=[...line.matchAll(pat)];return m.length?{line,i,m}:null}).filter(Boolean);
-  G('vs-cnt').textContent=`${res.length} line${res.length!==1?'s':''} — ${res.reduce((a,r)=>a+r.m.length,0)} total matches`;
+  // Build a regex pattern per term (AND = line must match ALL terms)
+  const pats = [];
+  try {
+    for(const q of terms){
+      let p = rx ? q : q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      if(ww&&!rx) p = `\\b${p}\\b`;
+      pats.push(new RegExp(p, cs?'g':'gi'));
+    }
+  } catch(e){ G('vs-res').innerHTML=`<span class="err">Invalid regex: ${esc(e.message)}</span>`; return; }
+  const lines = vaultData.split('\n');
+  const res = lines.map((line,i)=>{
+    // Line must match ALL patterns (AND logic)
+    if(!pats.every(pat=>pat.test(line))){ pats.forEach(p=>p.lastIndex=0); return null; }
+    pats.forEach(p=>p.lastIndex=0);
+    const m = [...line.matchAll(pats[0])];
+    return {line,i,m};
+  }).filter(Boolean);
+  G('vs-cnt').textContent = terms.length>1
+    ? `${res.length} line${res.length!==1?'s':''} matching ALL ${terms.length} terms`
+    : `${res.length} line${res.length!==1?'s':''} — ${res.reduce((a,r)=>a+r.m.length,0)} matches`;
   if(!res.length){G('vs-res').innerHTML='<div style="color:var(--text3);font-size:0.78rem;padding:7px 0">No matches found.</div>';return;}
-  G('vs-res').innerHTML=res.map(({line,i})=>{
-    const hi=line.replace(pat,m=>`<span class="mh">${esc(m)}</span>`);
-    return`<div class="vmatch"><span class="vln">L${i+1}</span>${ctx?hi:''}</div>`;
+  G('vs-res').innerHTML = res.map(({line,i})=>{
+    let hi = line;
+    pats.forEach(pat=>{ pat.lastIndex=0; hi=hi.replace(pat,m=>`<span class="mh">${esc(m)}</span>`); });
+    return `<div class="vmatch"><span class="vln">L${i+1}</span>${ctx?hi:''}</div>`;
   }).join('');
 }
 
@@ -1779,6 +2262,10 @@ const tabAnimDefs = {
     const by=y+(h*0.5)*(1-Math.abs(Math.sin(t*0.05)));
     ctx.beginPath();ctx.arc(bx,by,2.5,0,Math.PI*2);
     ctx.fillStyle='rgba(255,184,0,0.85)';ctx.fill();
+  },
+  nettools: function(ctx,W,H,t){
+    // Reuse subnet tree anim for combined tab
+    const drawNode_=(x,y,r,depth)=>{ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=`rgba(0,200,255,${0.3+depth*0.15})`;ctx.fill();if(depth<3){const sp=18/depth,ny=y+12;[[x-sp,ny],[x+sp,ny]].forEach(([nx,_ny])=>{ctx.beginPath();ctx.moveTo(x,y+r);ctx.lineTo(nx,_ny-3);ctx.strokeStyle='rgba(0,200,255,0.2)';ctx.lineWidth=0.8;ctx.stroke();drawNode_(nx,_ny,r*0.7,depth+1);});}};ctx.clearRect(0,0,W,H);drawNode_(W/2,8,4,1);
   },
   subnet: function(ctx,W,H,t){
     // Binary tree / network split
@@ -1922,6 +2409,24 @@ const tabAnimDefs = {
     ctx.beginPath();ctx.moveTo(sweep,0);ctx.lineTo(sweep,H);
     ctx.strokeStyle='rgba(0,200,255,0.7)';ctx.lineWidth=1;ctx.stroke();
   },
+  printer: function(ctx,W,H,t){
+    // Printer icon — paper sliding out with progress bar
+    ctx.clearRect(0,0,W,H);
+    const cx=W/2,cy=H/2;
+    // Printer body
+    ctx.fillStyle='rgba(0,200,255,0.15)';ctx.fillRect(cx-20,cy-10,40,20);
+    ctx.strokeStyle='rgba(0,200,255,0.5)';ctx.lineWidth=1.2;ctx.strokeRect(cx-20,cy-10,40,20);
+    // Paper slot
+    const prog=(Math.sin(t*0.04)+1)/2;
+    const paperY=cy+10-prog*22;
+    ctx.fillStyle='rgba(0,255,157,0.2)';ctx.fillRect(cx-12,paperY,24,20);
+    ctx.strokeStyle='rgba(0,255,157,0.6)';ctx.lineWidth=0.8;ctx.strokeRect(cx-12,paperY,24,20);
+    // Lines on paper
+    for(let l=0;l<3;l++){
+      ctx.beginPath();ctx.moveTo(cx-9,paperY+4+l*5);ctx.lineTo(cx-9+16*prog,paperY+4+l*5);
+      ctx.strokeStyle=`rgba(0,255,157,${0.3+l*0.1})`;ctx.lineWidth=0.7;ctx.stroke();
+    }
+  },
   notes: function(ctx,W,H,t){
     // Pen writing lines
     ctx.clearRect(0,0,W,H);
@@ -1963,13 +2468,19 @@ const tabAnimDefs = {
 let tabAnimFrame=0;
 let currentTabAnim='dashboard';
 
+function getActiveAnimCanvas(){
+  const active = document.querySelector('.section.active .tab-anim-canvas');
+  return active || null;
+}
+
 function runTabAnims(){
-  const canvas=G('tab-anim-canvas');
-  if(!canvas)return;
-  const ctx=canvas.getContext('2d');
-  const fn=tabAnimDefs[currentTabAnim];
-  if(fn) fn(ctx,canvas.width,canvas.height,tabAnimFrame);
-  tabAnimFrame++;
+  const canvas = getActiveAnimCanvas();
+  if(canvas){
+    const ctx=canvas.getContext('2d');
+    const fn=tabAnimDefs[currentTabAnim];
+    if(fn) fn(ctx,canvas.width,canvas.height,tabAnimFrame);
+    tabAnimFrame++;
+  }
   requestAnimationFrame(runTabAnims);
 }
 
@@ -1980,6 +2491,9 @@ document.querySelectorAll('.tab').forEach(t=>{
     tabAnimFrame=0;
   });
 });
+
+// ── RADAR STATUS — controls radar color (green=ok, red=offline) ──
+let _radarOK = null; // null=unknown, true=online, false=offline
 
 // ── RADAR ANIMATION ──
 (function(){
@@ -2011,84 +2525,68 @@ document.querySelectorAll('.tab').forEach(t=>{
     ctx.fillStyle='rgba(2,14,8,0.92)';
     ctx.fill();
 
+    // Dynamic radar color: green = backend OK, red = offline, yellow = unknown
+    const rOK = _radarOK;
+    const rBase  = rOK===true  ? '0,210,80'   : rOK===false ? '220,40,40'  : '180,140,0';
+    const rSweep = rOK===true  ? '0,230,90'   : rOK===false ? '230,50,50'  : '200,160,20';
+    const rBlip  = rOK===true  ? '0,255,120'  : rOK===false ? '255,80,80'  : '220,180,40';
+    const rBright= rOK===true  ? '0,255,110'  : rOK===false ? '255,60,60'  : '220,190,60';
+
     // Rings
     [0.25,0.5,0.75,1].forEach(f=>{
       ctx.beginPath();
       ctx.arc(cx,cy,R*f,0,Math.PI*2);
-      ctx.strokeStyle=`rgba(0,200,80,${0.06+f*0.08})`;
+      ctx.strokeStyle=`rgba(${rBase},${0.06+f*0.08})`;
       ctx.lineWidth=0.8;
       ctx.stroke();
     });
 
     // Crosshairs
-    ctx.strokeStyle='rgba(0,200,80,0.1)';
+    ctx.strokeStyle=`rgba(${rBase},0.1)`;
     ctx.lineWidth=0.7;
     ctx.beginPath(); ctx.moveTo(cx-R,cy); ctx.lineTo(cx+R,cy); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(cx,cy-R); ctx.lineTo(cx,cy+R); ctx.stroke();
 
     // Diagonal faint lines
-    ctx.strokeStyle='rgba(0,200,80,0.055)';
+    ctx.strokeStyle=`rgba(${rBase},0.055)`;
     ctx.beginPath(); ctx.moveTo(cx-R*0.72,cy-R*0.72); ctx.lineTo(cx+R*0.72,cy+R*0.72); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(cx+R*0.72,cy-R*0.72); ctx.lineTo(cx-R*0.72,cy+R*0.72); ctx.stroke();
 
-    // Sweep gradient (the green pie slice)
+    // Sweep (filled arc segments fading)
     const sweepSpan = Math.PI * 0.65;
-    const grad = ctx.createConicalGradient
-      ? null // not standard, use manual
-      : null;
-
-    // Draw sweep as filled arc segments fading
     for(let i=0; i<60; i++){
       const a0 = angle - (i/60)*sweepSpan;
       const a1 = angle - ((i+1)/60)*sweepSpan;
       const alpha = (1 - i/60) * 0.45;
-      ctx.beginPath();
-      ctx.moveTo(cx,cy);
-      ctx.arc(cx,cy,R,a0,a1,true);
-      ctx.closePath();
-      ctx.fillStyle=`rgba(0,230,90,${alpha})`;
-      ctx.fill();
+      ctx.beginPath(); ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,R,a0,a1,true); ctx.closePath();
+      ctx.fillStyle=`rgba(${rSweep},${alpha})`; ctx.fill();
     }
 
     // Sweep line (bright leading edge)
-    ctx.beginPath();
-    ctx.moveTo(cx,cy);
+    ctx.beginPath(); ctx.moveTo(cx,cy);
     ctx.lineTo(cx + Math.cos(angle)*R, cy + Math.sin(angle)*R);
-    ctx.strokeStyle='rgba(0,255,110,0.9)';
-    ctx.lineWidth=1.2;
-    ctx.stroke();
+    ctx.strokeStyle=`rgba(${rBright},0.9)`; ctx.lineWidth=1.2; ctx.stroke();
     // glow tip
     ctx.beginPath();
     ctx.arc(cx + Math.cos(angle)*R, cy + Math.sin(angle)*R, 2.5, 0, Math.PI*2);
-    ctx.fillStyle='rgba(0,255,110,0.95)';
-    ctx.fill();
+    ctx.fillStyle=`rgba(${rBright},0.95)`; ctx.fill();
 
     // Blips
     blips.forEach(b=>{
-      ctx.beginPath();
-      ctx.arc(b.x,b.y,b.size,0,Math.PI*2);
-      ctx.fillStyle=`rgba(0,255,120,${b.alpha})`;
-      ctx.fill();
-      // glow ring
-      ctx.beginPath();
-      ctx.arc(b.x,b.y,b.size*2.5,0,Math.PI*2);
-      ctx.strokeStyle=`rgba(0,255,120,${b.alpha*0.35})`;
-      ctx.lineWidth=0.8;
-      ctx.stroke();
+      ctx.beginPath(); ctx.arc(b.x,b.y,b.size,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${rBlip},${b.alpha})`; ctx.fill();
+      ctx.beginPath(); ctx.arc(b.x,b.y,b.size*2.5,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(${rBlip},${b.alpha*0.35})`; ctx.lineWidth=0.8; ctx.stroke();
     });
 
     // Center dot
-    ctx.beginPath();
-    ctx.arc(cx,cy,2.2,0,Math.PI*2);
-    ctx.fillStyle='rgba(0,255,120,0.9)';
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(cx,cy,2.2,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${rBlip},0.9)`; ctx.fill();
 
     // Outer ring border
-    ctx.beginPath();
-    ctx.arc(cx,cy,R,0,Math.PI*2);
-    ctx.strokeStyle='rgba(0,200,80,0.35)';
-    ctx.lineWidth=1.2;
-    ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(${rBase},0.35)`; ctx.lineWidth=1.2; ctx.stroke();
 
     // Spawn and tick blips
     maybeSpawnBlip();
@@ -2124,7 +2622,64 @@ window.addEventListener('load',()=>{
   setTimeout(()=>navScroll(0),100);
   // Start tab animations
   runTabAnims();
+  // Start asset monitor
+  initMonitor();
+  initSlog();
+  initPrinter();
+  loadTheme();
+  loadTabOrder();
+  loadWinHidden();
+  buildCmdQuickTags();
 });
+
+// ══════════════ TOPBAR CONTROLS ══════════════
+let _tbFS = false;
+document.addEventListener('fullscreenchange',     ()=>{ _tbFS=!!document.fullscreenElement; _updateFsBtn(); });
+document.addEventListener('webkitfullscreenchange',()=>{ _tbFS=!!document.webkitFullscreenElement; _updateFsBtn(); });
+
+function _updateFsBtn(){
+  const b=G('tb-fs-btn');
+  if(!b) return;
+  b.textContent = _tbFS ? '⊡' : '⛶';
+  b.title       = _tbFS ? 'Exit Fullscreen' : 'Enter Fullscreen';
+}
+
+function tbToggleFS(){
+  if(!_tbFS){
+    const el=document.documentElement;
+    try{
+      if(el.requestFullscreen)             el.requestFullscreen();
+      else if(el.webkitRequestFullscreen)  el.webkitRequestFullscreen();
+      else if(el.mozRequestFullScreen)     el.mozRequestFullScreen();
+    }catch(e){}
+  } else {
+    try{
+      if(document.exitFullscreen)          document.exitFullscreen();
+      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if(document.mozCancelFullScreen)  document.mozCancelFullScreen();
+    }catch(e){}
+  }
+}
+
+function tbMinimize(){
+  // Exit fullscreen → restores normal browser window view
+  try{
+    if(document.exitFullscreen)          document.exitFullscreen();
+    else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+  }catch(e){}
+}
+
+function tbPowerOff(){
+  // Step 1: exit fullscreen (restores browser window)
+  // Step 2: confirm + close tab
+  try{
+    if(document.exitFullscreen)          document.exitFullscreen();
+    else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+  }catch(e){}
+  setTimeout(()=>{
+    if(confirm('Close NetOps Toolkit?')) window.close();
+  }, 220);
+}
 
 // ══════════════ SPLASH ══════════════
 function launchApp(){
@@ -2256,6 +2811,11 @@ function toggleStartMenu(){
   const sm = G('start-menu');
   sm.classList.toggle('open');
 }
+// Close admin panel on bg click
+document.addEventListener('click', e=>{
+  const ap = G('admin-panel');
+  if(ap && ap.classList.contains('open') && e.target === ap) ap.classList.remove('open');
+});
 // Close start menu when clicking elsewhere
 document.addEventListener('click', e=>{
   if(!G('tb-start').contains(e.target) && !G('start-menu').contains(e.target)){
@@ -2264,9 +2824,695 @@ document.addEventListener('click', e=>{
 });
 
 
+
+// ══════════════ ASSET MONITOR ══════════════
+const MON_KEY   = 'netops_monitors_v2';
+let monitorAssets   = [];
+let monitorTimer    = null;
+let monitorInterval = 30000;
+let monCountdown    = 0;
+let monCountTimer   = null;
+
+// ── AUDIO: IGI Prison Alarm via Web Audio ──
+let _audioCtx = null;
+function ac(){ 
+  if(!_audioCtx){ 
+    try{ _audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+  }
+  return _audioCtx; 
+}
+
+let _alarmLooping = false;
+let _alarmNodes   = [];
+let _alarmTimer   = null;
+
+// ══════════════════════════════════════════════
+//  ALARM SOUND LIBRARY — Web Audio synthesized
+// ══════════════════════════════════════════════
+
+const ALARM_SOUNDS = {
+
+  // 🚨 IGI Prison Siren — fast descending warble, two-burst pattern
+  igi_prison: function(ctx, t0){
+    const freqs = [1200,1000,800,650,550,650,800,1000,1200,1050,850,650,550,650,850,1100];
+    let t = t0;
+    for(let b=0;b<2;b++){
+      freqs.forEach(f=>{
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type='sawtooth';
+        o.frequency.setValueAtTime(f,t);
+        o.frequency.linearRampToValueAtTime(f*0.68,t+0.075);
+        g.gain.setValueAtTime(0.32,t);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.095);
+        o.start(t); o.stop(t+0.095);
+        _alarmNodes.push(o); t+=0.082;
+      });
+      t+=0.22;
+    }
+    return t - t0;
+  },
+
+  // ☢️ Nuclear Alert — slow rising wail, classic civil defense
+  nuclear: function(ctx, t0){
+    let t = t0;
+    for(let i=0;i<3;i++){
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type='sine';
+      o.frequency.setValueAtTime(300+i*80, t);
+      o.frequency.linearRampToValueAtTime(900+i*100, t+1.2);
+      o.frequency.linearRampToValueAtTime(300+i*80, t+2.0);
+      g.gain.setValueAtTime(0.0,t);
+      g.gain.linearRampToValueAtTime(0.28,t+0.15);
+      g.gain.setValueAtTime(0.28,t+1.8);
+      g.gain.linearRampToValueAtTime(0.0,t+2.2);
+      o.start(t); o.stop(t+2.2);
+      _alarmNodes.push(o); t+=0.12;
+    }
+    return 2.4;
+  },
+
+  // 🌊 Submarine Dive — deep diving klaxon, classic AWOOGA
+  submarine: function(ctx, t0){
+    let t = t0;
+    for(let rep=0;rep<2;rep++){
+      // AWOOGA: two tones alternating fast
+      [880,660,880,660,880].forEach((f,i)=>{
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type='square';
+        o.frequency.setValueAtTime(f,t);
+        g.gain.setValueAtTime(0.25,t);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+        o.start(t); o.stop(t+0.18);
+        _alarmNodes.push(o); t+=0.17;
+      });
+      t+=0.35;
+    }
+    return t - t0;
+  },
+
+  // 🚔 Police Siren — two-tone European wail
+  police: function(ctx, t0){
+    let t = t0;
+    for(let rep=0;rep<2;rep++){
+      [770,620].forEach(f=>{
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type='sawtooth';
+        o.frequency.setValueAtTime(f,t);
+        o.frequency.linearRampToValueAtTime(f*1.18,t+0.45);
+        g.gain.setValueAtTime(0.28,t);
+        g.gain.setValueAtTime(0.28,t+0.44);
+        g.gain.linearRampToValueAtTime(0.001,t+0.46);
+        o.start(t); o.stop(t+0.46);
+        _alarmNodes.push(o); t+=0.46;
+      });
+    }
+    return t - t0;
+  },
+
+  // 📡 Radar Beep — short sharp repeating blips
+  radar_beep: function(ctx, t0){
+    let t = t0;
+    for(let i=0;i<6;i++){
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type='sine';
+      o.frequency.setValueAtTime(1400,t);
+      g.gain.setValueAtTime(0.0,t);
+      g.gain.linearRampToValueAtTime(0.35,t+0.015);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.09);
+      o.start(t); o.stop(t+0.09);
+      _alarmNodes.push(o);
+      t += (i%2===0) ? 0.18 : 0.35;
+    }
+    return t - t0;
+  },
+
+  // 📣 Klaxon Horn — loud harsh industrial buzzer
+  klaxon: function(ctx, t0){
+    let t = t0;
+    [[160,180],[160,180],[160,180]].forEach(([f1,f2],i)=>{
+      [f1,f2,f1,f2].forEach((f,j)=>{
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type='square';
+        o.frequency.setValueAtTime(f,t);
+        g.gain.setValueAtTime(0.3,t);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.11);
+        o.start(t); o.stop(t+0.11);
+        _alarmNodes.push(o); t+=0.10;
+      });
+      t+=0.25;
+    });
+    return t - t0;
+  },
+
+  // 💓 Heartbeat Critical — fast urgent double-thump
+  heartbeat: function(ctx, t0){
+    let t = t0;
+    for(let beat=0;beat<4;beat++){
+      [0,0.18].forEach(offset=>{
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type='sine';
+        o.frequency.setValueAtTime(80,t+offset);
+        o.frequency.exponentialRampToValueAtTime(40,t+offset+0.12);
+        g.gain.setValueAtTime(0.0,t+offset);
+        g.gain.linearRampToValueAtTime(0.5,t+offset+0.02);
+        g.gain.exponentialRampToValueAtTime(0.001,t+offset+0.13);
+        o.start(t+offset); o.stop(t+offset+0.13);
+        _alarmNodes.push(o);
+      });
+      t += 0.38 + (beat>1 ? -0.06 : 0); // speeds up slightly
+    }
+    return t - t0;
+  },
+
+  off: function(){ return 0.5; }
+};
+
+function getAlarmChoice(){
+  const sel = G('mon-alarm-select');
+  return sel ? sel.value : 'igi_prison';
+}
+
+function saveAlarmChoice(){
+  localStorage.setItem('netops_alarm', getAlarmChoice());
+}
+
+function loadAlarmChoice(){
+  const sel = G('mon-alarm-select');
+  const saved = localStorage.getItem('netops_alarm');
+  if(sel && saved) sel.value = saved;
+}
+
+function playAlarmBurst(){
+  const ctx = ac(); if(!ctx) return 0.5;
+  const choice = getAlarmChoice();
+  if(choice === 'off') return 0.5;
+  const fn = ALARM_SOUNDS[choice];
+  if(!fn) return 0.5;
+  return fn(ctx, ctx.currentTime + 0.01) * 1000;
+}
+
+function startAlarmLoop(){
+  if(_alarmLooping) return;
+  if(getAlarmChoice() === 'off') return;
+  _alarmLooping = true;
+  try{ ac()?.resume(); }catch(e){}
+  function burst(){
+    if(!_alarmLooping) return;
+    const dur = playAlarmBurst();
+    _alarmTimer = setTimeout(burst, dur + 450);
+  }
+  burst();
+}
+
+function stopAlarm(){
+  _alarmLooping = false;
+  if(_alarmTimer){ clearTimeout(_alarmTimer); _alarmTimer = null; }
+  _alarmNodes.forEach(o=>{ try{ o.stop(); }catch(e){} });
+  _alarmNodes = [];
+  window.speechSynthesis?.cancel();
+  const bar = G('mon-alert-bar');
+  if(bar){ bar.classList.remove('active'); bar.style.display='none'; }
+}
+
+function testAlarm(){
+  try{ ac()?.resume(); }catch(e){}
+  const btn = G('test-alarm-btn');
+  if(_alarmLooping){
+    stopAlarm();
+    if(btn) btn.textContent = '🔊 Test';
+  } else {
+    if(getAlarmChoice()==='off'){ showToast('Sound is set to Off'); return; }
+    startAlarmLoop();
+    speakAlert('Test Asset', true);
+    if(btn) btn.textContent = '🔇 Stop';
+    setTimeout(()=>{ if(_alarmLooping){ stopAlarm(); if(btn) btn.textContent='🔊 Test'; } }, 10000);
+  }
+}
+
+// ── TEXT TO SPEECH ──
+function speakAlert(name, isDown){
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(
+    isDown 
+      ? name + ' is down. Alert. ' + name + ' is offline.' 
+      : name + ' is back online.'
+  );
+  u.rate = 0.88; u.pitch = 1.1; u.volume = 1;
+  window.speechSynthesis.speak(u);
+}
+
+// ── EMAIL ALERT (fully automated via ping backend) ──
+function saveEmailConfig(){
+  const from = G('em-from')?.value.trim();
+  const pass = G('em-pass')?.value.trim();
+  const to   = G('em-to')?.value.trim();
+  if(!from||!pass||!to){ setEmStatus('Fill all 3 fields','warn'); return; }
+  setEmStatus('Saving…','info');
+  fetch('http://localhost:5199/email-config?from='+encodeURIComponent(from)+'&pass='+encodeURIComponent(pass)+'&to='+encodeURIComponent(to))
+    .then(r=>r.json())
+    .then(d=>{ if(d.ok){ setEmStatus('✅ Saved','ok'); localStorage.setItem('netops_em_from',from); localStorage.setItem('netops_em_to',to); } else setEmStatus('Error saving','err'); })
+    .catch(()=>setEmStatus('❌ Backend offline — run START_PING_SERVER.bat','err'));
+}
+
+async function testEmailAlert(){
+  setEmStatus('Sending test email…','info');
+  try {
+    const r = await fetch('http://localhost:5199/email-test');
+    const d = await r.json();
+    if(d.ok){ setEmStatus('✅ Test email sent! Check inbox.','ok'); }
+    else { setEmStatus('❌ '+d.msg,'err'); }
+  } catch(e){ setEmStatus('❌ Backend offline — run START_PING_SERVER.bat','err'); }
+}
+
+async function sendEmailAlert(name, isDown, ip){
+  try {
+    const url = 'http://localhost:5199/email-alert?name='+encodeURIComponent(name)+'&ip='+encodeURIComponent(ip)+'&down='+(isDown?'1':'0');
+    const r = await fetch(url);
+    const d = await r.json();
+    if(d.ok){ console.log('[email] Alert sent for '+name); }
+    else { console.warn('[email] Failed:', d.msg); }
+  } catch(e){ console.warn('[email] Backend offline'); }
+}
+
+function setEmStatus(msg, type){
+  const el = G('em-status'); if(!el) return;
+  el.textContent = msg;
+  el.style.color = type==='ok'?'rgba(0,255,157,0.8)':type==='err'?'rgba(255,79,110,0.8)':'rgba(255,184,0,0.8)';
+}
+
+function loadEmailFields(){
+  const from = localStorage.getItem('netops_em_from');
+  const to   = localStorage.getItem('netops_em_to');
+  if(from && G('em-from')) G('em-from').value = from;
+  if(to   && G('em-to'))   G('em-to').value   = to;
+}
+
+
+
+// ── ALERT BAR ──
+let _offlineAssets = {};
+
+function showAlertBar(text, assetId, isDown){
+  const bar  = G('mon-alert-bar');
+  const list = G('mon-alert-list');
+  if(!bar) return;
+
+  // Track offline assets
+  if(assetId){
+    if(isDown){ _offlineAssets[assetId] = text; }
+    else { delete _offlineAssets[assetId]; }
+  }
+
+  const offlineCount = Object.keys(_offlineAssets).length;
+  if(offlineCount === 0){
+    bar.classList.remove('active');
+    bar.style.display = 'none';
+    return;
+  }
+
+  // Update header text
+  const main = G('mon-alert-text');
+  if(main) main.textContent = offlineCount === 1
+    ? '⚠ ALERT — 1 asset is OFFLINE'
+    : '⚠ ALERT — ' + offlineCount + ' assets are OFFLINE';
+
+  // Update list of offline assets
+  if(list) list.innerHTML = Object.values(_offlineAssets).map(t=>'▸ '+t).join('<br>');
+
+  bar.style.display = 'block';
+  bar.classList.add('active');
+}
+
+// ── SAVE / LOAD ──
+function monitorSave(){
+  localStorage.setItem(MON_KEY, JSON.stringify(
+    monitorAssets.map(a=>({id:a.id,name:a.name,ip:a.ip,status:a.status,since:a.since,lastAlert:a.lastAlert}))
+  ));
+}
+
+function monitorLoad(){
+  try{
+    const d = localStorage.getItem(MON_KEY);
+    if(d){ monitorAssets = JSON.parse(d); }
+  }catch(e){}
+  // Ensure 7 slots minimum
+  while(monitorAssets.length < 7){
+    const i = monitorAssets.length;
+    monitorAssets.push({id: Date.now()+Math.random()*999|0+i, name:'Asset '+(i+1), ip:'', status:'idle', since:null, lastAlert:null});
+  }
+}
+
+// ── RENDER ──
+function monitorRender(){
+  const grid = G('monitor-grid');
+  if(!grid) return;
+  grid.innerHTML = monitorAssets.map((a,idx)=>{
+    const dotCls  = a.status==='online'?'online':a.status==='offline'?'offline':'idle-dot';
+    const cardCls = a.status==='online'?'online':a.status==='offline'?'offline':'';
+    const statTxt = a.status==='online'?'ONLINE':a.status==='offline'?'OFFLINE':'IDLE';
+    const statCls = a.status==='online'?'online':a.status==='offline'?'offline':'idle-stat';
+    return `<div class="monitor-card ${cardCls}" id="mc-${a.id}">
+  <div class="mc-top">
+    <div class="mc-dot ${dotCls}" id="mcd-${a.id}"></div>
+    <div class="mc-name">${esc(a.name||'Asset '+(idx+1))}</div>
+    <div class="mc-badge ${statCls}" id="mcs-${a.id}">${statTxt}</div>
+  </div>
+  <div class="mc-edit">
+    <input type="text" placeholder="Name…" value="${esc(a.name||'')}"
+      oninput="monSaveField(${a.id},'name',this.value)"
+      style="flex:1;font-size:0.74rem;padding:5px 8px;">
+    <input type="text" placeholder="IP or URL (e.g. 192.168.1.1 or google.com)…" value="${esc(a.ip||'')}"
+      oninput="monSaveField(${a.id},'ip',this.value)"
+      style="flex:2;font-size:0.74rem;padding:5px 8px;">
+  </div>
+  <div class="mc-meta">
+    <span style="font-family:var(--mono);font-size:0.64rem;color:var(--text3)" id="mcip-${a.id}">${a.ip?'🔗 '+esc(a.ip):''}</span>
+    <span style="font-family:var(--mono);font-size:0.62rem;color:var(--text3)" id="mcst-${a.id}">${a.since?'Since '+a.since:''}</span>
+  </div>
+  <div class="mc-actions">
+    <button class="btn sm g" style="font-size:0.62rem;padding:4px 10px;" onclick="monitorCheckOne(${a.id})">▶ Check</button>
+    <button class="btn sm r" style="font-size:0.62rem;padding:4px 10px;" onclick="monitorRemove(${a.id})">✕ Remove</button>
+  </div>
+</div>`;
+  }).join('');
+}
+
+function monSaveField(id, field, val){
+  const a = monitorAssets.find(x=>x.id===id);
+  if(!a) return;
+  a[field] = val.trim();
+  if(field==='ip'){ const el=G('mcip-'+id); if(el) el.textContent=val?'🔗 '+val:''; }
+  monitorSave();
+}
+
+function monitorAddCard(){
+  monitorAssets.push({id:Date.now(), name:'New Asset', ip:'', status:'idle', since:null, lastAlert:null});
+  monitorSave(); monitorRender();
+}
+
+function monitorRemove(id){
+  monitorAssets = monitorAssets.filter(x=>x.id!==id);
+  monitorSave(); monitorRender();
+}
+
+// ── CHECK ONE ASSET ──
+async function monitorCheckOne(id){
+  const a = monitorAssets.find(x=>x.id===id);
+  if(!a) return;
+
+  // Show checking state
+  const card=G('mc-'+a.id), dot=G('mcd-'+a.id), badge=G('mcs-'+a.id);
+  if(card) card.className='monitor-card checking';
+  if(dot)  dot.className='mc-dot checking';
+  if(badge){ badge.className='mc-badge checking'; badge.textContent='CHECKING…'; }
+
+  let online   = false;
+  let pingMs   = null;
+  let pingLoss = null;
+
+  if(!a.ip || !a.ip.trim()){
+    if(card) card.className='monitor-card';
+    if(dot)  dot.className='mc-dot idle-dot';
+    if(badge){ badge.className='mc-badge idle-stat'; badge.textContent='NO IP'; }
+    return;
+  }
+
+  const raw = a.ip.trim();
+
+  // ── METHOD 1: Real ICMP ping via local Python backend (localhost:5199) ──
+  // CRITICAL: AbortController timeout MUST be > count × per_pkt_timeout on backend.
+  // Backend uses -w 6000 (6s/pkt) for external IPs, -w 5000 for local.
+  // With count=5: 5×6=30s external, 5×5=25s local. Add 8s buffer.
+  let usedPing = false;
+  try {
+    const [pingCount, pingThresh] = getMonSensitivity();
+    const isExternal = !raw.startsWith('192.168') && !raw.startsWith('10.')
+                    && !raw.startsWith('172.')    && !raw.startsWith('127.');
+    const perPkt  = isExternal ? 6000 : 5000;  // ms per packet, must match backend
+    const abortMs = pingCount * perPkt + 8000;  // total abort timeout with buffer
+    const ctrl = new AbortController();
+    setTimeout(()=>ctrl.abort(), abortMs);
+    // thresh=pingThresh: e.g. 81 means online if loss<81% → 1/5 packets = ONLINE
+    const url = 'http://localhost:5199/ping?host=' + encodeURIComponent(raw)
+              + '&count=' + pingCount + '&thresh=' + pingThresh;
+    const pr = await fetch(url, {signal: ctrl.signal, cache:'no-store'});
+    if(pr.ok){
+      const pd = await pr.json();
+      online   = pd.online === true;
+      pingMs   = pd.ms;
+      pingLoss = pd.loss;
+      usedPing = true;
+      console.log('[ping]', raw, pd);
+    }
+  } catch(e){ /* backend not running — fall through to HTTP check */ }
+
+  // ── METHOD 2: HTTP reachability (works for router/web servers) ──
+  if(!usedPing){
+    const target = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
+    try {
+      const ctrl = new AbortController();
+      setTimeout(()=>ctrl.abort(), 9000);
+      await fetch(target, {mode:'no-cors', cache:'no-store', signal:ctrl.signal});
+      online = true;
+    } catch(err){
+      if(err.name === 'AbortError'){
+        online = false;
+      } else {
+        try {
+          const ctrl2 = new AbortController();
+          setTimeout(()=>ctrl2.abort(), 7000);
+          await fetch('http://' + raw, {mode:'no-cors', cache:'no-store', signal:ctrl2.signal});
+          online = true;
+        } catch(e2){ online = false; }
+      }
+    }
+  }
+
+  const wasStatus = a.status;
+  const now = new Date().toLocaleTimeString();
+  a.status = online ? 'online' : 'offline';
+  a.since  = now;
+
+  // Update UI
+  if(card)  card.className  = 'monitor-card '  + a.status;
+  if(dot)   dot.className   = 'mc-dot '         + a.status;
+  if(badge){
+    badge.className = 'mc-badge ' + a.status;
+    const lossInfo = (typeof pingLoss !== 'undefined' && pingLoss !== null && pingLoss > 0 && pingLoss < 100)
+      ? ' · ' + pingLoss + '% loss' : '';
+    badge.textContent = online
+      ? ('ONLINE' + (pingMs !== null ? ' · ' + pingMs + 'ms' : '') + lossInfo)
+      : ('OFFLINE' + (typeof pingLoss !== 'undefined' && pingLoss !== null ? ' · ' + pingLoss + '% loss' : ''));
+  }
+  const stEl=G('mcst-'+a.id); if(stEl) stEl.textContent='Since '+now;
+
+  // Fire alerts on STATUS CHANGE only
+  if(wasStatus !== 'idle' && wasStatus !== a.status){
+    const isDown = !online;
+    const alertTxt = isDown
+      ? a.name + ' (' + a.ip + ') went OFFLINE at ' + now
+      : a.name + ' (' + a.ip + ') came back ONLINE at ' + now;
+    showAlertBar(alertTxt, a.id, isDown);
+
+    // Sound + voice — loop until stopped
+    const soundOn = G('mon-sound') ? G('mon-sound').checked : true;
+    if(soundOn && getAlarmChoice() !== 'off'){
+      if(isDown){
+        startAlarmLoop();
+        const btn = G('test-alarm-btn');
+        if(btn) btn.textContent = '🔇 Stop';
+      } else {
+        if(Object.keys(_offlineAssets).length === 0){
+          stopAlarm();
+          const btn = G('test-alarm-btn');
+          if(btn) btn.textContent = '🔊 Test';
+        }
+      }
+    }
+    speakAlert(a.name, isDown);
+    // Email alert — throttle: max once per 5 min per asset
+    const last = a.lastAlert ? Date.now()-new Date(a.lastAlert).getTime() : Infinity;
+    if(last > 300000){
+      sendEmailAlert(a.name, isDown, a.ip);  // fully automated
+      a.lastAlert = new Date().toISOString();
+    }
+  }
+  monitorSave();
+}
+
+async function monitorCheckAll(){
+  const active = monitorAssets.filter(a=>a.ip && a.ip.trim());
+  if(!active.length){ monCountdown=monitorInterval/1000; updateCountdown(); return; }
+
+  // Show checking state for all
+  active.forEach(a=>{
+    const card=G('mc-'+a.id),dot=G('mcd-'+a.id),badge=G('mcs-'+a.id);
+    if(card) card.className='monitor-card checking';
+    if(dot)  dot.className='mc-dot checking';
+    if(badge){ badge.className='mc-badge checking'; badge.textContent='CHECKING…'; }
+  });
+
+  // Try parallel batch via /ping-all (all hosts checked simultaneously on backend)
+  const [pingCount, pingThresh] = getMonSensitivity();
+  let batchDone = false;
+  try {
+    const hosts = active.map(a=>a.ip.trim()).join(',');
+    // Abort timeout: count × max_per_pkt(6s) + generous buffer
+    const ctrl = new AbortController();
+    setTimeout(()=>ctrl.abort(), pingCount * 6000 + 12000);
+    const r = await fetch(
+      'http://localhost:5199/ping-all?hosts=' + encodeURIComponent(hosts)
+      + '&count=' + pingCount + '&thresh=' + pingThresh,
+      {signal: ctrl.signal, cache:'no-store'});
+    if(r.ok){
+      const results = await r.json();
+      for(const a of active){
+        const res = results[a.ip.trim()];
+        if(res !== undefined) await applyAssetResult(a, res.online===true, res.ms??null, res.loss??null);
+      }
+      batchDone = true;
+    }
+  } catch(e){ /* fall through to sequential */ }
+
+  // Fallback: sequential per-asset (if backend offline)
+  if(!batchDone) for(const a of active) await monitorCheckOne(a.id);
+
+  monCountdown = monitorInterval / 1000;
+  updateCountdown();
+}
+
+// Shared: apply a completed ping result to an asset card + fire alerts
+async function applyAssetResult(a, online, pingMs, pingLoss){
+  const card=G('mc-'+a.id),dot=G('mcd-'+a.id),badge=G('mcs-'+a.id);
+  const wasStatus = a.status;
+  const now = new Date().toLocaleTimeString();
+  a.status = online ? 'online' : 'offline';
+  a.since  = now;
+  if(card) card.className  = 'monitor-card '  + a.status;
+  if(dot)  dot.className   = 'mc-dot '         + a.status;
+  if(badge){
+    badge.className = 'mc-badge ' + a.status;
+    const lossInfo = (pingLoss !== null && pingLoss > 0 && pingLoss < 100) ? ' · '+pingLoss+'% loss' : '';
+    badge.textContent = online
+      ? ('ONLINE' + (pingMs !== null ? ' · '+pingMs+'ms' : '') + lossInfo)
+      : ('OFFLINE' + (pingLoss !== null ? ' · '+pingLoss+'% loss' : ''));
+  }
+  const stEl=G('mcst-'+a.id); if(stEl) stEl.textContent='Since '+now;
+  if(wasStatus !== 'idle' && wasStatus !== a.status){
+    const isDown = !online;
+    const alertTxt = isDown
+      ? a.name+' ('+a.ip+') went OFFLINE at '+now
+      : a.name+' ('+a.ip+') came back ONLINE at '+now;
+    showAlertBar(alertTxt, a.id, isDown);
+    const soundOn = G('mon-sound') ? G('mon-sound').checked : true;
+    if(soundOn && getAlarmChoice() !== 'off'){
+      if(isDown){ startAlarmLoop(); const btn=G('test-alarm-btn'); if(btn) btn.textContent='🔇 Stop'; }
+      else if(Object.keys(_offlineAssets).length===0){ stopAlarm(); const btn=G('test-alarm-btn'); if(btn) btn.textContent='🔊 Test'; }
+    }
+    speakAlert(a.name, isDown);
+    const last = a.lastAlert ? Date.now()-new Date(a.lastAlert).getTime() : Infinity;
+    if(last > 300000){ sendEmailAlert(a.name, isDown, a.ip); a.lastAlert = new Date().toISOString(); }
+  }
+  monitorSave();
+}
+
+function updateCountdown(){
+  const el = G('mon-next');
+  if(el) el.textContent = 'Next check in ' + monCountdown + 's';
+  if(monCountdown > 0) monCountdown--;
+}
+
+function setMonitorInterval(){
+  const sel = G('mon-interval');
+  if(!sel) return;
+  monitorInterval = parseInt(sel.value);
+  monCountdown = monitorInterval / 1000;
+  if(monitorTimer)  clearInterval(monitorTimer);
+  if(monCountTimer) clearInterval(monCountTimer);
+  monitorTimer  = setInterval(monitorCheckAll,  monitorInterval);
+  monCountTimer = setInterval(updateCountdown, 1000);
+}
+
+function getMonSensitivity(){
+  const sel = G('mon-sensitivity');
+  const val = sel ? sel.value : '5|100';
+  const [c, t] = val.split('|');
+  return [parseInt(c), parseInt(t)];
+}
+
+function saveSensitivity(){
+  const sel = G('mon-sensitivity');
+  if(sel) localStorage.setItem('netops_sensitivity', sel.value);
+}
+
+function loadSensitivity(){
+  const sel = G('mon-sensitivity');
+  const saved = localStorage.getItem('netops_sensitivity');
+  if(sel && saved) sel.value = saved;
+}
+
+async function checkPingBackend(){
+  const el = G('ping-backend-status');
+  try {
+    const r = await fetch('http://localhost:5199/status', {cache:'no-store'});
+    if(r.ok){
+      const d = await r.json();
+      if(el){
+        _radarOK = true;
+        const [pc,pt] = getMonSensitivity(); el.textContent = '✅  Ping Backend CONNECTED — Real ICMP ping active ('+d.os+'). '+pc+' packets · online if ≥1 reply received · all '+pc+' must fail to show OFFLINE.';
+        el.style.cssText = 'font-family:var(--mono);font-size:0.72rem;padding:8px 14px;border-radius:4px;margin-bottom:10px;background:rgba(0,255,157,0.06);border:1px solid rgba(0,255,157,0.25);color:rgba(0,255,157,0.85);display:flex;align-items:center;gap:8px;';
+      }
+    } else { throw new Error(); }
+  } catch(e){
+    if(el){
+      _radarOK = false;
+      el.innerHTML = '❌  Ping Backend OFFLINE — Browser HTTP check only (phones &amp; raw IPs may show wrong status).<br><strong style="color:rgba(255,184,0,0.9);">→ Double-click START_PING_SERVER.bat then wait 5 seconds — this bar will turn green automatically.</strong>';
+      el.style.cssText = 'font-family:var(--mono);font-size:0.72rem;padding:8px 14px;border-radius:4px;margin-bottom:10px;background:rgba(255,79,110,0.07);border:1px solid rgba(255,79,110,0.3);color:rgba(255,79,110,0.85);display:block;line-height:1.7;';
+    }
+  }
+}
+
+function initMonitor(){
+  monitorLoad();
+  monitorRender();
+  monCountdown = monitorInterval / 1000;
+  monitorTimer  = setInterval(monitorCheckAll,  monitorInterval);
+  monCountTimer = setInterval(updateCountdown, 1000);
+  checkPingBackend();
+  setInterval(checkPingBackend, 15000);
+  loadEmailFields();
+  loadSensitivity();
+  loadAlarmChoice();
+  setTimeout(monitorCheckAll, 2000);
+}
+
 // ══════════════ LOCK SCREEN ══════════════
 const LOCK_PIN = '1234';
 let lockEntry = '';
+
+function logoutUser(){
+  // Clear session, show login splash
+  _currentRole = null;
+  // Remove role badge from topbar
+  const badge = document.getElementById('login-role-badge');
+  if(badge) badge.remove();
+  // Show splash/login
+  const splash = G('splash');
+  if(splash){ splash.style.display='flex'; splash.style.opacity='1'; splash.style.pointerEvents='auto'; }
+  // Clear login fields
+  if(G('login-user')) G('login-user').value='';
+  if(G('login-pass')) G('login-pass').value='';
+  if(G('login-err'))  G('login-err').textContent='';
+  toast('🔒 Logged out');
+}
 
 function lockScreen(){
   lockEntry = '';
@@ -2366,6 +3612,595 @@ document.addEventListener('keydown', e=>{
   e.preventDefault();
 });
 
+
+// ══════════════ SUPPORT LOG ══════════════
+const SLOG_KEY = 'netops_slog_v1';
+let slogEntries = [];
+
+function slogLoad(){
+  try{ const d=localStorage.getItem(SLOG_KEY); if(d) slogEntries=JSON.parse(d); }catch(e){}
+}
+
+function slogSave2Storage(){
+  localStorage.setItem(SLOG_KEY, JSON.stringify(slogEntries));
+}
+
+function slogShowForm(){
+  const f=G('slog-form'); if(!f) return;
+  f.style.display='block';
+  G('sl-who').focus();
+}
+
+function slogCancelForm(){
+  G('slog-form').style.display='none';
+  ['sl-who','sl-title','sl-desc','sl-tags'].forEach(id=>{ const e=G(id); if(e) e.value=''; });
+}
+
+function slogSave(){
+  const who   = G('sl-who').value.trim();
+  const title = G('sl-title').value.trim();
+  const desc  = G('sl-desc').value.trim();
+  const type  = G('sl-type').value;
+  const tags  = G('sl-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  if(!who || !title){ toast('⚠ Name and title are required'); return; }
+  const entry = {
+    id:    'SL-' + Date.now(),
+    who, title, desc, type, tags,
+    time:  new Date().toLocaleString()
+  };
+  slogEntries.unshift(entry);
+  slogSave2Storage();
+  slogCancelForm();
+  slogRender();
+  toast('✔ Log entry saved');
+}
+
+function slogDelete(id){
+  if(!confirm('Delete this log entry?')) return;
+  slogEntries = slogEntries.filter(e=>e.id!==id);
+  slogSave2Storage();
+  slogRender();
+}
+
+function slogChangeStatus(id, newType){
+  const e = slogEntries.find(x=>x.id===id);
+  if(e){ e.type=newType; slogSave2Storage(); slogRender(); }
+}
+
+function slogRender(){
+  const list  = G('slog-list'); if(!list) return;
+  const who   = (G('sl-search-who')?.value||'').toLowerCase();
+  const title = (G('sl-search-title')?.value||'').toLowerCase();
+  const tag   = (G('sl-search-tag')?.value||'').toLowerCase();
+  const type  = G('sl-filter-type')?.value||'';
+
+  const filtered = slogEntries.filter(e=>{
+    if(who   && !e.who.toLowerCase().includes(who))     return false;
+    if(title && !e.title.toLowerCase().includes(title)) return false;
+    if(tag   && !e.tags.some(t=>t.toLowerCase().includes(tag))) return false;
+    if(type  && e.type !== type) return false;
+    return true;
+  });
+
+  const cnt = G('sl-count');
+  if(cnt) cnt.textContent = filtered.length + ' / ' + slogEntries.length + ' entries';
+
+  if(!filtered.length){
+    list.innerHTML = '<div class="slog-empty">📭 No entries found</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(e=>`
+    <div class="slog-card" id="slc-${e.id}">
+      <div class="slog-meta">
+        <span class="slog-id">${esc(e.id)}</span>
+        <span class="slog-who">👤 ${esc(e.who)}</span>
+        <span class="slog-badge ${e.type}">${e.type==='request'?'📥 REQUEST':e.type==='done'?'✅ DONE':'⏳ PENDING'}</span>
+        <span class="slog-time">🕐 ${esc(e.time)}</span>
+      </div>
+      <div class="slog-title">${esc(e.title)}</div>
+      ${e.desc?`<div class="slog-desc">${esc(e.desc)}</div>`:''}
+      ${e.tags.length?`<div style="margin-top:5px;display:flex;gap:4px;flex-wrap:wrap;">${e.tags.map(t=>`<span style="font-size:0.6rem;padding:1px 6px;background:rgba(0,200,255,0.07);border:1px solid rgba(0,200,255,0.15);border-radius:2px;color:var(--text3);">${esc(t)}</span>`).join('')}</div>`:''}
+      <div class="slog-actions">
+        <button class="btn sm g" style="font-size:0.62rem;padding:3px 8px;" onclick="slogChangeStatus('${e.id}','done')">✅ Done</button>
+        <button class="btn sm y" style="font-size:0.62rem;padding:3px 8px;" onclick="slogChangeStatus('${e.id}','pending')">⏳ Pending</button>
+        <button class="btn sm r" style="font-size:0.62rem;padding:3px 8px;" onclick="slogDelete('${e.id}')">🗑 Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function initSlog(){
+  slogLoad();
+  slogRender();
+}
+
+
+// ══════════════════════════════════════════════════════════
+//  LOGIN SYSTEM
+// ══════════════════════════════════════════════════════════
+// Default credentials — stored hashed in localStorage
+// Admin: admin / Admin@NetOps26
+// User:  user  / User@NetOps26
+const _LOGIN_KEY = 'netops_creds_v1';
+let _currentRole = null;  // 'admin' | 'user' | null
+
+async function _sha1(str){
+  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function _loadCreds(){
+  try { return JSON.parse(localStorage.getItem(_LOGIN_KEY))||{}; } catch(e){ return {}; }
+}
+
+async function _defaultHash(pw){ return await _sha1(pw + 'netops_salt_mk26'); }
+
+async function _getHash(role){
+  const stored = _loadCreds()[role];
+  if(stored) return stored;
+  // Return default hash
+  const defaults = { admin:'Admin@NetOps26', user:'User@NetOps26' };
+  return await _defaultHash(defaults[role]||'');
+}
+
+async function doLogin(){
+  const user = (G('login-user')?.value||'').trim().toLowerCase();
+  const pass = G('login-pass')?.value||'';
+  const errEl = G('login-err');
+  if(!user||!pass){ if(errEl) errEl.textContent='Enter username and password'; return; }
+  if(user !== 'admin' && user !== 'user'){
+    if(errEl) errEl.textContent='✘ Unknown user. Use "admin" or "user"'; return;
+  }
+  const inputHash = await _sha1(pass + 'netops_salt_mk26');
+  const storedHash = await _getHash(user);
+  if(inputHash === storedHash){
+    _currentRole = user;
+    // Show role badge in topbar
+    const badge = document.createElement('span');
+    badge.id = 'login-role-badge';
+    badge.className = 'login-role-badge';
+    badge.style.cssText = 'font-family:var(--mono);font-size:0.6rem;padding:2px 8px;border-radius:3px;background:rgba(0,255,157,0.1);border:1px solid rgba(0,255,157,0.2);color:rgba(0,255,157,0.8);letter-spacing:1px;text-transform:uppercase;flex-shrink:0;';
+    badge.textContent = user === 'admin' ? '⚙ ADMIN' : '👤 USER';
+    if(user === 'admin'){
+      badge.style.cursor = 'pointer';
+      badge.title = 'Open admin settings';
+      badge.onclick = ()=>G('admin-panel').classList.add('open');
+    }
+    const topbar = G('topbar');
+    if(topbar){
+      const copy = topbar.querySelector('[onclick*="© M Kamjo"]') || topbar.querySelector('span[style*="M Kamjo"]');
+      if(copy) topbar.insertBefore(badge, copy);
+      else topbar.insertBefore(badge, topbar.lastElementChild);
+    }
+    launchApp();
+    if(errEl) errEl.textContent='';
+  } else {
+    if(errEl){
+      errEl.textContent='✘ Incorrect password';
+      G('login-pass').value='';
+      G('login-pass').animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'translateX(0)'}],{duration:280});
+    }
+  }
+}
+
+async function adminSavePW(role){
+  const val = G('adm-'+role+'-pw')?.value.trim();
+  if(!val||val.length<4){ toast('⚠ Password must be at least 4 chars'); return; }
+  const hash = await _sha1(val + 'netops_salt_mk26');
+  const creds = _loadCreds();
+  creds[role] = hash;
+  localStorage.setItem(_LOGIN_KEY, JSON.stringify(creds));
+  G('adm-'+role+'-pw').value='';
+  toast('✅ '+role+' password updated');
+}
+
+async function adminShowCreds(el){
+  const creds = _loadCreds();
+  const adminDefault = 'Admin@NetOps26 (default)';
+  const userDefault  = 'User@NetOps26 (default)';
+  el.style.color = 'var(--text)';
+  el.innerHTML = `<b style="color:var(--accent)">admin</b> password: ${creds.admin?'<i style="color:var(--accent4)">custom (hash stored, cannot reveal)</i>':adminDefault}<br>`+
+                 `<b style="color:var(--accent)">user</b>  password: ${creds.user?'<i style="color:var(--accent4)">custom (hash stored, cannot reveal)</i>':userDefault}`;
+}
+
+// ══════════════════════════════════════════════════════════
+//  PRINTER PANEL
+// ══════════════════════════════════════════════════════════
+const PRT_KEY = 'netops_printers_v1';
+let _printers = [];
+
+function prtLoad(){ try{ const d=localStorage.getItem(PRT_KEY); if(d) _printers=JSON.parse(d); }catch(e){} }
+function prtSave(){ localStorage.setItem(PRT_KEY, JSON.stringify(_printers)); }
+
+function prtRender(){
+  const el = G('printer-list'); if(!el) return;
+  if(!_printers.length){ el.innerHTML='<div style="color:var(--text3);font-size:0.76rem;padding:8px 0;">No printers added yet. Add one below.</div>'; return; }
+  el.innerHTML = _printers.map((p,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+      <span style="font-family:var(--mono);font-size:0.78rem;color:var(--text);flex:1;min-width:100px;">🖨️ ${esc(p.name)}</span>
+      <input type="text" value="${esc(p.ip)}" onchange="_printers[${i}].ip=this.value;prtSave()"
+        style="width:150px;font-size:0.72rem;padding:4px 7px;" title="Printer IP">
+      <select onchange="_printers[${i}].proto=this.value;prtSave()" style="width:80px;font-size:0.72rem;padding:4px;">
+        <option ${p.proto==='http'?'selected':''}>http</option>
+        <option ${p.proto==='https'?'selected':''}>https</option>
+      </select>
+      <input type="text" value="${esc(p.port||'')}" placeholder="Port"
+        onchange="_printers[${i}].port=this.value;prtSave()"
+        style="width:60px;font-size:0.72rem;padding:4px 7px;" title="Port (blank=default)">
+      <button class="btn sm g" onclick="prtOpen(${i})">🌐 Open Page</button>
+      <button class="btn sm r" onclick="_printers.splice(${i},1);prtSave();prtRender()">✕</button>
+    </div>`).join('');
+}
+
+function prtOpen(i){
+  const p = _printers[i];
+  const port = p.port ? ':'+p.port : '';
+  window.open(`${p.proto}://${p.ip}${port}`, '_blank');
+}
+
+function prtAdd(){
+  const name = G('prt-new-name').value.trim();
+  const ip   = G('prt-new-ip').value.trim();
+  const proto= G('prt-new-proto').value;
+  const port = G('prt-new-port').value.trim();
+  if(!ip){ toast('⚠ Enter an IP address'); return; }
+  _printers.push({ name: name||ip, ip, proto, port });
+  prtSave(); prtRender();
+  ['prt-new-name','prt-new-ip','prt-new-port'].forEach(id=>{ const e=G(id); if(e) e.value=''; });
+  toast('✅ Printer added: '+(name||ip));
+}
+
+function prtQuickOpen(){
+  const ip    = G('prt-quick-ip').value.trim();
+  const proto = G('prt-quick-proto').value;
+  if(!ip){ toast('⚠ Enter a printer IP'); return; }
+  window.open(`${proto}://${ip}`, '_blank');
+}
+
+async function prtQuickSNMP(){
+  // SNMP is UDP and can't be done from browser — we show a note and offer ping check
+  const ip = G('prt-quick-ip').value.trim();
+  const res = G('prt-snmp-res');
+  if(!ip){ toast('⚠ Enter a printer IP'); return; }
+  show('prt-snmp-res', '<span class="spin">⟳</span> Checking printer reachability…');
+  // Try to ping via backend
+  try {
+    const r = await fetch(`http://localhost:5199/ping?host=${encodeURIComponent(ip)}&count=2&thresh=50`,{cache:'no-store'});
+    if(r.ok){
+      const d = await r.json();
+      const st = d.online ? '<span class="ok">✔ REACHABLE</span>' : '<span class="err">✘ UNREACHABLE</span>';
+      show('prt-snmp-res',
+        `<span class="k">Printer IP:</span> <span class="v">${esc(ip)}</span>
+`+
+        `<span class="k">Status:</span>     ${st} ${d.ms?'('+d.ms+'ms)':''}
+`+
+        `<span class="k">Web UI:</span>     <a href="http://${esc(ip)}" target="_blank">http://${esc(ip)} ↗</a>  <a href="https://${esc(ip)}" target="_blank">https://↗</a>  <a href="http://${esc(ip)}:631" target="_blank">:631 IPP ↗</a>
+`+
+        `<span style="color:var(--text3);font-size:0.7rem;">Note: SNMP (UDP/161) requires a dedicated SNMP tool and cannot run from browser.</span>`
+      );
+    } else throw new Error();
+  } catch(e){
+    show('prt-snmp-res',
+      `<a href="http://${esc(ip)}" target="_blank">→ Open http://${esc(ip)} ↗</a>
+`+
+      `<a href="https://${esc(ip)}" target="_blank">→ Open https://${esc(ip)} ↗</a>
+`+
+      `<a href="http://${esc(ip)}:631" target="_blank">→ Open IPP :631 ↗</a>
+`+
+      `<span style="color:var(--text3);font-size:0.7rem;">Ping backend offline — start START_PING_SERVER.bat for reachability check.</span>`
+    );
+  }
+}
+
+function initPrinter(){ prtLoad(); prtRender(); }
+
+// ══════════════════════════════════════════════════════════
+//  PASSWORD GENERATOR
+// ══════════════════════════════════════════════════════════
+function pgGen(){
+  const upper = G('pg-upper').checked;
+  const lower = G('pg-lower').checked;
+  const num   = G('pg-num').checked;
+  const sym   = G('pg-sym').checked;
+  const noAmb = G('pg-ambig').checked;
+  const len   = parseInt(G('pg-len').value)||16;
+  const count = parseInt(G('pg-count').value)||5;
+
+  let chars = '';
+  if(upper) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if(lower) chars += 'abcdefghijklmnopqrstuvwxyz';
+  if(num)   chars += '0123456789';
+  if(sym)   chars += '!@#$%^&*()-_=+[]{}|;:,.<>?';
+  if(noAmb) chars = chars.replace(/[0OIl1]/g,'');
+  if(!chars){ toast('⚠ Select at least one character type'); return; }
+
+  const out = G('pg-out'); if(!out) return;
+  const results = [];
+  for(let p=0;p<count;p++){
+    let pw = '';
+    const arr = new Uint8Array(len * 2);
+    crypto.getRandomValues(arr);
+    let j=0;
+    while(pw.length < len && j < arr.length){
+      const idx = arr[j++] % chars.length;
+      pw += chars[idx];
+    }
+    // Ensure at least one of each selected type
+    const ensure=[];
+    const ensureChars=[];
+    if(upper&&!noAmb) ensureChars.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+    else if(upper) ensureChars.push('ABCDEFGHJKLMNPQRSTUVWXYZ');
+    if(lower&&!noAmb) ensureChars.push('abcdefghijklmnopqrstuvwxyz');
+    else if(lower) ensureChars.push('abcdefghjkmnpqrstuvwxyz');
+    if(num&&!noAmb) ensureChars.push('23456789');
+    else if(num) ensureChars.push('23456789');
+    if(sym) ensureChars.push('!@#$%^&*()-_=+');
+    results.push(pw);
+  }
+  out.innerHTML = results.map(pw=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.82rem;color:var(--accent2);flex:1;word-break:break-all;">${esc(pw)}</span>
+      <button class="btn sm" onclick="cpToast('${pw.replace(/'/g,"\'")}')">Copy</button>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+//  HIBP PASSWORD LEAK CHECKER (k-anonymity)
+// ══════════════════════════════════════════════════════════
+async function _sha1hex(str){
+  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+}
+
+async function hibpCheckAll(){
+  const raw = G('hibp-in').value.trim();
+  if(!raw){ toast('⚠ Enter passwords to check'); return; }
+  const out = G('hibp-out');
+  out.innerHTML = '<span class="spin">⟳</span> Checking passwords against HaveIBeenPwned…';
+
+  const lines = raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  const entries = lines.map(line=>{
+    // Extract label and password
+    const pipeIdx = line.indexOf('|');
+    if(pipeIdx !== -1){
+      const label = line.slice(0,pipeIdx).trim();
+      const pw    = line.slice(pipeIdx+1).replace(/^ /, ''); // one space after |
+      return { label, pw };
+    }
+    return { label: '', pw: line };
+  });
+
+  let html = '';
+  for(const entry of entries){
+    const { label, pw } = entry;
+    if(!pw){ continue; }
+    try {
+      const hash = await _sha1hex(pw);
+      const prefix = hash.slice(0,5);
+      const suffix = hash.slice(5);
+      const r = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`,{
+        headers:{'Add-Padding':'true'}
+      });
+      if(!r.ok) throw new Error('API error '+r.status);
+      const text = await r.text();
+      const lines2 = text.split('\r\n');
+      let count = 0;
+      for(const l of lines2){
+        const [s,c] = l.split(':');
+        if(s && s.toUpperCase() === suffix){ count = parseInt(c)||0; break; }
+      }
+      const displayLabel = label ? `<span style="color:var(--text2)">${esc(label)}</span> <span style="color:var(--text3)">|</span> ` : '';
+      const pwDisplay = '•'.repeat(Math.min(pw.length,6)) + (pw.length>6 ? '…':'');
+      if(count > 0){
+        html += `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+          <span class="badge bd">⚠ PWNED</span>
+          ${displayLabel}<span style="font-family:var(--mono);color:var(--accent3)">${pwDisplay}</span>
+          <span style="font-size:0.68rem;color:var(--accent3);margin-left:auto;">Found <b>${count.toLocaleString()}</b> time${count>1?'s':''} in breaches</span>
+        </div>`;
+      } else {
+        html += `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+          <span class="badge bs">✔ SAFE</span>
+          ${displayLabel}<span style="font-family:var(--mono);color:var(--accent2)">${pwDisplay}</span>
+          <span style="font-size:0.68rem;color:var(--text3);margin-left:auto;">Not found in known breaches</span>
+        </div>`;
+      }
+    } catch(e){
+      html += `<div style="padding:6px 0;border-bottom:1px solid var(--border);color:var(--accent4);font-size:0.76rem;">
+        ⚠ Error checking ${label||'password'}: ${esc(e.message)}
+      </div>`;
+    }
+    // Small delay to avoid rate limiting
+    await new Promise(r=>setTimeout(r,200));
+  }
+  out.innerHTML = html || '<span style="color:var(--text3)">No valid entries found.</span>';
+}
+
+
+// ══════════════════════════════════════════════════════════
+//  THEME TOGGLE — Dark / Light
+// ══════════════════════════════════════════════════════════
+function toggleTheme(){
+  const light = document.body.classList.toggle('light-theme');
+  const btn = document.getElementById('tb-theme-btn');
+  if(btn) btn.textContent = light ? '☀️' : '🌙';
+  localStorage.setItem('netops_theme', light ? 'light' : 'dark');
+  toast(light ? '☀️ Light theme' : '🌙 Dark theme');
+}
+function loadTheme(){
+  const saved = localStorage.getItem('netops_theme');
+  if(saved === 'light'){
+    document.body.classList.add('light-theme');
+    const btn = document.getElementById('tb-theme-btn');
+    if(btn) btn.textContent = '☀️';
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  DRAG-TO-REORDER TABS
+// ══════════════════════════════════════════════════════════
+let _dragTab = null;
+
+function tabDragStart(e){
+  _dragTab = e.currentTarget;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', _dragTab.dataset.sec);
+  setTimeout(()=>{ if(_dragTab) _dragTab.style.opacity='0.4'; }, 0);
+}
+
+function tabDragEnd(e){
+  if(_dragTab) { _dragTab.style.opacity='1'; _dragTab = null; }
+  saveTabOrder();
+}
+
+function tabDrop(e){
+  e.preventDefault();
+  if(!_dragTab) return;
+  const target = e.target.closest('.tab');
+  if(!target || target === _dragTab) return;
+  const nav = document.getElementById('nav');
+  const tabs = [...nav.querySelectorAll('.tab')];
+  const fromIdx = tabs.indexOf(_dragTab);
+  const toIdx   = tabs.indexOf(target);
+  if(fromIdx < 0 || toIdx < 0) return;
+  if(fromIdx < toIdx) nav.insertBefore(_dragTab, target.nextSibling);
+  else nav.insertBefore(_dragTab, target);
+}
+
+function saveTabOrder(){
+  const order = [...document.querySelectorAll('#nav .tab')].map(t=>t.dataset.sec);
+  localStorage.setItem('netops_tab_order', JSON.stringify(order));
+}
+
+function loadTabOrder(){
+  try {
+    const saved = JSON.parse(localStorage.getItem('netops_tab_order')||'[]');
+    if(!saved.length) return;
+    const nav = document.getElementById('nav');
+    saved.forEach(sec=>{
+      const tab = nav.querySelector(`[data-sec="${sec}"]`);
+      if(tab) nav.appendChild(tab);
+    });
+  } catch(e){}
+}
+
+// ══════════════════════════════════════════════════════════
+//  WINDOWS QUICK LAUNCH — Customize (hide/show buttons)
+// ══════════════════════════════════════════════════════════
+let _winEditMode = false;
+const WIN_HIDE_KEY = 'netops_win_hidden';
+
+function toggleWinEditMode(){
+  _winEditMode = !_winEditMode;
+  const btn = document.getElementById('win-edit-btn');
+  const hint = document.getElementById('win-edit-hint');
+  const grid = document.querySelector('#sec-dashboard .wgrid');
+  if(!grid) return;
+  if(_winEditMode){
+    btn.textContent = '✅ Done';
+    btn.style.borderColor = 'var(--accent2)';
+    btn.style.color = 'var(--accent2)';
+    if(hint) hint.style.display = 'block';
+    // Add remove buttons to all visible wbtns
+    grid.querySelectorAll('.wbtn:not(.win-hidden)').forEach(b=>{
+      if(b.querySelector('.win-x')) return;
+      const x = document.createElement('span');
+      x.className = 'win-x';
+      x.textContent = '✕';
+      x.style.cssText = 'margin-left:5px;color:var(--accent3);font-weight:700;cursor:pointer;font-size:0.8rem;';
+      x.onclick = (ev)=>{ ev.stopPropagation(); ev.preventDefault(); hideWinBtn(b); };
+      b.appendChild(x);
+    });
+  } else {
+    btn.textContent = '✏️ Customize';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    if(hint) hint.style.display = 'none';
+    grid.querySelectorAll('.win-x').forEach(x=>x.remove());
+    saveWinHidden();
+  }
+}
+
+function hideWinBtn(btn){
+  const key = btn.textContent.replace('✕','').trim();
+  btn.style.display = 'none';
+  btn.dataset.winkey = key;
+  btn.classList.add('win-hidden');
+  // Show a small restore chip
+  const restore = document.getElementById('win-restore-bar') || createRestoreBar();
+  const chip = document.createElement('span');
+  chip.className = 'tag';
+  chip.style.cssText = 'border-color:var(--accent3);color:var(--accent3);cursor:pointer;';
+  chip.textContent = '↩ ' + key;
+  chip.title = 'Click to restore';
+  chip.onclick = ()=>{ btn.style.display=''; btn.classList.remove('win-hidden'); chip.remove(); saveWinHidden(); };
+  restore.appendChild(chip);
+  saveWinHidden();
+}
+
+function createRestoreBar(){
+  const bar = document.createElement('div');
+  bar.id = 'win-restore-bar';
+  bar.style.cssText = 'margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;';
+  const label = document.createElement('span');
+  label.style.cssText = 'font-size:0.6rem;color:var(--text3);letter-spacing:1px;align-self:center;';
+  label.textContent = 'HIDDEN (click to restore):';
+  bar.appendChild(label);
+  const grid = document.querySelector('#sec-dashboard .wgrid');
+  if(grid) grid.parentElement.appendChild(bar);
+  return bar;
+}
+
+function saveWinHidden(){
+  const hidden = [...document.querySelectorAll('#sec-dashboard .wbtn.win-hidden')].map(b=>b.dataset.winkey||b.textContent.trim());
+  localStorage.setItem(WIN_HIDE_KEY, JSON.stringify(hidden));
+}
+
+function loadWinHidden(){
+  try {
+    const hidden = JSON.parse(localStorage.getItem(WIN_HIDE_KEY)||'[]');
+    if(!hidden.length) return;
+    document.querySelectorAll('#sec-dashboard .wbtn').forEach(btn=>{
+      const key = btn.textContent.trim();
+      if(hidden.includes(key)){ btn.style.display='none'; btn.dataset.winkey=key; btn.classList.add('win-hidden'); }
+    });
+  } catch(e){}
+}
+
+// ══════════════════════════════════════════════════════════
+//  INLINE CMD RUNNER
+// ══════════════════════════════════════════════════════════
+async function runCmd(){
+  const cmd = document.getElementById('cmd-run-in')?.value?.trim();
+  if(!cmd) return;
+  const out = document.getElementById('cmd-run-out');
+  if(!out) return;
+  out.style.display = 'block';
+  out.style.color = 'var(--accent4)';
+  out.textContent = '⟳ Running: ' + cmd + '\n';
+  try {
+    const r = await fetch('http://localhost:5199/run-cmd?cmd=' + encodeURIComponent(cmd), {cache:'no-store'});
+    if(!r.ok) throw new Error('Backend returned ' + r.status);
+    const d = await r.json();
+    out.style.color = d.ok ? 'var(--accent2)' : 'var(--accent3)';
+    out.textContent = (d.output||'').trim() || (d.ok ? '(no output)' : d.error||'Error');
+  } catch(e){
+    out.style.color = 'var(--accent3)';
+    out.textContent = '❌ ' + e.message + '\n\nMake sure START_PING_SERVER.bat is running.';
+  }
+}
+
+function buildCmdQuickTags(){
+  const el = document.getElementById('cmd-quick-tags');
+  if(!el) return;
+  const cmds = ['ipconfig /all','arp -a','netstat -an','route print','nslookup 8.8.8.8','whoami','systeminfo','tasklist','net user','net localgroup administrators'];
+  el.innerHTML = cmds.map(c=>
+    `<span class="tag" onclick="G('cmd-run-in').value='${c}';runCmd()">${c}</span>`
+  ).join('');
+}
+
+
 </script>
 </body>
 </html>
+
