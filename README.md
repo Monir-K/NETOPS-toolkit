@@ -117,6 +117,14 @@ git push -u origin main
 Then in GitHub → Settings → Pages → Source: `main` / `/ (root)` → Save  
 Your tool will be live at: `https://YOUR_USERNAME.github.io/netops-toolkit/`
 
+🔐 Default Login
+Admin
+Username: admin
+Password: 
+User
+Username: user
+Password: User@NetOps26
+
 ---
 
 ## 📜 License
