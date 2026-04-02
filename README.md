@@ -1,121 +1,54 @@
-# NetOps Toolkit
+# NetOps Toolkit v3.1 — By M Kamjo
 
-> A professional-grade, single-file browser-based network support toolkit for IT & infrastructure engineers.  
-> **By M Kamjo** — v3.0
+## Quick Start
+1. Double-click **START_PING_SERVER.bat** — keep terminal open
+2. Double-click **launch-edge.bat** — opens Edge in InPrivate/fullscreen
+3. Login with: `admin` / `Admin@NetOps26` (or `user` / `User@NetOps26`)
 
----
+## Files
+- `index.html` — full single-file application
+- `ping_server.py` — Python backend (ping, email, DNS proxy, cmd runner)
+- `START_PING_SERVER.bat` — starts the backend on port 5199
+- `launch-edge.bat` — opens Edge in InPrivate + fullscreen mode
 
-## 🚀 Quick Start
+## Default Login Credentials
+| Role  | Username | Password         |
+|-------|----------|------------------|
+| Admin | admin    | Admin@NetOps26   |
+| User  | user     | User@NetOps26    |
 
-1. Download `index.html`
-2. Open with **Microsoft Edge** (double-click or right-click → Open with → Edge)
-3. The tool auto-requests fullscreen on load
-4. Click **▶ LAUNCH** on the splash screen
+**Change passwords:** Login as admin → click ADMIN badge in topbar → Admin Settings panel
 
-No installation. No server. No dependencies. Everything runs locally in your browser.
+## Features
+- 📡 Asset Monitor — ICMP ping + HTTP reachability + email alerts
+- 🔐 Credential Vault — hidden text storage with multi-field live search
+- 🔗 URL/Domain Threat Intelligence (urlscan.io)
+- 🌍 IP Geolocation + ASN (ip-api.com, fallback via backend proxy)
+- 🌐 DNS Lookup — Cloudflare DoH → Google DoH → local proxy fallback
+- 📧 Email Header Analyzer — local, SPF/DKIM/DMARC check
+- 🔧 Net Tools — Subnet Calculator + Netsh Builder + IP Range + Ping/Tracert
+- 📊 Ports — color-coded dangerous ports (HIGH RISK in red)
+- 🔑 Password — strength checker, generator, HIBP breach checker
+- 💻 Inline CMD Runner — safe commands run from dashboard
+- 🖨️ Printer — saved printers with one-click web interface access
+- 🌙/☀️ Dark/Light theme toggle
+- ↕️ Drag-to-reorder tabs, order saved to localStorage
 
----
+## Email Alerts
+1. Go to Google Account → Security → App Passwords
+2. Dashboard → Email Alerts row → fill Gmail, App Password, Recipients → Save
 
-## 🔧 Features (16 Tabs)
+## Lock / Logout
+Click the 🔒 button in taskbar to log out and return to login screen.
 
-| Tab | Description |
-|---|---|
-| 📡 Dashboard | Public IP, LAN IP, ISP, ASN, Location, Timezone — quick check bar |
-| 🔐 Vault | Hidden credential/config storage with advanced regex search |
-| 🔗 URL Check | urlscan.io threat intelligence for URLs and domains |
-| 🌍 IP Lookup | Full geo/ASN/proxy/hosting/mobile detection via ip-api.com |
-| 🌐 DNS | DNS lookup (Google DNS), WHOIS (rdap.org), SSL cert (crt.sh) |
-| 📧 Email Hdrs | Full email header analyzer — SPF/DKIM/DMARC, routing hops |
-| 🧮 Subnet | CIDR subnet calculator — network, broadcast, hosts, binary mask |
-| 📊 Ports | Searchable local database of 60+ common ports |
-| 🔌 MAC | MAC vendor lookup + formatter (colon/dash/Cisco/plain) |
-| 🧹 Extractor | Auto-extract IPs, emails, URLs, MACs, hashes from any text |
-| ⚙️ Netsh | Netsh command builder — static IP, DNS, reset, flush, etc. |
-| 📦 Encoder | Base64, URL encode, HEX, IP ↔ Integer |
-| 🔑 Password | Strength analyzer + default credential checker (25 pairs) |
-| 📡 IP Range | Range generator + ping/tracert command builder |
-| 📝 Notes | Session-persistent scratchpad |
-| 🖥️ Windows | ms-settings: links + .cpl / .msc quick launch |
+## Notes
+- Tool designed to run from localhost:5199 (via ping_server.py)
+- Lock screen PIN (legacy): 1234 — customise LOCK_PIN in index.html
+- All data stored in localStorage — nothing sent to external servers except:
+  - ip-api.com (geolocation), dns.cloudflare.com (DNS queries)
+  - macvendors.com (MAC lookup), urlscan.io (URL threat intel)
+  - api.pwnedpasswords.com (HIBP — only first 5 chars of hash, k-anonymity)
 
----
-
-## 🖥️ UI Features
-
-- **Splash screen** — fullscreen matrix animation, auto-requests F11 on load
-- **Taskbar** — Windows-style bottom bar: green start menu, network status, live clock
-- **Lock screen** — PIN `1234` (change `LOCK_PIN` in source to customise)
-- **Radar** — animated scanning radar in bottom-right corner
-- **Tab animations** — each tab has a unique mini canvas animation themed to its function
-- **Power button** — top-right, closes the tool
-
----
-
-## ⚙️ Configuration
-
-Open `index.html` in any text editor or VS Code and search for these lines to customise:
-
-```js
-const LOCK_PIN = '1234';       // Change lock screen PIN
-```
-
----
-
-## 🌐 APIs Used (all free, no key required)
-
-| API | Usage |
-|---|---|
-| [ip-api.com](https://ip-api.com) | IP geolocation, ISP, ASN, proxy/VPN detection |
-| [ipify.org](https://api.ipify.org) | Public IP detection |
-| [urlscan.io](https://urlscan.io) | URL/domain threat intelligence |
-| [dns.google](https://dns.google) | DNS record lookups |
-| [rdap.org](https://rdap.org) | WHOIS / RDAP domain info |
-| [crt.sh](https://crt.sh) | SSL certificate transparency logs |
-| [macvendors.com](https://api.macvendors.com) | MAC address vendor lookup |
-
----
-
-## 📁 Project Structure
-
-```
-netops-toolkit/
-├── index.html          # Entire application (single file)
-├── README.md           # This file
-├── .gitignore          # Git ignore rules
-└── .vscode/
-    └── settings.json   # VS Code recommended settings
-```
-
----
-
-## 🛠️ Development
-
-Open in VS Code:
-```bash
-code netops-toolkit/
-```
-
-Recommended VS Code extensions:
-- **Live Preview** (ms-vscode.live-server) — instant browser refresh on save
-- **HTML CSS Support** (ecmel.vscode-html-css)
-- **Prettier** — code formatter
-
-> The entire app is a single HTML file. No build step, no npm, no framework.
-
----
-
-## 📤 Deploy to GitHub Pages
-
-```bash
-git init
-git add .
-git commit -m "Initial commit — NetOps Toolkit v3.0"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/netops-toolkit.git
-git push -u origin main
-```
-
-Then in GitHub → Settings → Pages → Source: `main` / `/ (root)` → Save  
-Your tool will be live at: `https://YOUR_USERNAME.github.io/netops-toolkit/`
 
 🔐 Default Login
 Admin
@@ -124,10 +57,3 @@ Password:
 User
 Username: user
 Password: User@NetOps26
-
----
-
-## 📜 License
-
-MIT — free to use, modify and distribute.  
-**By M Kamjo**
