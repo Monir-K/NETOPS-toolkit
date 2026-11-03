@@ -2,14 +2,15 @@
 
 ## Quick Start
 1. Double-click **START_PING_SERVER.bat** — keep terminal open
-2. Double-click **launch-edge.bat** — opens Edge in InPrivate/fullscreen
+2. Double-click **launch-edge.bat** — opens Edge in fullscreen using a regular profile
 3. Login with: `admin` / `Admin@NetOps26` (or `user` / `User@NetOps26`)
+4. New users can enter a username and password on the login screen and select **START 1-MONTH FREE TRIAL**
 
 ## Files
 - `index.html` — full single-file application
 - `ping_server.py` — Python backend (ping, email, DNS proxy, cmd runner)
 - `START_PING_SERVER.bat` — starts the backend on port 5199
-- `launch-edge.bat` — opens Edge in InPrivate + fullscreen mode
+- `launch-edge.bat` — opens Edge in fullscreen using a regular browser profile
 
 ## Default Login Credentials
 | Role  | Username | Password         |
@@ -18,6 +19,9 @@
 | User  | user     | User@NetOps26    |
 
 **Change passwords:** Login as admin → click ADMIN badge in topbar → Admin Settings panel
+
+## One-Month Trial
+New users can create an account from the login screen. Trial access expires one calendar month after signup. Trial accounts are stored in the browser's local storage, so they are limited to that browser profile and can be reset if its site data is cleared; this is not centralized account or subscription enforcement. Use a regular browser window (not InPrivate/Incognito) to preserve trial access between sessions.
 
 ## Features
 - 📡 Asset Monitor — ICMP ping + HTTP reachability + email alerts
@@ -32,7 +36,9 @@
 - 💻 Inline CMD Runner — safe commands run from dashboard
 - 🖨️ Printer — saved printers with one-click web interface access
 - 🌙/☀️ Dark/Light theme toggle
-- ↕️ Drag-to-reorder tabs, order saved to localStorage
+- Navigation grouped into Network, Security & Analysis, and Workspace menus
+- Click **Show/Hide** on panel headings to expand or collapse dense feature sections
+- ↕️ Drag-to-reorder tools within each navigation menu; order saved to localStorage
 
 ## Email Alerts
 1. Go to Google Account → Security → App Passwords

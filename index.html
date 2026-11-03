@@ -63,7 +63,8 @@ body.light-theme .tab.active{background:var(--panel);}
 body.light-theme #radar-canvas{filter:hue-rotate(180deg) brightness(0.85);}
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{max-width:100vw;overflow-x:hidden;}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;padding-top:42px;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;padding-top:0;}
+body{font-size:15px;line-height:1.5;}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,200,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.022) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
 
 /* ── TOPBAR ── */
@@ -114,49 +115,70 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .ni-chip-lbl{color:var(--text3);font-size:0.56rem;letter-spacing:1px;text-transform:uppercase;}
 .ni-chip-val{color:var(--accent2);}
 
-/* ── NAV — fixed width, arrows to scroll ── */
+/* ── NAV ── */
 #nav-wrap{
   position:sticky;top:42px;z-index:199;
   background:var(--bg2);border-bottom:1px solid var(--border);
-  display:flex;align-items:stretch;width:100%;
+  display:flex;align-items:stretch;width:100%;padding:0 clamp(8px,2vw,28px);
 }
-.nav-arrow{
-  width:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  background:var(--bg2);border:none;color:var(--text3);font-size:0.85rem;cursor:pointer;
-  transition:color 0.15s;user-select:none;
-}
-.nav-arrow:hover{color:var(--accent);}
 #nav{
-  display:flex;gap:0;flex:1;overflow:hidden; /* NO scroll, hidden — scrolled via JS */
-  padding:6px 0 0;
+  display:flex;align-items:center;gap:7px;flex:1;min-width:0;flex-wrap:wrap;
+  padding:7px 0;overflow:visible;
 }
 .tab{
-  padding:6px 12px;font-size:0.65rem;font-weight:700;letter-spacing:0.8px;
-  text-transform:uppercase;color:var(--text3);cursor:pointer;
-  border-radius:3px 3px 0 0;border:1px solid transparent;border-bottom:none;
+  display:block;width:100%;padding:8px 12px;font-size:0.82rem;font-weight:600;letter-spacing:0.2px;
+  text-align:left;color:var(--text2);cursor:pointer;background:transparent;
+  border:1px solid transparent;border-radius:4px;
   white-space:nowrap;transition:all 0.12s;user-select:none;flex-shrink:0;
 }
-.tab:hover{color:var(--text2);background:rgba(15,25,35,0.7);}
-.tab.active{color:var(--accent);background:var(--panel);border-color:var(--border);border-bottom:2px solid var(--panel);margin-bottom:-1px;text-shadow:0 0 8px rgba(0,200,255,0.35);}
+.tab:hover{color:var(--text);background:rgba(15,25,35,0.7);}
+.tab.active{color:var(--accent);background:rgba(0,200,255,0.08);border-color:rgba(0,200,255,0.24);}
+.nav-home{width:auto;padding:8px 14px;background:var(--panel);border-color:var(--border);font-weight:700;}
+.nav-group{position:relative;flex-shrink:0;}
+.nav-group summary{
+  list-style:none;cursor:pointer;padding:8px 13px;border:1px solid var(--border);
+  border-radius:4px;background:var(--panel);color:var(--text2);
+  font-size:0.82rem;font-weight:700;white-space:nowrap;transition:all 0.15s;
+}
+.nav-group summary::-webkit-details-marker{display:none;}
+.nav-group summary::after{content:'⌄';margin-left:8px;color:var(--text3);}
+.nav-group[open] summary,.nav-group.active-group summary,.nav-home.active{color:var(--accent);border-color:rgba(0,200,255,0.35);}
+.nav-menu{
+  position:absolute;top:calc(100% + 6px);left:0;z-index:300;min-width:210px;
+  max-width:min(270px,calc(100vw - 24px));
+  padding:6px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  box-shadow:0 12px 30px rgba(0,0,0,0.4);
+}
+.nav-menu .tab{margin:2px 0;}
+.nav-group:last-child .nav-menu{left:auto;right:0;}
 
 /* ── MAIN ── */
-#main{padding:16px 18px 80px;position:relative;z-index:1;}
+#main{width:min(100%,1680px);margin:0 auto;padding:22px clamp(16px,2.4vw,36px) 90px;position:relative;z-index:1;}
 .section{display:none;animation:fadein 0.15s ease;}.section.active{display:block;}
 @keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
 @media(max-width:820px){.g2,.g3{grid-template-columns:1fr;}}
 
 /* ── PANEL ── */
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:16px;margin-bottom:13px;}
-.pt{font-size:0.64rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:11px;display:flex;align-items:center;gap:7px;}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:18px;margin-bottom:16px;}
+.pt{font-size:0.82rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:13px;display:flex;align-items:center;gap:8px;}
 .pt::before{content:'';display:inline-block;width:3px;height:11px;background:var(--accent);border-radius:2px;flex-shrink:0;}
-.note{font-size:0.72rem;color:var(--text3);margin-bottom:9px;line-height:1.55;}
+.note{font-size:0.86rem;color:var(--text2);margin-bottom:11px;line-height:1.65;}
+.panel-toggle{
+  margin-left:auto;flex-shrink:0;border:1px solid var(--border);border-radius:4px;
+  padding:4px 9px;background:var(--bg3);color:var(--text2);font:600 0.72rem var(--sans);
+  letter-spacing:0.3px;cursor:pointer;transition:all 0.15s;
+}
+.panel-toggle:hover{border-color:var(--accent);color:var(--accent);}
+.panel.collapsed{padding-bottom:5px;}
+.panel.collapsed .panel-body{display:none;}
+.panel.collapsed .pt{margin-bottom:8px;}
 
 /* ── INPUTS ── */
 input[type=text],input[type=password],textarea,select{
   width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;
-  color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:8px 11px;outline:none;
+  color:var(--text);font-family:var(--mono);font-size:0.88rem;padding:9px 12px;outline:none;
   transition:border-color 0.15s,box-shadow 0.15s;
 }
 input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,200,255,0.07);}
@@ -164,7 +186,7 @@ textarea{resize:vertical;min-height:80px;}
 select{cursor:pointer;}select option{background:var(--bg3);}
 
 /* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:4px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:var(--sans);font-size:0.73rem;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:4px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:var(--sans);font-size:0.8rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0;}
 .btn:hover{background:rgba(0,200,255,0.08);}
 .btn.g{border-color:var(--accent2);color:var(--accent2);}.btn.g:hover{background:rgba(0,255,157,0.08);}
 .btn.r{border-color:var(--accent3);color:var(--accent3);}.btn.r:hover{background:rgba(255,79,110,0.08);}
@@ -353,6 +375,13 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
   box-shadow:0 0 20px rgba(0,255,157,0.3);
 }
 #login-submit:hover{transform:scale(1.02);box-shadow:0 0 35px rgba(0,255,157,0.55);}
+#trial-submit{
+  font-family:'Share Tech Mono',monospace;font-size:0.72rem;letter-spacing:1px;
+  text-transform:uppercase;color:rgba(0,255,157,0.85);
+  background:rgba(0,255,157,0.06);border:1px solid rgba(0,255,157,0.3);
+  border-radius:5px;padding:10px;cursor:pointer;transition:background 0.15s,border-color 0.15s;
+}
+#trial-submit:hover{background:rgba(0,255,157,0.12);border-color:rgba(0,255,157,0.6);}
 #login-err{font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#ff4f6e;min-height:1em;text-align:center;letter-spacing:1px;}
 #login-role-badge{
   font-family:'Share Tech Mono',monospace;font-size:0.62rem;
@@ -619,9 +648,15 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 ::-webkit-scrollbar-track{background:var(--bg2);}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 /* ── TAB CANVAS ANIMATIONS ── */
-.tab-anim-inline{display:flex;justify-content:flex-start;align-items:center;margin-bottom:14px;padding:8px 12px;background:rgba(0,200,255,0.03);border:1px solid rgba(0,200,255,0.08);border-radius:6px;pointer-events:none;gap:12px;}
-.tab-anim-inline canvas{border-radius:4px;opacity:0.9;}
+.tab-anim-inline{display:flex;justify-content:flex-start;align-items:center;margin-bottom:9px;padding:3px 8px;background:rgba(0,200,255,0.02);border:1px solid rgba(0,200,255,0.06);border-radius:5px;pointer-events:none;gap:8px;}
+.tab-anim-inline canvas{width:48px;height:32px;border-radius:4px;opacity:0.75;}
 .tab-anim-label{font-family:var(--mono);font-size:0.62rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;}
+@media(max-width:600px){
+  #nav-wrap{padding:0 10px;}
+  #nav{gap:5px;}
+  .nav-group summary,.nav-home{padding:7px 9px;font-size:0.76rem;}
+  .panel{padding:14px;}
+}
 
 </style>
 </head>
@@ -641,6 +676,8 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
       <input type="text" id="login-user" placeholder="Username" autocomplete="username" onkeydown="if(event.key==='Enter')G('login-pass').focus()">
       <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
       <button id="login-submit" onclick="doLogin()">▶ LOGIN</button>
+      <button id="trial-submit" onclick="doSignup()">START 1-MONTH FREE TRIAL</button>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:rgba(0,200,255,0.45);text-align:center;line-height:1.6;">New users: create a username and password above. Trial access lasts one month on this browser.</div>
       <div id="login-err"></div>
     </div>
     <div id="splash-credits">© M Kamjo 2026</div>
@@ -780,25 +817,38 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
   <button id="power-btn"  class="topbar-btn" onclick="tbPowerOff()"  title="Exit fullscreen &amp; close tab">⏻</button>
 </div>
 
-<!-- NAV with scroll arrows -->
+<!-- Feature navigation -->
 <div id="nav-wrap">
-  <button class="nav-arrow" id="nav-left" onclick="navScroll(-1)">&#8249;</button>
   <div id="nav" ondragover="event.preventDefault()" ondrop="tabDrop(event)">
-    <div class="tab active" draggable="true" data-sec="dashboard" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">📡 Dashboard</div>
-    <div class="tab" draggable="true" data-sec="vault" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔐 Vault</div>
-    <div class="tab" draggable="true" data-sec="urlcheck" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔗 URL Check</div>
-    <div class="tab" draggable="true" data-sec="iplookup" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🌍 IP Lookup</div>
-    <div class="tab" draggable="true" data-sec="dns" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🌐 DNS</div>
-    <div class="tab" draggable="true" data-sec="emailhdr" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">📧 Email Hdrs</div>
-    <div class="tab" draggable="true" data-sec="nettools" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔧 Net Tools</div>
-    <div class="tab" draggable="true" data-sec="ports" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">📊 Ports</div>
-    <div class="tab" draggable="true" data-sec="mac" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔌 MAC</div>
-    <div class="tab" draggable="true" data-sec="extract" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🧹 Extractor</div>
-    <div class="tab" draggable="true" data-sec="passcheck" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔑 Password</div>
-    <div class="tab" draggable="true" data-sec="notes" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">📝 Notes</div>
-    <div class="tab" draggable="true" data-sec="printer" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🖨️ Printer</div>
+    <div class="tab nav-home active" role="button" aria-pressed="true" tabindex="0" data-sec="dashboard">📡 Dashboard</div>
+    <details class="nav-group">
+      <summary>🌐 Network</summary>
+      <div class="nav-menu">
+        <div class="tab" role="button" aria-pressed="false" tabindex="0" draggable="true" data-sec="iplookup" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🌍 IP Lookup</div>
+        <div class="tab" role="button" aria-pressed="false" tabindex="0" draggable="true" data-sec="dns" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🌐 DNS, WHOIS &amp; SSL</div>
+        <div class="tab" role="button" aria-pressed="false" tabindex="0" draggable="true" data-sec="nettools" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔧 Network Tools</div>
+        <div class="tab" role="button" aria-pressed="false" tabindex="0" draggable="true" data-sec="ports" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">📊 Port Reference</div>
+        <div class="tab" role="button" aria-pressed="false" tabindex="0" draggable="true" data-sec="mac" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔌 MAC Tools</div>
+      </div>
+    </details>
+    <details class="nav-group">
+      <summary>🛡️ Security &amp; Analysis</summary>
+      <div class="nav-menu">
+        <div class="tab" role="button" aria-pressed="false" tabindex="0" draggable="true" data-sec="urlcheck" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔗 URL Threat Check</div>
+        <div class="tab" role="button" aria-pressed="false" tabindex="0" draggable="true" data-sec="passcheck" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔑 Password Tools</div>
+        <div class="tab" role="button" aria-pressed="false" tabindex="0" draggable="true" data-sec="extract" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🧹 Text Extractor</div>
+        <div class="tab" role="button" aria-pressed="false" tabindex="0" draggable="true" data-sec="emailhdr" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">📧 Email Header Analyzer</div>
+      </div>
+    </details>
+    <details class="nav-group">
+      <summary>🧰 Workspace</summary>
+      <div class="nav-menu">
+        <div class="tab" role="button" aria-pressed="false" tabindex="0" draggable="true" data-sec="vault" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🔐 Credential Vault</div>
+        <div class="tab" role="button" aria-pressed="false" tabindex="0" draggable="true" data-sec="notes" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">📝 Notes &amp; Support Log</div>
+        <div class="tab" role="button" aria-pressed="false" tabindex="0" draggable="true" data-sec="printer" ondragstart="tabDragStart(event)" ondragend="tabDragEnd(event)">🖨️ Printers</div>
+      </div>
+    </details>
   </div>
-  <button class="nav-arrow" id="nav-right" onclick="navScroll(1)">&#8250;</button>
 </div>
 
 <div id="main">
@@ -1467,26 +1517,62 @@ function loading(id, m='Working…'){ show(id,`<span class="spin">⟳</span> ${m
 // ── TAB NAV ──
 document.querySelectorAll('.tab').forEach(t => {
   t.addEventListener('click', function(){
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(x=>{
+      x.classList.remove('active');
+      x.setAttribute('aria-pressed','false');
+    });
     document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
     this.classList.add('active');
+    this.setAttribute('aria-pressed','true');
     G('sec-'+this.dataset.sec).classList.add('active');
-    // scroll active tab into view
-    this.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+    document.querySelectorAll('.nav-group').forEach(group=>{
+      group.classList.toggle('active-group', group.contains(this));
+      group.open = false;
+    });
+  });
+  t.addEventListener('keydown',function(e){
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();this.click();}
   });
 });
 
-// ── NAV SCROLL ARROWS ──
-let navOffset = 0;
-function navScroll(dir){
-  const nav = G('nav');
-  const tabs = nav.querySelectorAll('.tab');
-  const tabW = tabs[0] ? tabs[0].offsetWidth + 1 : 120;
-  navOffset = Math.max(0, Math.min(navOffset + dir * tabW * 3, nav.scrollWidth - nav.offsetWidth));
-  // Use translate instead of scrollLeft since overflow is hidden
-  nav.style.transform = `translateX(-${navOffset}px)`;
-  G('nav-left').style.opacity = navOffset > 0 ? '1' : '0.3';
-  G('nav-right').style.opacity = navOffset < (nav.scrollWidth - nav.offsetWidth) ? '1' : '0.3';
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.nav-group')){
+    document.querySelectorAll('.nav-group').forEach(group=>group.open=false);
+  }
+});
+
+function initCollapsiblePanels(){
+  document.querySelectorAll('.panel').forEach(panel=>{
+    const heading=panel.querySelector(':scope > .pt');
+    if(!heading||panel.dataset.collapsible==='true') return;
+    const body=document.createElement('div');
+    body.className='panel-body';
+    while(heading.nextSibling) body.appendChild(heading.nextSibling);
+    panel.appendChild(body);
+    panel.dataset.collapsible='true';
+
+    const title=heading.textContent.replace(/\s+/g,' ').trim();
+    const section=panel.closest('.section')?.id||'';
+    const collapsedByDefault=
+      (section==='sec-dashboard'&&/Windows Quick Launch|Command Runner|Quick Check/.test(title))||
+      (section==='sec-vault'&&/Advanced Search|Support Log/.test(title))||
+      (section==='sec-nettools'&&/CIDR Quick Reference|IP Range Generator|Ping \/ Tracert Builder|Netsh Command Builder|Quick CMD Snippets/.test(title))||
+      (section==='sec-passcheck'&&/Default Credential Checker|Password Leak Checker/.test(title));
+    if(collapsedByDefault) panel.classList.add('collapsed');
+
+    const toggle=document.createElement('button');
+    toggle.type='button';
+    toggle.className='panel-toggle';
+    toggle.textContent=collapsedByDefault?'Show':'Hide';
+    toggle.setAttribute('aria-expanded',String(!collapsedByDefault));
+    toggle.setAttribute('aria-label',(collapsedByDefault?'Expand ':'Collapse ')+title);
+    toggle.addEventListener('click',()=>{
+      const collapsed=panel.classList.toggle('collapsed');
+      toggle.textContent=collapsed?'Show':'Hide';
+      toggle.setAttribute('aria-expanded',String(!collapsed));
+    });
+    heading.appendChild(toggle);
+  });
 }
 
 // ── PUBLIC IP + INFO ──
@@ -2618,8 +2704,6 @@ window.addEventListener('load',()=>{
   G('ns-iface').addEventListener('input',buildNetsh);
   G('ping-t').addEventListener('input',genPing);
   G('ping-c').addEventListener('input',genPing);
-  // Init nav arrow visibility
-  setTimeout(()=>navScroll(0),100);
   // Start tab animations
   runTabAnims();
   // Start asset monitor
@@ -2628,6 +2712,7 @@ window.addEventListener('load',()=>{
   initPrinter();
   loadTheme();
   loadTabOrder();
+  initCollapsiblePanels();
   loadWinHidden();
   buildCmdQuickTags();
 });
@@ -3501,6 +3586,7 @@ let lockEntry = '';
 function logoutUser(){
   // Clear session, show login splash
   _currentRole = null;
+  if(_trialExpiryTimer){ clearInterval(_trialExpiryTimer); _trialExpiryTimer = null; }
   // Remove role badge from topbar
   const badge = document.getElementById('login-role-badge');
   if(badge) badge.remove();
@@ -3723,7 +3809,9 @@ function initSlog(){
 // Admin: admin / Admin@NetOps26
 // User:  user  / User@NetOps26
 const _LOGIN_KEY = 'netops_creds_v1';
-let _currentRole = null;  // 'admin' | 'user' | null
+const _TRIAL_USERS_KEY = 'netops_trial_users_v1';
+let _currentRole = null;
+let _trialExpiryTimer = null;
 
 async function _sha1(str){
   const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str));
@@ -3732,6 +3820,13 @@ async function _sha1(str){
 
 function _loadCreds(){
   try { return JSON.parse(localStorage.getItem(_LOGIN_KEY))||{}; } catch(e){ return {}; }
+}
+
+function _loadTrialUsers(){
+  try {
+    const users = JSON.parse(localStorage.getItem(_TRIAL_USERS_KEY)||'{}');
+    return users && typeof users === 'object' && !Array.isArray(users) ? users : {};
+  } catch(e){ return {}; }
 }
 
 async function _defaultHash(pw){ return await _sha1(pw + 'netops_salt_mk26'); }
@@ -3749,31 +3844,18 @@ async function doLogin(){
   const pass = G('login-pass')?.value||'';
   const errEl = G('login-err');
   if(!user||!pass){ if(errEl) errEl.textContent='Enter username and password'; return; }
-  if(user !== 'admin' && user !== 'user'){
-    if(errEl) errEl.textContent='✘ Unknown user. Use "admin" or "user"'; return;
+  const isDefaultUser = user === 'admin' || user === 'user';
+  const trialAccount = isDefaultUser ? null : _loadTrialUsers()[user];
+  if(!isDefaultUser && !trialAccount){
+    if(errEl) errEl.textContent='✘ Unknown user. Create a one-month trial account to get started.'; return;
+  }
+  if(trialAccount && (!Number.isFinite(trialAccount.expiresAt) || Date.now() >= trialAccount.expiresAt)){
+    if(errEl) errEl.textContent='✘ This one-month trial has expired'; return;
   }
   const inputHash = await _sha1(pass + 'netops_salt_mk26');
-  const storedHash = await _getHash(user);
+  const storedHash = isDefaultUser ? await _getHash(user) : trialAccount.passwordHash;
   if(inputHash === storedHash){
-    _currentRole = user;
-    // Show role badge in topbar
-    const badge = document.createElement('span');
-    badge.id = 'login-role-badge';
-    badge.className = 'login-role-badge';
-    badge.style.cssText = 'font-family:var(--mono);font-size:0.6rem;padding:2px 8px;border-radius:3px;background:rgba(0,255,157,0.1);border:1px solid rgba(0,255,157,0.2);color:rgba(0,255,157,0.8);letter-spacing:1px;text-transform:uppercase;flex-shrink:0;';
-    badge.textContent = user === 'admin' ? '⚙ ADMIN' : '👤 USER';
-    if(user === 'admin'){
-      badge.style.cursor = 'pointer';
-      badge.title = 'Open admin settings';
-      badge.onclick = ()=>G('admin-panel').classList.add('open');
-    }
-    const topbar = G('topbar');
-    if(topbar){
-      const copy = topbar.querySelector('[onclick*="© M Kamjo"]') || topbar.querySelector('span[style*="M Kamjo"]');
-      if(copy) topbar.insertBefore(badge, copy);
-      else topbar.insertBefore(badge, topbar.lastElementChild);
-    }
-    launchApp();
+    _startSession(user, trialAccount);
     if(errEl) errEl.textContent='';
   } else {
     if(errEl){
@@ -3782,6 +3864,80 @@ async function doLogin(){
       G('login-pass').animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'translateX(0)'}],{duration:280});
     }
   }
+}
+
+function _startSession(user, trialAccount){
+  _currentRole = user;
+  const badge = document.createElement('span');
+  badge.id = 'login-role-badge';
+  badge.className = 'login-role-badge';
+  badge.style.cssText = 'font-family:var(--mono);font-size:0.6rem;padding:2px 8px;border-radius:3px;background:rgba(0,255,157,0.1);border:1px solid rgba(0,255,157,0.2);color:rgba(0,255,157,0.8);letter-spacing:1px;text-transform:uppercase;flex-shrink:0;';
+  badge.textContent = user === 'admin' ? '⚙ ADMIN' : trialAccount ? '⌛ FREE TRIAL' : '👤 USER';
+  if(user === 'admin'){
+    badge.style.cursor = 'pointer';
+    badge.title = 'Open admin settings';
+    badge.onclick = ()=>G('admin-panel').classList.add('open');
+  } else if(trialAccount){
+    badge.title = 'Trial ends '+new Date(trialAccount.expiresAt).toLocaleDateString();
+    if(_trialExpiryTimer) clearInterval(_trialExpiryTimer);
+    _trialExpiryTimer = setInterval(()=>{
+      if(Date.now() >= trialAccount.expiresAt){
+        clearInterval(_trialExpiryTimer);
+        _trialExpiryTimer = null;
+        logoutUser();
+        const errEl = G('login-err');
+        if(errEl) errEl.textContent='✘ Your one-month trial has ended';
+      }
+    }, 60000);
+  }
+  const topbar = G('topbar');
+  if(topbar){
+    const copy = topbar.querySelector('[onclick*="© M Kamjo"]') || topbar.querySelector('span[style*="M Kamjo"]');
+    if(copy) topbar.insertBefore(badge, copy);
+    else topbar.insertBefore(badge, topbar.lastElementChild);
+  }
+  launchApp();
+}
+
+async function doSignup(){
+  const user = (G('login-user')?.value||'').trim().toLowerCase();
+  const pass = G('login-pass')?.value||'';
+  const errEl = G('login-err');
+  if(!/^[a-z0-9._-]{3,32}$/.test(user)){
+    if(errEl) errEl.textContent='Use a username of 3-32 letters, numbers, dots, _ or -'; return;
+  }
+  if(user === 'admin' || user === 'user'){
+    if(errEl) errEl.textContent='✘ That username is reserved'; return;
+  }
+  if(pass.length < 8){
+    if(errEl) errEl.textContent='Use a password with at least 8 characters'; return;
+  }
+  const users = _loadTrialUsers();
+  if(users[user]){
+    if(errEl) errEl.textContent='✘ That username already has an account'; return;
+  }
+  const createdAt = Date.now();
+  const nextMonth = new Date(createdAt);
+  const day = nextMonth.getUTCDate();
+  const targetMonth = nextMonth.getUTCMonth()+1;
+  const lastDay = new Date(Date.UTC(nextMonth.getUTCFullYear(), targetMonth+1, 0)).getUTCDate();
+  nextMonth.setUTCDate(1);
+  nextMonth.setUTCMonth(targetMonth);
+  nextMonth.setUTCDate(Math.min(day, lastDay));
+  const account = {
+    passwordHash: await _sha1(pass + 'netops_salt_mk26'),
+    createdAt,
+    expiresAt: nextMonth.getTime()
+  };
+  users[user] = account;
+  try {
+    localStorage.setItem(_TRIAL_USERS_KEY, JSON.stringify(users));
+  } catch(e){
+    if(errEl) errEl.textContent='✘ Could not save the trial account in this browser';
+    return;
+  }
+  if(errEl) errEl.textContent='';
+  _startSession(user, account);
 }
 
 async function adminSavePW(role){
@@ -4057,14 +4213,14 @@ function tabDrop(e){
   e.preventDefault();
   if(!_dragTab) return;
   const target = e.target.closest('.tab');
-  if(!target || target === _dragTab) return;
-  const nav = document.getElementById('nav');
-  const tabs = [...nav.querySelectorAll('.tab')];
+  if(!target || target === _dragTab || target.parentElement !== _dragTab.parentElement) return;
+  const tabs = [...target.parentElement.querySelectorAll('.tab')];
   const fromIdx = tabs.indexOf(_dragTab);
   const toIdx   = tabs.indexOf(target);
   if(fromIdx < 0 || toIdx < 0) return;
-  if(fromIdx < toIdx) nav.insertBefore(_dragTab, target.nextSibling);
-  else nav.insertBefore(_dragTab, target);
+  if(fromIdx < toIdx) target.parentElement.insertBefore(_dragTab, target.nextSibling);
+  else target.parentElement.insertBefore(_dragTab, target);
+  saveTabOrder();
 }
 
 function saveTabOrder(){
@@ -4076,10 +4232,9 @@ function loadTabOrder(){
   try {
     const saved = JSON.parse(localStorage.getItem('netops_tab_order')||'[]');
     if(!saved.length) return;
-    const nav = document.getElementById('nav');
     saved.forEach(sec=>{
-      const tab = nav.querySelector(`[data-sec="${sec}"]`);
-      if(tab) nav.appendChild(tab);
+      const tab = document.querySelector(`#nav [data-sec="${sec}"]`);
+      if(tab && tab.parentElement.classList.contains('nav-menu')) tab.parentElement.appendChild(tab);
     });
   } catch(e){}
 }
