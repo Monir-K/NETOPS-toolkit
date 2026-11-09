@@ -21,7 +21,7 @@
 **Change passwords:** Login as admin → click ADMIN badge in topbar → Admin Settings panel
 
 ## Three-Day Demo
-Select **DEMO** to start without a username or password. A transparent, angled DEMO watermark appears while demo access is active. The demo ends three days after its first start in that browser profile; after expiration, the app displays a message that the demo has finished. The start time is stored in local storage, so clearing site data can reset it. This is not centralized account or subscription enforcement. Use a regular browser window (not InPrivate/Incognito) to preserve the demo period between sessions.
+Select **DEMO** to start without a username or password. A transparent, angled DEMO watermark appears while demo access is active. The demo ends three days after its first start in that browser profile; after expiration, the app displays a message to contact [WhatsApp support](https://wa.me/447577355752) for a personal username and password. The start time is stored in local storage, so clearing site data can reset it. This is not centralized account or subscription enforcement. Use a regular browser window (not InPrivate/Incognito) to preserve the demo period between sessions.
 
 ## Features
 - 📡 Asset Monitor — ICMP ping + HTTP reachability + email alerts

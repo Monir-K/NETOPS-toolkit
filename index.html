@@ -3917,7 +3917,7 @@ function startDemo(){
   }
   const session = {createdAt, expiresAt:createdAt + _DEMO_DURATION_MS};
   if(Date.now() >= session.expiresAt){
-    if(errEl) errEl.textContent='Demo version has finished. Create a username and password to continue.';
+    _showDemoFinishedMessage();
     return;
   }
   if(errEl) errEl.textContent='';
@@ -3928,9 +3928,13 @@ function _checkDemoExpiry(){
   if(_currentRole !== 'demo' || _demoExpiresAt === null || Date.now() < _demoExpiresAt) return;
   if(_demoExpiryTimer){ clearTimeout(_demoExpiryTimer); _demoExpiryTimer = null; }
   logoutUser();
-  const errEl = G('login-err');
-  if(errEl) errEl.textContent='Demo version has finished. Create a username and password to continue.';
+  _showDemoFinishedMessage();
   toast('Demo version has finished');
+}
+
+function _showDemoFinishedMessage(){
+  const errEl = G('login-err');
+  if(errEl) errEl.innerHTML='Demo version has finished. To get your own username and password, contact support on WhatsApp: <a href="https://wa.me/447577355752" target="_blank" rel="noopener noreferrer">+447577355752</a>.';
 }
 window.addEventListener('focus', _checkDemoExpiry);
 document.addEventListener('visibilitychange', _checkDemoExpiry);
