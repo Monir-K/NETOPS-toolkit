@@ -82,8 +82,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 }
 .logo{font-family:var(--mono);font-size:0.88rem;color:var(--accent);letter-spacing:3px;text-shadow:0 0 12px rgba(0,200,255,0.45);white-space:nowrap;flex-shrink:0;}
 .logo span{color:var(--accent2);}
-.ip-badge{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:0.68rem;color:var(--text2);background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:2px 8px;white-space:nowrap;flex-shrink:0;}
-.current-users-badge{color:var(--accent);border-color:rgba(0,200,255,0.42);font-weight:700;}
+.ip-badge{display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:#6a8fa8;background:#0f1923;border:1px solid #1e3448;border-radius:3px;padding:2px 8px;white-space:nowrap;flex-shrink:0;color:var(--text2);background:var(--panel);border-color:var(--border);font-family:var(--mono);}
+.current-users-badge{display:inline-block;color:#00c8ff;border-color:rgba(0,200,255,0.55);font-weight:700;color:var(--accent);border-color:rgba(0,200,255,0.42);}
 .dot{width:5px;height:5px;border-radius:50%;background:var(--accent2);box-shadow:0 0 5px var(--accent2);animation:blink 2s infinite;flex-shrink:0;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.15}}
 .ip-val{color:var(--accent);}
@@ -830,6 +830,78 @@ body.demo-mode #demo-watermark{display:flex;}
   <button id="tb-fs-btn"  class="topbar-btn" onclick="tbToggleFS()"  title="Toggle Fullscreen (F11)">⛶</button>
   <button id="power-btn"  class="topbar-btn" onclick="tbPowerOff()"  title="Exit fullscreen &amp; close tab">⏻</button>
 </div>
+
+<script>
+(function(){
+  if(window.fetch || !document.documentMode) return;
+  var output=document.getElementById('active-user-count');
+  if(!output) return;
+  var base=32;
+  var ttl=120000;
+  var key='netops_presence_sessions_v1';
+  var id=new Date().getTime().toString(36)+'-'+Math.random().toString(36).slice(2);
+
+  function setCount(count){
+    var value=String(base+count);
+    if(typeof output.textContent!=='undefined') output.textContent=value;
+    else output.innerText=value;
+  }
+
+  function loadSessions(){
+    try{
+      var sessions=JSON.parse(window.localStorage.getItem(key)||'{}');
+      if(sessions && typeof sessions==='object') return sessions;
+    }catch(e){}
+    return {};
+  }
+
+  function saveSessions(sessions){
+    try{ window.localStorage.setItem(key,JSON.stringify(sessions)); }catch(e){}
+  }
+
+  function requestPresence(leave){
+    try{
+      var xhr=new XMLHttpRequest();
+      xhr.open('GET','/presence?id='+encodeURIComponent(id)+(leave?'&leave=1':''),true);
+      xhr.onreadystatechange=function(){
+        if(xhr.readyState!==4 || xhr.status!==200 || leave) return;
+        try{
+          var data=JSON.parse(xhr.responseText);
+          if(typeof data.count==='number' && data.count>=0) setCount(data.count);
+        }catch(e){}
+      };
+      xhr.send(null);
+    }catch(e){}
+  }
+
+  function update(){
+    var now=new Date().getTime();
+    var sessions=loadSessions();
+    var sessionId;
+    for(sessionId in sessions){
+      if(Object.prototype.hasOwnProperty.call(sessions,sessionId) && now-Number(sessions[sessionId])>ttl) delete sessions[sessionId];
+    }
+    sessions[id]=now;
+    saveSessions(sessions);
+    var count=0;
+    for(sessionId in sessions){ if(Object.prototype.hasOwnProperty.call(sessions,sessionId)) count++; }
+    setCount(count);
+    requestPresence(false);
+  }
+
+  function release(){
+    var sessions=loadSessions();
+    delete sessions[id];
+    saveSessions(sessions);
+    requestPresence(true);
+  }
+
+  if(window.addEventListener) window.addEventListener('beforeunload',release);
+  else if(window.attachEvent) window.attachEvent('onbeforeunload',release);
+  update();
+  window.setInterval(update,10000);
+})();
+</script>
 
 <!-- Feature navigation -->
 <div id="nav-wrap">
