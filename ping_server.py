@@ -19,7 +19,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CFG_FILE = os.path.join(BASE_DIR, 'email_config.json')
 
 email_cfg = {"from_email":"","app_password":"","to_emails":[]}
-PRESENCE_TTL_SECONDS = 35
+PRESENCE_TTL_SECONDS = 120
 presence_sessions = {}
 presence_lock = threading.Lock()
 

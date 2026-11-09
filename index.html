@@ -83,6 +83,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .logo{font-family:var(--mono);font-size:0.88rem;color:var(--accent);letter-spacing:3px;text-shadow:0 0 12px rgba(0,200,255,0.45);white-space:nowrap;flex-shrink:0;}
 .logo span{color:var(--accent2);}
 .ip-badge{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:0.68rem;color:var(--text2);background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:2px 8px;white-space:nowrap;flex-shrink:0;}
+.current-users-badge{color:var(--accent);border-color:rgba(0,200,255,0.42);font-weight:700;}
 .dot{width:5px;height:5px;border-radius:50%;background:var(--accent2);box-shadow:0 0 5px var(--accent2);animation:blink 2s infinite;flex-shrink:0;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.15}}
 .ip-val{color:var(--accent);}
@@ -823,7 +824,7 @@ body.demo-mode #demo-watermark{display:flex;}
   <div class="ip-badge" id="tb-asn-wrap" style="display:none">ASN: <span class="ip-val" id="tb-asn">…</span></div>
   <div class="ip-badge" id="tb-tz-wrap" style="display:none">TZ: <span class="ip-val" id="tb-tz">…</span></div>
   <span style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(0,255,157,0.3);letter-spacing:2px;margin-left:auto;padding-right:6px;white-space:nowrap;">© M Kamjo</span>
-  <span class="ip-badge" role="status" aria-label="Current users">Current users: <span id="active-user-count">32</span></span>
+  <span class="ip-badge current-users-badge" role="status" aria-label="Current users">Current users: <span id="active-user-count">32</span></span>
   <button id="tb-theme-btn" class="topbar-btn" onclick="toggleTheme()" title="Toggle Dark/Light Theme" style="font-size:0.78rem;letter-spacing:0.5px;">🌙</button>
   <button id="tb-min-btn" class="topbar-btn" onclick="tbMinimize()" title="Exit Fullscreen / Restore browser window">⬜</button>
   <button id="tb-fs-btn"  class="topbar-btn" onclick="tbToggleFS()"  title="Toggle Fullscreen (F11)">⛶</button>
@@ -2942,7 +2943,7 @@ window.addEventListener('online', updateNetStatus);
 window.addEventListener('offline', updateNetStatus);
 
 const _ACTIVE_USER_BASE = 32;
-const _PRESENCE_TTL_MS = 35000;
+const _PRESENCE_TTL_MS = 120000;
 const _PRESENCE_SESSIONS_KEY = 'netops_presence_sessions_v1';
 
 function _getPresenceId(){
@@ -2981,6 +2982,7 @@ async function updateActiveUserCount(){
 
 updateActiveUserCount();
 setInterval(updateActiveUserCount,10000);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) updateActiveUserCount(); });
 window.addEventListener('pagehide',()=>{
   let sessions = {};
   try{
