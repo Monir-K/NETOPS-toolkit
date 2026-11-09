@@ -4,7 +4,7 @@
 1. Double-click **START_PING_SERVER.bat** — keep terminal open
 2. Double-click **launch-edge.bat** — opens Edge in fullscreen using a regular profile
 3. Login with: `admin` / `Admin@NetOps26` (or `user` / `User@NetOps26`)
-4. New users can enter a username and password on the login screen and select **START 1-MONTH FREE TRIAL**
+4. New users can enter a username and password on the login screen and select **DEMO**
 
 ## Files
 - `index.html` — full single-file application
@@ -20,8 +20,8 @@
 
 **Change passwords:** Login as admin → click ADMIN badge in topbar → Admin Settings panel
 
-## One-Month Trial
-New users can create an account from the login screen. Trial access expires one calendar month after signup. Trial accounts are stored in the browser's local storage, so they are limited to that browser profile and can be reset if its site data is cleared; this is not centralized account or subscription enforcement. Use a regular browser window (not InPrivate/Incognito) to preserve trial access between sessions.
+## One-Month Demo
+New users can create a demo account from the login screen. Demo access expires one calendar month after signup. Demo accounts are stored in the browser's local storage, so expiration is enforced per account in that browser profile; clearing site data can reset it. This is not centralized account or subscription enforcement. Use a regular browser window (not InPrivate/Incognito) to preserve demo access between sessions.
 
 ## Features
 - 📡 Asset Monitor — ICMP ping + HTTP reachability + email alerts

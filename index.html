@@ -676,8 +676,8 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
       <input type="text" id="login-user" placeholder="Username" autocomplete="username" onkeydown="if(event.key==='Enter')G('login-pass').focus()">
       <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
       <button id="login-submit" onclick="doLogin()">▶ LOGIN</button>
-      <button id="trial-submit" onclick="doSignup()">START 1-MONTH FREE TRIAL</button>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:rgba(0,200,255,0.45);text-align:center;line-height:1.6;">New users: create a username and password above. Trial access lasts one month on this browser.</div>
+      <button id="trial-submit" onclick="doSignup()">DEMO</button>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:rgba(0,200,255,0.45);text-align:center;line-height:1.6;">New users: create a username and password above. Demo access lasts one calendar month on this browser.</div>
       <div id="login-err"></div>
     </div>
     <div id="splash-credits">© M Kamjo 2026</div>
@@ -3847,10 +3847,10 @@ async function doLogin(){
   const isDefaultUser = user === 'admin' || user === 'user';
   const trialAccount = isDefaultUser ? null : _loadTrialUsers()[user];
   if(!isDefaultUser && !trialAccount){
-    if(errEl) errEl.textContent='✘ Unknown user. Create a one-month trial account to get started.'; return;
+    if(errEl) errEl.textContent='✘ Unknown user. Create a demo account to get started.'; return;
   }
   if(trialAccount && (!Number.isFinite(trialAccount.expiresAt) || Date.now() >= trialAccount.expiresAt)){
-    if(errEl) errEl.textContent='✘ This one-month trial has expired'; return;
+    if(errEl) errEl.textContent='✘ This demo has expired'; return;
   }
   const inputHash = await _sha1(pass + 'netops_salt_mk26');
   const storedHash = isDefaultUser ? await _getHash(user) : trialAccount.passwordHash;
@@ -3872,13 +3872,13 @@ function _startSession(user, trialAccount){
   badge.id = 'login-role-badge';
   badge.className = 'login-role-badge';
   badge.style.cssText = 'font-family:var(--mono);font-size:0.6rem;padding:2px 8px;border-radius:3px;background:rgba(0,255,157,0.1);border:1px solid rgba(0,255,157,0.2);color:rgba(0,255,157,0.8);letter-spacing:1px;text-transform:uppercase;flex-shrink:0;';
-  badge.textContent = user === 'admin' ? '⚙ ADMIN' : trialAccount ? '⌛ FREE TRIAL' : '👤 USER';
+  badge.textContent = user === 'admin' ? '⚙ ADMIN' : trialAccount ? 'DEMO' : '👤 USER';
   if(user === 'admin'){
     badge.style.cursor = 'pointer';
     badge.title = 'Open admin settings';
     badge.onclick = ()=>G('admin-panel').classList.add('open');
   } else if(trialAccount){
-    badge.title = 'Trial ends '+new Date(trialAccount.expiresAt).toLocaleDateString();
+    badge.title = 'Demo ends '+new Date(trialAccount.expiresAt).toLocaleDateString();
     if(_trialExpiryTimer) clearInterval(_trialExpiryTimer);
     _trialExpiryTimer = setInterval(()=>{
       if(Date.now() >= trialAccount.expiresAt){
@@ -3886,7 +3886,7 @@ function _startSession(user, trialAccount){
         _trialExpiryTimer = null;
         logoutUser();
         const errEl = G('login-err');
-        if(errEl) errEl.textContent='✘ Your one-month trial has ended';
+        if(errEl) errEl.textContent='✘ Your demo has ended';
       }
     }, 60000);
   }
@@ -3933,7 +3933,7 @@ async function doSignup(){
   try {
     localStorage.setItem(_TRIAL_USERS_KEY, JSON.stringify(users));
   } catch(e){
-    if(errEl) errEl.textContent='✘ Could not save the trial account in this browser';
+    if(errEl) errEl.textContent='✘ Could not save the demo account in this browser';
     return;
   }
   if(errEl) errEl.textContent='';
