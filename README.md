@@ -4,7 +4,7 @@
 1. Double-click **START_PING_SERVER.bat** — keep terminal open
 2. Double-click **launch-edge.bat** — opens Edge in fullscreen using a regular profile
 3. Login with: `admin` / `Admin@NetOps26` (or `user` / `User@NetOps26`)
-4. New users can enter a username and password on the login screen and select **DEMO**
+4. Select **DEMO** on the login screen to start a three-day demo without credentials
 
 ## Files
 - `index.html` — full single-file application
@@ -20,8 +20,8 @@
 
 **Change passwords:** Login as admin → click ADMIN badge in topbar → Admin Settings panel
 
-## One-Month Demo
-New users can create a demo account from the login screen. Demo access expires one calendar month after signup. Demo accounts are stored in the browser's local storage, so expiration is enforced per account in that browser profile; clearing site data can reset it. This is not centralized account or subscription enforcement. Use a regular browser window (not InPrivate/Incognito) to preserve demo access between sessions.
+## Three-Day Demo
+Select **DEMO** to start without a username or password. A transparent, angled DEMO watermark appears while demo access is active. The demo ends three days after its first start in that browser profile; after expiration, the app displays a message that the demo has finished. The start time is stored in local storage, so clearing site data can reset it. This is not centralized account or subscription enforcement. Use a regular browser window (not InPrivate/Incognito) to preserve the demo period between sessions.
 
 ## Features
 - 📡 Asset Monitor — ICMP ping + HTTP reachability + email alerts

@@ -375,13 +375,22 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
   box-shadow:0 0 20px rgba(0,255,157,0.3);
 }
 #login-submit:hover{transform:scale(1.02);box-shadow:0 0 35px rgba(0,255,157,0.55);}
-#trial-submit{
+#demo-submit{
   font-family:'Share Tech Mono',monospace;font-size:0.72rem;letter-spacing:1px;
   text-transform:uppercase;color:rgba(0,255,157,0.85);
   background:rgba(0,255,157,0.06);border:1px solid rgba(0,255,157,0.3);
   border-radius:5px;padding:10px;cursor:pointer;transition:background 0.15s,border-color 0.15s;
 }
-#trial-submit:hover{background:rgba(0,255,157,0.12);border-color:rgba(0,255,157,0.6);}
+#demo-submit:hover{background:rgba(0,255,157,0.12);border-color:rgba(0,255,157,0.6);}
+#demo-watermark{
+  display:none;position:fixed;z-index:900;top:50%;left:50%;width:72vw;height:34vh;
+  align-items:center;justify-content:center;transform:translate(-50%,-50%) rotate(-24deg);
+  color:rgba(0,200,255,0.12);font-family:'Share Tech Mono',monospace;
+  font-size:clamp(5rem,18vw,16rem);font-weight:900;letter-spacing:0.12em;
+  line-height:1;white-space:nowrap;pointer-events:none;user-select:none;
+  text-shadow:0 0 24px rgba(0,200,255,0.08);
+}
+body.demo-mode #demo-watermark{display:flex;}
 #login-err{font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#ff4f6e;min-height:1em;text-align:center;letter-spacing:1px;}
 #login-role-badge{
   font-family:'Share Tech Mono',monospace;font-size:0.62rem;
@@ -662,6 +671,7 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
 </head>
 <body>
 <div id="toast"></div>
+<div id="demo-watermark" aria-hidden="true">DEMO</div>
 
 <!-- ════════════════ SPLASH / LOGIN SCREEN ════════════════ -->
 <div id="splash">
@@ -676,8 +686,8 @@ input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:po
       <input type="text" id="login-user" placeholder="Username" autocomplete="username" onkeydown="if(event.key==='Enter')G('login-pass').focus()">
       <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
       <button id="login-submit" onclick="doLogin()">▶ LOGIN</button>
-      <button id="trial-submit" onclick="doSignup()">DEMO</button>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:rgba(0,200,255,0.45);text-align:center;line-height:1.6;">New users: create a username and password above. Demo access lasts one calendar month on this browser.</div>
+      <button id="demo-submit" onclick="startDemo()">DEMO</button>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:rgba(0,200,255,0.45);text-align:center;line-height:1.6;">Start a three-day demo without a username or password.</div>
       <div id="login-err"></div>
     </div>
     <div id="splash-credits">© M Kamjo 2026</div>
@@ -3586,7 +3596,9 @@ let lockEntry = '';
 function logoutUser(){
   // Clear session, show login splash
   _currentRole = null;
-  if(_trialExpiryTimer){ clearInterval(_trialExpiryTimer); _trialExpiryTimer = null; }
+  if(_demoExpiryTimer){ clearTimeout(_demoExpiryTimer); _demoExpiryTimer = null; }
+  _demoExpiresAt = null;
+  document.body.classList.remove('demo-mode');
   // Remove role badge from topbar
   const badge = document.getElementById('login-role-badge');
   if(badge) badge.remove();
@@ -3809,9 +3821,11 @@ function initSlog(){
 // Admin: admin / Admin@NetOps26
 // User:  user  / User@NetOps26
 const _LOGIN_KEY = 'netops_creds_v1';
-const _TRIAL_USERS_KEY = 'netops_trial_users_v1';
+const _DEMO_START_KEY = 'netops_demo_started_at_v1';
+const _DEMO_DURATION_MS = 3 * 24 * 60 * 60 * 1000;
 let _currentRole = null;
-let _trialExpiryTimer = null;
+let _demoExpiryTimer = null;
+let _demoExpiresAt = null;
 
 async function _sha1(str){
   const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str));
@@ -3820,13 +3834,6 @@ async function _sha1(str){
 
 function _loadCreds(){
   try { return JSON.parse(localStorage.getItem(_LOGIN_KEY))||{}; } catch(e){ return {}; }
-}
-
-function _loadTrialUsers(){
-  try {
-    const users = JSON.parse(localStorage.getItem(_TRIAL_USERS_KEY)||'{}');
-    return users && typeof users === 'object' && !Array.isArray(users) ? users : {};
-  } catch(e){ return {}; }
 }
 
 async function _defaultHash(pw){ return await _sha1(pw + 'netops_salt_mk26'); }
@@ -3845,17 +3852,13 @@ async function doLogin(){
   const errEl = G('login-err');
   if(!user||!pass){ if(errEl) errEl.textContent='Enter username and password'; return; }
   const isDefaultUser = user === 'admin' || user === 'user';
-  const trialAccount = isDefaultUser ? null : _loadTrialUsers()[user];
-  if(!isDefaultUser && !trialAccount){
-    if(errEl) errEl.textContent='✘ Unknown user. Create a demo account to get started.'; return;
-  }
-  if(trialAccount && (!Number.isFinite(trialAccount.expiresAt) || Date.now() >= trialAccount.expiresAt)){
-    if(errEl) errEl.textContent='✘ This demo has expired'; return;
+  if(!isDefaultUser){
+    if(errEl) errEl.textContent='✘ Unknown user. Start a Demo without credentials.'; return;
   }
   const inputHash = await _sha1(pass + 'netops_salt_mk26');
-  const storedHash = isDefaultUser ? await _getHash(user) : trialAccount.passwordHash;
+  const storedHash = await _getHash(user);
   if(inputHash === storedHash){
-    _startSession(user, trialAccount);
+    _startSession(user);
     if(errEl) errEl.textContent='';
   } else {
     if(errEl){
@@ -3866,29 +3869,23 @@ async function doLogin(){
   }
 }
 
-function _startSession(user, trialAccount){
+function _startSession(user, demoSession){
   _currentRole = user;
+  if(_demoExpiryTimer){ clearTimeout(_demoExpiryTimer); _demoExpiryTimer = null; }
+  document.body.classList.toggle('demo-mode', user === 'demo');
   const badge = document.createElement('span');
   badge.id = 'login-role-badge';
   badge.className = 'login-role-badge';
   badge.style.cssText = 'font-family:var(--mono);font-size:0.6rem;padding:2px 8px;border-radius:3px;background:rgba(0,255,157,0.1);border:1px solid rgba(0,255,157,0.2);color:rgba(0,255,157,0.8);letter-spacing:1px;text-transform:uppercase;flex-shrink:0;';
-  badge.textContent = user === 'admin' ? '⚙ ADMIN' : trialAccount ? 'DEMO' : '👤 USER';
+  badge.textContent = user === 'admin' ? '⚙ ADMIN' : user === 'demo' ? 'DEMO' : '👤 USER';
   if(user === 'admin'){
     badge.style.cursor = 'pointer';
     badge.title = 'Open admin settings';
     badge.onclick = ()=>G('admin-panel').classList.add('open');
-  } else if(trialAccount){
-    badge.title = 'Demo ends '+new Date(trialAccount.expiresAt).toLocaleDateString();
-    if(_trialExpiryTimer) clearInterval(_trialExpiryTimer);
-    _trialExpiryTimer = setInterval(()=>{
-      if(Date.now() >= trialAccount.expiresAt){
-        clearInterval(_trialExpiryTimer);
-        _trialExpiryTimer = null;
-        logoutUser();
-        const errEl = G('login-err');
-        if(errEl) errEl.textContent='✘ Your demo has ended';
-      }
-    }, 60000);
+  } else if(user === 'demo' && demoSession){
+    _demoExpiresAt = demoSession.expiresAt;
+    badge.title = 'Demo ends '+new Date(_demoExpiresAt).toLocaleString();
+    _demoExpiryTimer = setTimeout(_checkDemoExpiry, Math.max(0, _demoExpiresAt - Date.now()));
   }
   const topbar = G('topbar');
   if(topbar){
@@ -3899,46 +3896,44 @@ function _startSession(user, trialAccount){
   launchApp();
 }
 
-async function doSignup(){
-  const user = (G('login-user')?.value||'').trim().toLowerCase();
-  const pass = G('login-pass')?.value||'';
+function startDemo(){
   const errEl = G('login-err');
-  if(!/^[a-z0-9._-]{3,32}$/.test(user)){
-    if(errEl) errEl.textContent='Use a username of 3-32 letters, numbers, dots, _ or -'; return;
-  }
-  if(user === 'admin' || user === 'user'){
-    if(errEl) errEl.textContent='✘ That username is reserved'; return;
-  }
-  if(pass.length < 8){
-    if(errEl) errEl.textContent='Use a password with at least 8 characters'; return;
-  }
-  const users = _loadTrialUsers();
-  if(users[user]){
-    if(errEl) errEl.textContent='✘ That username already has an account'; return;
-  }
-  const createdAt = Date.now();
-  const nextMonth = new Date(createdAt);
-  const day = nextMonth.getUTCDate();
-  const targetMonth = nextMonth.getUTCMonth()+1;
-  const lastDay = new Date(Date.UTC(nextMonth.getUTCFullYear(), targetMonth+1, 0)).getUTCDate();
-  nextMonth.setUTCDate(1);
-  nextMonth.setUTCMonth(targetMonth);
-  nextMonth.setUTCDate(Math.min(day, lastDay));
-  const account = {
-    passwordHash: await _sha1(pass + 'netops_salt_mk26'),
-    createdAt,
-    expiresAt: nextMonth.getTime()
-  };
-  users[user] = account;
+  let createdAt;
   try {
-    localStorage.setItem(_TRIAL_USERS_KEY, JSON.stringify(users));
+    const savedStart = localStorage.getItem(_DEMO_START_KEY);
+    if(savedStart === null){
+      createdAt = Date.now();
+      localStorage.setItem(_DEMO_START_KEY, String(createdAt));
+    } else {
+      createdAt = Number(savedStart);
+    }
   } catch(e){
-    if(errEl) errEl.textContent='✘ Could not save the demo account in this browser';
+    if(errEl) errEl.textContent='✘ Could not save the demo period in this browser';
+    return;
+  }
+  if(!Number.isFinite(createdAt) || createdAt <= 0 || createdAt > Date.now()){
+    if(errEl) errEl.textContent='✘ Demo period could not be verified';
+    return;
+  }
+  const session = {createdAt, expiresAt:createdAt + _DEMO_DURATION_MS};
+  if(Date.now() >= session.expiresAt){
+    if(errEl) errEl.textContent='Demo version has finished. Create a username and password to continue.';
     return;
   }
   if(errEl) errEl.textContent='';
-  _startSession(user, account);
+  _startSession('demo', session);
 }
+
+function _checkDemoExpiry(){
+  if(_currentRole !== 'demo' || _demoExpiresAt === null || Date.now() < _demoExpiresAt) return;
+  if(_demoExpiryTimer){ clearTimeout(_demoExpiryTimer); _demoExpiryTimer = null; }
+  logoutUser();
+  const errEl = G('login-err');
+  if(errEl) errEl.textContent='Demo version has finished. Create a username and password to continue.';
+  toast('Demo version has finished');
+}
+window.addEventListener('focus', _checkDemoExpiry);
+document.addEventListener('visibilitychange', _checkDemoExpiry);
 
 async function adminSavePW(role){
   const val = G('adm-'+role+'-pw')?.value.trim();
