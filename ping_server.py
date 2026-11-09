@@ -6,8 +6,8 @@ Run: python ping_server.py  (or double-click START_PING_SERVER.bat)
 Then open: http://localhost:5199
 """
 
-import subprocess, json, platform, threading, smtplib, os, mimetypes
-from http.server import HTTPServer, BaseHTTPRequestHandler
+import subprocess, json, platform, threading, smtplib, os, mimetypes, time
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -19,6 +19,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CFG_FILE = os.path.join(BASE_DIR, 'email_config.json')
 
 email_cfg = {"from_email":"","app_password":"","to_emails":[]}
+PRESENCE_TTL_SECONDS = 35
+presence_sessions = {}
+presence_lock = threading.Lock()
 
 def load_email_cfg():
     global email_cfg
@@ -262,6 +265,21 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as e:
                 self._json({'ok':False,'output':'','error':str(e)})
 
+        elif p.path == '/presence':
+            session_id = qs.get('id',[''])[0]
+            if not session_id or len(session_id) > 128:
+                self.send_response(400); self._cors(); self.end_headers(); return
+            now = time.monotonic()
+            with presence_lock:
+                stale = [sid for sid,seen in presence_sessions.items() if now-seen > PRESENCE_TTL_SECONDS]
+                for sid in stale: presence_sessions.pop(sid,None)
+                if qs.get('leave',['0'])[0] == '1':
+                    presence_sessions.pop(session_id,None)
+                else:
+                    presence_sessions[session_id] = now
+                count = len(presence_sessions)
+            self._json({'count':count})
+
         elif p.path == '/status':
             self._json({'status':'ok','port':PORT,'os':platform.system(),
                         'email_configured':bool(email_cfg.get('from_email') and email_cfg.get('app_password'))})
@@ -314,7 +332,7 @@ def main():
     r = ping('127.0.0.1',count=1,timeout=1)
     print(f'  Ping test: {"✓ OK ("+str(r["ms"])+"ms)" if r["online"] else "✗ FAILED — try Run as Administrator"}\n')
 
-    server = HTTPServer(('127.0.0.1',PORT),Handler)
+    server = ThreadingHTTPServer(('127.0.0.1',PORT),Handler)
     try: server.serve_forever()
     except KeyboardInterrupt: print('\n  Stopped.'); server.server_close()
 

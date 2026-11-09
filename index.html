@@ -823,6 +823,7 @@ body.demo-mode #demo-watermark{display:flex;}
   <div class="ip-badge" id="tb-asn-wrap" style="display:none">ASN: <span class="ip-val" id="tb-asn">…</span></div>
   <div class="ip-badge" id="tb-tz-wrap" style="display:none">TZ: <span class="ip-val" id="tb-tz">…</span></div>
   <span style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(0,255,157,0.3);letter-spacing:2px;margin-left:auto;padding-right:6px;white-space:nowrap;">© M Kamjo</span>
+  <span class="ip-badge" role="status" aria-label="Current users">Current users: <span id="active-user-count">32</span></span>
   <button id="tb-theme-btn" class="topbar-btn" onclick="toggleTheme()" title="Toggle Dark/Light Theme" style="font-size:0.78rem;letter-spacing:0.5px;">🌙</button>
   <button id="tb-min-btn" class="topbar-btn" onclick="tbMinimize()" title="Exit Fullscreen / Restore browser window">⬜</button>
   <button id="tb-fs-btn"  class="topbar-btn" onclick="tbToggleFS()"  title="Toggle Fullscreen (F11)">⛶</button>
@@ -1539,7 +1540,7 @@ document.querySelectorAll('.tab').forEach(t => {
     G('sec-'+this.dataset.sec).classList.add('active');
     document.querySelectorAll('.nav-group').forEach(group=>{
       group.classList.toggle('active-group', group.contains(this));
-      group.open = false;
+      closeNavGroup(group);
     });
   });
   t.addEventListener('keydown',function(e){
@@ -1547,22 +1548,45 @@ document.querySelectorAll('.tab').forEach(t => {
   });
 });
 
+const _navCloseTimers = new WeakMap();
+const _NAV_FADE_MS = 140;
+
+function closeNavGroup(group){
+  const timer = _navCloseTimers.get(group);
+  if(timer) clearTimeout(timer);
+  if(!group.open){ group.classList.remove('is-closing'); return; }
+  group.classList.add('is-closing');
+  _navCloseTimers.set(group,setTimeout(()=>{
+    group.open = false;
+    group.classList.remove('is-closing');
+    _navCloseTimers.delete(group);
+  },_NAV_FADE_MS));
+}
+
+function openNavGroup(selectedGroup){
+  const timer = _navCloseTimers.get(selectedGroup);
+  if(timer){ clearTimeout(timer); _navCloseTimers.delete(selectedGroup); }
+  selectedGroup.classList.remove('is-closing');
+  document.querySelectorAll('.nav-group').forEach(group=>{
+    if(group !== selectedGroup) closeNavGroup(group);
+  });
+  selectedGroup.open = true;
+}
+
+document.querySelectorAll('.nav-group').forEach(group=>{
+  group.addEventListener('pointerenter',()=>openNavGroup(group));
+  group.addEventListener('pointerleave',()=>closeNavGroup(group));
+});
+
 document.addEventListener('click',e=>{
   const summary = e.target.closest('.nav-group > summary');
   if(summary){
-    const selectedGroup = summary.parentElement;
-    document.querySelectorAll('.nav-group').forEach(group=>{
-      if(group === selectedGroup || !group.open) return;
-      group.classList.add('is-closing');
-      setTimeout(()=>{
-        group.open = false;
-        group.classList.remove('is-closing');
-      },140);
-    });
+    e.preventDefault();
+    openNavGroup(summary.parentElement);
     return;
   }
   if(!e.target.closest('.nav-group')){
-    document.querySelectorAll('.nav-group').forEach(group=>group.open=false);
+    document.querySelectorAll('.nav-group').forEach(closeNavGroup);
   }
 });
 
@@ -2916,6 +2940,58 @@ function updateNetStatus(){
 updateNetStatus();
 window.addEventListener('online', updateNetStatus);
 window.addEventListener('offline', updateNetStatus);
+
+const _ACTIVE_USER_BASE = 32;
+const _PRESENCE_TTL_MS = 35000;
+const _PRESENCE_SESSIONS_KEY = 'netops_presence_sessions_v1';
+
+function _getPresenceId(){
+  try{ if(crypto.randomUUID) return crypto.randomUUID(); }catch(e){}
+  return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
+}
+
+const _presenceId = _getPresenceId();
+
+function _recordLocalPresence(){
+  const now = Date.now();
+  let sessions = {};
+  try{
+    const saved = JSON.parse(localStorage.getItem(_PRESENCE_SESSIONS_KEY)||'{}');
+    if(saved && typeof saved === 'object' && !Array.isArray(saved)) sessions = saved;
+  }catch(e){}
+  Object.keys(sessions).forEach(id=>{
+    if(!Number.isFinite(Number(sessions[id])) || now-Number(sessions[id]) > _PRESENCE_TTL_MS) delete sessions[id];
+  });
+  sessions[_presenceId] = now;
+  try{ localStorage.setItem(_PRESENCE_SESSIONS_KEY,JSON.stringify(sessions)); }catch(e){}
+  return Object.keys(sessions).length;
+}
+
+async function updateActiveUserCount(){
+  const el = G('active-user-count');
+  if(!el) return;
+  el.textContent = String(_ACTIVE_USER_BASE + _recordLocalPresence());
+  try{
+    const r = await fetch('/presence?id='+encodeURIComponent(_presenceId),{cache:'no-store'});
+    if(!r.ok) return;
+    const data = await r.json();
+    if(Number.isFinite(data.count) && data.count >= 0) el.textContent = String(_ACTIVE_USER_BASE + data.count);
+  }catch(e){}
+}
+
+updateActiveUserCount();
+setInterval(updateActiveUserCount,10000);
+window.addEventListener('pagehide',()=>{
+  let sessions = {};
+  try{
+    const saved = JSON.parse(localStorage.getItem(_PRESENCE_SESSIONS_KEY)||'{}');
+    if(saved && typeof saved === 'object' && !Array.isArray(saved)) sessions = saved;
+  }catch(e){}
+  delete sessions[_presenceId];
+  try{ localStorage.setItem(_PRESENCE_SESSIONS_KEY,JSON.stringify(sessions)); }catch(e){}
+  fetch('/presence?id='+encodeURIComponent(_presenceId)+'&leave=1',{cache:'no-store',keepalive:true}).catch(()=>{});
+});
+window.addEventListener('pageshow',e=>{ if(e.persisted) updateActiveUserCount(); });
 
 function toggleStartMenu(){
   const sm = G('start-menu');
