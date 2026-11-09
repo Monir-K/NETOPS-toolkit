@@ -148,7 +148,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   max-width:min(270px,calc(100vw - 24px));
   padding:6px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;
   box-shadow:0 12px 30px rgba(0,0,0,0.4);
+  opacity:1;transform:translateY(0);transition:opacity 0.14s ease,transform 0.14s ease;
 }
+.nav-group.is-closing .nav-menu{opacity:0;transform:translateY(-4px);pointer-events:none;}
 .nav-menu .tab{margin:2px 0;}
 .nav-group:last-child .nav-menu{left:auto;right:0;}
 
@@ -1546,6 +1548,19 @@ document.querySelectorAll('.tab').forEach(t => {
 });
 
 document.addEventListener('click',e=>{
+  const summary = e.target.closest('.nav-group > summary');
+  if(summary){
+    const selectedGroup = summary.parentElement;
+    document.querySelectorAll('.nav-group').forEach(group=>{
+      if(group === selectedGroup || !group.open) return;
+      group.classList.add('is-closing');
+      setTimeout(()=>{
+        group.open = false;
+        group.classList.remove('is-closing');
+      },140);
+    });
+    return;
+  }
   if(!e.target.closest('.nav-group')){
     document.querySelectorAll('.nav-group').forEach(group=>group.open=false);
   }
